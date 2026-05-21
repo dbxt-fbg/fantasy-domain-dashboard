@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project: Fantasy</title>
+    <link rel="stylesheet" href="assets/dashboard.css">
+    <script src="assets/dashboard.js" defer></script>
+    <style>
+        /* Page-specific overrides only — shared styles live in assets/dashboard.css */
+    </style>
+    <!-- Interactive handlers (toggleAccordion, sortTable, etc.) live in assets/dashboard.js -->
+</head>
+<body class="page-project">
+    <div class="container">
+        
+        <header>
+            <h1>🎯 Project: Fantasy</h1>
+            <div class="subtitle">Launch roadmap • Generated May 21, 2026 at 11:15</div>
+        </header>
+        <nav class="top-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="active">Project: Fantasy</a></li>
+                <li class="nav-item"><a href="team_members_dashboard.html">Team Members</a></li>
+                <li class="nav-item"><a href="logs_dashboard.html">Agents and Logs</a></li>
+            </ul>
+        </nav>
+        <nav class="sub-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="team_dashboard.html#team-metrics">Stories</a></li>
+                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="epics_dashboard.html">Epics</a></li>
+                <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
+                <li class="nav-item"><a href="hygiene_dashboard.html">Ticket Hygiene</a></li>
+                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
+                <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
+                <li class="nav-item"><a href="dependencies.html">Dependencies</a></li>
+                <li class="nav-item"><a href="mbr.html">MBR</a></li>
+            </ul>
+        </nav>
+        <div class="content">
+            <div class="intro-banner">
+                <p>Major deliverables for the Fantasy launch. Dates labelled with "~" are approximate (originally specified as a quarter or year).</p>
+            </div>
+
+            <!-- Timeline chart -->
+            <div class="section">
+                <div class="chart-container">
+                    <div class="chart-title">📅 Deliverable Timeline</div>
+                    <div class="roadmap-svg-wrap">
+                        <svg viewBox="0 0 1100 300" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 320px; display: block;">
+                            <line x1="140.8" y1="183.0" x2="140.8" y2="195.0" stroke="#475569" stroke-width="1" /><text x="140.8" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Jun</text><line x1="261.7" y1="183.0" x2="261.7" y2="195.0" stroke="#475569" stroke-width="1" /><text x="261.7" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Jul</text><line x1="386.7" y1="183.0" x2="386.7" y2="195.0" stroke="#475569" stroke-width="1" /><text x="386.7" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Aug</text><line x1="511.7" y1="183.0" x2="511.7" y2="195.0" stroke="#475569" stroke-width="1" /><text x="511.7" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Sep</text><line x1="632.6" y1="183.0" x2="632.6" y2="195.0" stroke="#475569" stroke-width="1" /><text x="632.6" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Oct</text><line x1="757.6" y1="183.0" x2="757.6" y2="195.0" stroke="#475569" stroke-width="1" /><text x="757.6" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Nov</text><line x1="878.6" y1="183.0" x2="878.6" y2="195.0" stroke="#475569" stroke-width="1" /><text x="878.6" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Dec</text><line x1="1003.6" y1="183.0" x2="1003.6" y2="195.0" stroke="#475569" stroke-width="1" /><text x="1003.6" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Jan 2027</text>
+                            <line x1="40" y1="189.0" x2="1060" y2="189.0" stroke="#475569" stroke-width="3" /><line x1="40" y1="189.0" x2="96.4" y2="189.0" stroke="#6366f1" stroke-width="3" />
+                            <line x1="257.7" y1="88" x2="257.7" y2="189.0" stroke="#6366f1" stroke-width="2"  /><circle cx="257.7" cy="189.0" r="5" fill="#6366f1" stroke="#1e293b" stroke-width="2" /><text x="257.7" y="82" text-anchor="middle" fill="#6366f1" font-size="11" font-weight="600">Alpha (internal build)</text><text x="257.7" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">Jun 30, 2026</text><line x1="318.2" y1="106" x2="318.2" y2="189.0" stroke="#3b82f6" stroke-width="2"  /><circle cx="318.2" cy="189.0" r="5" fill="#3b82f6" stroke="#1e293b" stroke-width="2" /><text x="318.2" y="100" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="600">Fanatics Fest (internal build)</text><text x="318.2" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">Jul 15, 2026</text><line x1="431.1" y1="124" x2="431.1" y2="189.0" stroke="#10b981" stroke-width="2"  /><circle cx="431.1" cy="189.0" r="5" fill="#10b981" stroke="#1e293b" stroke-width="2" /><text x="431.1" y="118" text-anchor="middle" fill="#10b981" font-size="11" font-weight="600">Beta (external, friends & family)</text><text x="431.1" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">Aug 12, 2026</text><line x1="544.0" y1="88" x2="544.0" y2="189.0" stroke="#f59e0b" stroke-width="2"  /><circle cx="544.0" cy="189.0" r="5" fill="#f59e0b" stroke="#1e293b" stroke-width="2" /><text x="544.0" y="82" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="600">Install-base activation</text><text x="544.0" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">Sep 9, 2026</text><line x1="632.6" y1="106" x2="632.6" y2="189.0" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3" /><circle cx="632.6" cy="189.0" r="5" fill="#ef4444" stroke="#1e293b" stroke-width="2" /><text x="632.6" y="100" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="600">Net-new customer acquisition</text><text x="632.6" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">~Q4 2026</text><line x1="1003.6" y1="124" x2="1003.6" y2="189.0" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,3" /><circle cx="1003.6" cy="189.0" r="5" fill="#8b5cf6" stroke="#1e293b" stroke-width="2" /><text x="1003.6" y="118" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="600">Marketing push</text><text x="1003.6" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">~2027</text>
+                            <line x1="96.4" y1="70" x2="96.4" y2="240" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.8" /><text x="96.4" y="280" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="600">Today · May 21, 2026</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deliverables table -->
+            <div class="section">
+                <h2 class="section-title">📋 Phases</h2>
+                <table class="roadmap-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 26%;">Phase</th>
+                            <th>Description</th>
+                            <th style="width: 15%; text-align: right;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    
+                        <tr>
+                            <td><strong>Alpha (internal build)</strong></td>
+                            <td>Focus on core functionality to access app, make picks, enter contests, and settle picks</td>
+                            <td style="text-align: right;">
+                                <div>Jun 30, 2026</div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 40d</span></div>
+                            </td>
+                        </tr>
+        
+                        <tr>
+                            <td><strong>Fanatics Fest (internal build)</strong></td>
+                            <td>Additional functionality and some polish to show users at Fanatics Fest</td>
+                            <td style="text-align: right;">
+                                <div>Jul 15, 2026</div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 55d</span></div>
+                            </td>
+                        </tr>
+        
+                        <tr>
+                            <td><strong>Beta (external, friends & family)</strong></td>
+                            <td>Account and pick-level functionality needed to put app in hands of real users for real testing</td>
+                            <td style="text-align: right;">
+                                <div>Aug 12, 2026</div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 83d</span></div>
+                            </td>
+                        </tr>
+        
+                        <tr>
+                            <td><strong>Install-base activation</strong></td>
+                            <td>Customer-ready app, with focus on functionality needed to activate existing FBG users</td>
+                            <td style="text-align: right;">
+                                <div>Sep 9, 2026</div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 111d</span></div>
+                            </td>
+                        </tr>
+        
+                        <tr>
+                            <td><strong>Net-new customer acquisition</strong></td>
+                            <td>Additional functionality needed to start acquiring net new DFS-first users</td>
+                            <td style="text-align: right;">
+                                <div>~Q4 2026</div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 133d</span></div>
+                            </td>
+                        </tr>
+        
+                        <tr>
+                            <td><strong>Marketing push</strong></td>
+                            <td></td>
+                            <td style="text-align: right;">
+                                <div>~2027</div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 225d</span></div>
+                            </td>
+                        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+    
+            <div class="section">
+                <h2 class="section-title">🎯 Vision</h2>
+                <div class="intro-banner">
+                    <p style="font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">
+                        <a href="https://betfanatics.atlassian.net/browse/INIT-185" target="_blank" style="color: var(--accent-text); text-decoration: none;">INIT-185</a>
+                        — Project Final Fantasy
+                        <span class="badge" style="background: var(--bg-hover); color: var(--text-secondary); margin-left: 8px;">In Progress</span>
+                    </p>
+                    <div class="vision-body"><p style="color: var(--text-secondary); margin-bottom: 10px;">DFS+ will be built as the most approachable, confidence-building, and fun entry point into the Fanatics ecosystem — a low-friction, games-first experience where casual fans learn, return, and gradually deepen their relationship with sports and Fanatics. Over the next 18–24 months, this initiative will:</p><p style="color: var(--text-secondary); margin-bottom: 10px;">• Make DFS+ the product fans “learn on,” with experiences that adapt as users gain confidence so repeat play feels easier, smarter, and more rewarding.<br>• Shift engagement from event-driven spikes to habitual, routine play (e.g., part of a weekly sports rhythm), with resilient cohorts that persist well beyond major events.<br>• Use generosity (promos, rewards, DI) in a disciplined, EV-modeled way: helping users overcome the learning curve and build habits early, then evolving into more targeted, loyalty-oriented rewards as the product itself drives stickiness.<br>• Position DFS+ as a durable, standalone product that serves as a trusted top-of-funnel on-ramp into Markets and Sportsbook, introducing those products in simple, highly engaging ways without overwhelming cross-sell or cannibalization.<br>• Compete primarily on product quality — clarity, feedback, progression, and social/fun —…</p></div>
+                    <p style="margin-top: 12px; font-size: 11px; color: var(--text-faint);">Snapshot generated May 21, 2026 at 10:00</p>
+                </div>
+            </div>
+    
+            <div class="section">
+                <h2 class="section-title">📊 Work Rollup</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card info">
+                        <div class="metric-label">Features</div>
+                        <div class="metric-value">50</div>
+                        <div class="metric-subtext">1 done · 28 in flight · 16 discovery · 5 dropped</div>
+                        <div class="status-bar"><div class="status-bar-seg" style="width: 2.0%; background: var(--success);" title="Done: 1 (2%)"></div><div class="status-bar-seg" style="width: 56.0%; background: var(--info);" title="In Flight: 28 (56%)"></div><div class="status-bar-seg" style="width: 32.0%; background: var(--text-muted);" title="Discovery: 16 (32%)"></div><div class="status-bar-seg" style="width: 10.0%; background: var(--danger);" title="Dropped: 5 (10%)"></div></div>
+                    </div>
+                    <div class="metric-card info">
+                        <div class="metric-label">Epics</div>
+                        <div class="metric-value">100</div>
+                        <div class="metric-subtext">15 done · 28 in flight · 45 discovery · 12 dropped</div>
+                        <div class="status-bar"><div class="status-bar-seg" style="width: 15.0%; background: var(--success);" title="Done: 15 (15%)"></div><div class="status-bar-seg" style="width: 28.0%; background: var(--info);" title="In Flight: 28 (28%)"></div><div class="status-bar-seg" style="width: 45.0%; background: var(--text-muted);" title="Discovery: 45 (45%)"></div><div class="status-bar-seg" style="width: 12.0%; background: var(--danger);" title="Dropped: 12 (12%)"></div></div>
+                    </div>
+                    <div class="metric-card info">
+                        <div class="metric-label">Stories</div>
+                        <div class="metric-value">192</div>
+                        <div class="metric-subtext">102 done · 19 in flight · 53 discovery · 9 dropped</div>
+                        <div class="status-bar"><div class="status-bar-seg" style="width: 53.1%; background: var(--success);" title="Done: 102 (53%)"></div><div class="status-bar-seg" style="width: 9.9%; background: var(--info);" title="In Flight: 19 (10%)"></div><div class="status-bar-seg" style="width: 27.6%; background: var(--text-muted);" title="Discovery: 53 (28%)"></div><div class="status-bar-seg" style="width: 4.7%; background: var(--danger);" title="Dropped: 9 (5%)"></div><div class="status-bar-seg" style="width: 4.7%; background: var(--text-faint);" title="Other: 9 (5%)"></div></div>
+                    </div>
+                    <div class="metric-card danger">
+                        <div class="metric-label">Features At Risk</div>
+                        <div class="metric-value">29</div>
+                        <div class="metric-subtext">flagged in snapshot</div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="section">
+                <h2 class="section-title">🎯 By Target Milestone</h2>
+                <div class="release-group-list">
+                    
+                    <details class="release-group" open>
+                        <summary class="release-group-summary">
+                            <span class="release-group-caret">▸</span>
+                            <span class="release-badge">30. Milestone 30 - 04.29.26 - 06.23.26</span>
+                            <span class="release-group-counts">
+                                <strong>25</strong> features
+                                · 1 done · 20 in flight · 4 discovery
+                            </span>
+                            <span class="release-group-pct">4%</span>
+                        </summary>
+                        <div class="release-group-body">
+                            <div class="status-bar"><div class="status-bar-seg" style="width: 4.0%; background: var(--success);" title="Done: 1 (4%)"></div><div class="status-bar-seg" style="width: 80.0%; background: var(--info);" title="In Flight: 20 (80%)"></div><div class="status-bar-seg" style="width: 16.0%; background: var(--text-muted);" title="Discovery: 4 (16%)"></div></div>
+                            <table class="release-group-table">
+                                <thead>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Summary</th>
+                                        <th>Status</th>
+                                        <th>Owner</th>
+                                        <th style="text-align: right;">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8148" target="_blank" class="ticket-key">FEAT-8148</a></td>
+                                    <td>[BE] DFS:  Backend Foundations</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8149" target="_blank" class="ticket-key">FEAT-8149</a></td>
+                                    <td>DFS: Frontend Foundations</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8216" target="_blank" class="ticket-key">FEAT-8216</a></td>
+                                    <td>[CAT] DFS: Universal Balance (Unified Wallet)</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8217" target="_blank" class="ticket-key">FEAT-8217</a></td>
+                                    <td>[CAT] DFS: Payments MVP  - Payment Methods (Deposit+Withdrawals)</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8500" target="_blank" class="ticket-key">FEAT-8500</a></td>
+                                    <td>[FE] DFS: Onboarding</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8509" target="_blank" class="ticket-key">FEAT-8509</a></td>
+                                    <td>[CAT] DFS: RG Limits &amp; Entry Limits </td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td>Lea King</td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8511" target="_blank" class="ticket-key">FEAT-8511</a></td>
+                                    <td>[CAT] DFS: Geolocation Support </td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td>Lea King</td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8554" target="_blank" class="ticket-key">FEAT-8554</a></td>
+                                    <td>[OF] DFS: Trading Engineering/Product Requirements [Alpha]</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td>John Groves</td>
+                                    <td data-sort="6" style="text-align: right; color: var(--text-muted); font-size: 12px;">6d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8570" target="_blank" class="ticket-key">FEAT-8570</a></td>
+                                    <td>DFS: Contest Management</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8811" target="_blank" class="ticket-key">FEAT-8811</a></td>
+                                    <td>DFS: Profit Boost</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8815" target="_blank" class="ticket-key">FEAT-8815</a></td>
+                                    <td>DFS: UMB</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8846" target="_blank" class="ticket-key">FEAT-8846</a></td>
+                                    <td>DFS: Contest Entry</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="5" style="text-align: right; color: var(--text-muted); font-size: 12px;">5d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8847" target="_blank" class="ticket-key">FEAT-8847</a></td>
+                                    <td>DFS: Contest Settlement &amp; Leaderboard</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8850" target="_blank" class="ticket-key">FEAT-8850</a></td>
+                                    <td>DFS: Homepage</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8851" target="_blank" class="ticket-key">FEAT-8851</a></td>
+                                    <td>DFS: Player Card (single market)</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8867" target="_blank" class="ticket-key">FEAT-8867</a></td>
+                                    <td>DFS: Pickslip</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8868" target="_blank" class="ticket-key">FEAT-8868</a></td>
+                                    <td>DFS: My Picks</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8879" target="_blank" class="ticket-key">FEAT-8879</a></td>
+                                    <td>DFS: League Pages</td>
+                                    <td><span style="color: var(--info-text);">Engineering Unpacking</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8905" target="_blank" class="ticket-key">FEAT-8905</a></td>
+                                    <td>DFS: Fast Lane Compliance for Backend Services</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="7" style="text-align: right; color: var(--text-muted); font-size: 12px;">7d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8906" target="_blank" class="ticket-key">FEAT-8906</a></td>
+                                    <td>DFS: Quality Work for Alpha</td>
+                                    <td><span style="color: var(--info-text);">Committed</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="7" style="text-align: right; color: var(--text-muted); font-size: 12px;">7d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8556" target="_blank" class="ticket-key">FEAT-8556</a></td>
+                                    <td>[FE] DFS: Foundations</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8853" target="_blank" class="ticket-key">FEAT-8853</a></td>
+                                    <td>DFS: Event Page</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8873" target="_blank" class="ticket-key">FEAT-8873</a></td>
+                                    <td>[OF] DFS: Trading Engineering/Product Requirements [Post MVP Launch]</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8902" target="_blank" class="ticket-key">FEAT-8902</a></td>
+                                    <td>[OF] DFS: Trading Engineering/Product Requirements [Beta]</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td>John Groves</td>
+                                    <td data-sort="6" style="text-align: right; color: var(--text-muted); font-size: 12px;">6d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8812" target="_blank" class="ticket-key">FEAT-8812</a></td>
+                                    <td>DFS: API gRPC</td>
+                                    <td><span style="color: var(--success-text);">Released</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                                </tr>
+                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+                
+                    <details class="release-group">
+                        <summary class="release-group-summary">
+                            <span class="release-group-caret">▸</span>
+                            <span class="release-badge">31. Milestone 31 - 06.24.26 - 08.18.26</span>
+                            <span class="release-group-counts">
+                                <strong>12</strong> features
+                                · 0 done · 7 in flight · 5 discovery
+                            </span>
+                            <span class="release-group-pct">0%</span>
+                        </summary>
+                        <div class="release-group-body">
+                            <div class="status-bar"><div class="status-bar-seg" style="width: 58.3%; background: var(--info);" title="In Flight: 7 (58%)"></div><div class="status-bar-seg" style="width: 41.7%; background: var(--text-muted);" title="Discovery: 5 (42%)"></div></div>
+                            <table class="release-group-table">
+                                <thead>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Summary</th>
+                                        <th>Status</th>
+                                        <th>Owner</th>
+                                        <th style="text-align: right;">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8506" target="_blank" class="ticket-key">FEAT-8506</a></td>
+                                    <td>DFS: Acquisition Promotions: Play &amp; Get, RAF, CYO-A</td>
+                                    <td><span style="color: var(--info-text);">Engineering Unpacking</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8507" target="_blank" class="ticket-key">FEAT-8507</a></td>
+                                    <td>DFS: FanCash Earn</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8508" target="_blank" class="ticket-key">FEAT-8508</a></td>
+                                    <td>DFS: FanCash Burn</td>
+                                    <td><span style="color: var(--info-text);">Engineering Unpacking</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8600" target="_blank" class="ticket-key">FEAT-8600</a></td>
+                                    <td>[CAT] App Switcher for Super app Concept </td>
+                                    <td><span style="color: var(--info-text);">Committed</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8605" target="_blank" class="ticket-key">FEAT-8605</a></td>
+                                    <td>DFS: Tooling - Playmaker/NATS/Dolly</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8813" target="_blank" class="ticket-key">FEAT-8813</a></td>
+                                    <td>DFS: Quality and Performance Testing</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8814" target="_blank" class="ticket-key">FEAT-8814</a></td>
+                                    <td>DFS: Permissibility</td>
+                                    <td><span style="color: var(--info-text);">Engineering Unpacking</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-7243" target="_blank" class="ticket-key">FEAT-7243</a></td>
+                                    <td>[CAT] DFS: Eligibility Service Part 1 [to be defined]</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="7" style="text-align: right; color: var(--text-muted); font-size: 12px;">7d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8512" target="_blank" class="ticket-key">FEAT-8512</a></td>
+                                    <td>[CAT] DFS: Tax &amp; Regulatory Reports </td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="9" style="text-align: right; color: var(--text-muted); font-size: 12px;">9d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8852" target="_blank" class="ticket-key">FEAT-8852</a></td>
+                                    <td>DFS: Player Page</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="9" style="text-align: right; color: var(--text-muted); font-size: 12px;">9d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8876" target="_blank" class="ticket-key">FEAT-8876</a></td>
+                                    <td>DFS: FairPlay + Notifications &amp; Badging</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8878" target="_blank" class="ticket-key">FEAT-8878</a></td>
+                                    <td>DFS: Flex Payouts/Contests</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="16" style="text-align: right; color: var(--text-muted); font-size: 12px;">16d ago</td>
+                                </tr>
+                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+                
+                    <details class="release-group">
+                        <summary class="release-group-summary">
+                            <span class="release-group-caret">▸</span>
+                            <span class="release-badge unscheduled">Unassigned</span>
+                            <span class="release-group-counts">
+                                <strong>8</strong> features
+                                · 0 done · 1 in flight · 7 discovery
+                            </span>
+                            <span class="release-group-pct">0%</span>
+                        </summary>
+                        <div class="release-group-body">
+                            <div class="status-bar"><div class="status-bar-seg" style="width: 12.5%; background: var(--info);" title="In Flight: 1 (12%)"></div><div class="status-bar-seg" style="width: 87.5%; background: var(--text-muted);" title="Discovery: 7 (88%)"></div></div>
+                            <table class="release-group-table">
+                                <thead>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Summary</th>
+                                        <th>Status</th>
+                                        <th>Owner</th>
+                                        <th style="text-align: right;">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8256" target="_blank" class="ticket-key">FEAT-8256</a></td>
+                                    <td>[DFS] GRID | Data, Financial and Regulatory Readiness</td>
+                                    <td><span style="color: var(--info-text);">In Progress</span></td>
+                                    <td>Linda Terrell</td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8513" target="_blank" class="ticket-key">FEAT-8513</a></td>
+                                    <td>DFS: Privacy / CCPA </td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="13" style="text-align: right; color: var(--text-muted); font-size: 12px;">13d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8518" target="_blank" class="ticket-key">FEAT-8518</a></td>
+                                    <td>DFS: Retention Promotions: NSTs</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="22" style="text-align: right; color: var(--text-muted); font-size: 12px;">22d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8520" target="_blank" class="ticket-key">FEAT-8520</a></td>
+                                    <td>Daily Engagement Mechanic </td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="28" style="text-align: right; color: var(--text-muted); font-size: 12px;">28d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8569" target="_blank" class="ticket-key">FEAT-8569</a></td>
+                                    <td>DFS: Fanatics ONE </td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="9" style="text-align: right; color: var(--text-muted); font-size: 12px;">9d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8789" target="_blank" class="ticket-key">FEAT-8789</a></td>
+                                    <td>DFS: Free to Play — Daily Streaks</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="17" style="text-align: right; color: var(--text-muted); font-size: 12px;">17d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8877" target="_blank" class="ticket-key">FEAT-8877</a></td>
+                                    <td>DFS: Combined Entries</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="14" style="text-align: right; color: var(--text-muted); font-size: 12px;">14d ago</td>
+                                </tr>
+                    
+                                <tr>
+                                    <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8880" target="_blank" class="ticket-key">FEAT-8880</a></td>
+                                    <td>DFS: Live Pick Tracking</td>
+                                    <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                    <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                    <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                                </tr>
+                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+                
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">🗂️ Features (INIT-185) — by Launch</h2>
+                <div class="launch-group-list">
+        
+                    <details class="launch-group" open>
+                        <summary class="launch-group-summary">
+                            <span class="launch-group-caret">▸</span>
+                            <span class="launch-badge alpha">Alpha</span>
+                            <span class="launch-group-counts">
+                                <strong>26</strong> features
+                                · 1 done · 18 in flight · 2 discovery
+                            </span>
+                            <span class="launch-group-pct">4%</span>
+                        </summary>
+                        <div class="launch-group-body">
+                            <div class="status-bar"><div class="status-bar-seg" style="width: 3.8%; background: var(--success);" title="Done: 1 (4%)"></div><div class="status-bar-seg" style="width: 69.2%; background: var(--info);" title="In Flight: 18 (69%)"></div><div class="status-bar-seg" style="width: 7.7%; background: var(--text-muted);" title="Discovery: 2 (8%)"></div><div class="status-bar-seg" style="width: 19.2%; background: var(--danger);" title="Dropped: 5 (19%)"></div></div>
+                            <table class="launch-group-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 0, 'string')">Key</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 1, 'string')">Summary</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 2, 'string')">Status</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'string')">Status Owner</th>
+                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 4, 'number')">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8148" target="_blank" class="ticket-key">FEAT-8148</a></td>
+                                <td>[BE] DFS:  Backend Foundations</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8149" target="_blank" class="ticket-key">FEAT-8149</a></td>
+                                <td>DFS: Frontend Foundations</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8216" target="_blank" class="ticket-key">FEAT-8216</a></td>
+                                <td>[CAT] DFS: Universal Balance (Unified Wallet)</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8217" target="_blank" class="ticket-key">FEAT-8217</a></td>
+                                <td>[CAT] DFS: Payments MVP  - Payment Methods (Deposit+Withdrawals)</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8500" target="_blank" class="ticket-key">FEAT-8500</a></td>
+                                <td>[FE] DFS: Onboarding</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8511" target="_blank" class="ticket-key">FEAT-8511</a></td>
+                                <td>[CAT] DFS: Geolocation Support </td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td>Lea King</td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8554" target="_blank" class="ticket-key">FEAT-8554</a></td>
+                                <td>[OF] DFS: Trading Engineering/Product Requirements [Alpha]</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td>John Groves</td>
+                                <td data-sort="6" style="text-align: right; color: var(--text-muted); font-size: 12px;">6d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8570" target="_blank" class="ticket-key">FEAT-8570</a></td>
+                                <td>DFS: Contest Management</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8815" target="_blank" class="ticket-key">FEAT-8815</a></td>
+                                <td>DFS: UMB</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8846" target="_blank" class="ticket-key">FEAT-8846</a></td>
+                                <td>DFS: Contest Entry</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="5" style="text-align: right; color: var(--text-muted); font-size: 12px;">5d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8847" target="_blank" class="ticket-key">FEAT-8847</a></td>
+                                <td>DFS: Contest Settlement &amp; Leaderboard</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8850" target="_blank" class="ticket-key">FEAT-8850</a></td>
+                                <td>DFS: Homepage</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8851" target="_blank" class="ticket-key">FEAT-8851</a></td>
+                                <td>DFS: Player Card (single market)</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8867" target="_blank" class="ticket-key">FEAT-8867</a></td>
+                                <td>DFS: Pickslip</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8868" target="_blank" class="ticket-key">FEAT-8868</a></td>
+                                <td>DFS: My Picks</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8879" target="_blank" class="ticket-key">FEAT-8879</a></td>
+                                <td>DFS: League Pages</td>
+                                <td><span style="color: var(--info-text);">Engineering Unpacking</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8905" target="_blank" class="ticket-key">FEAT-8905</a></td>
+                                <td>DFS: Fast Lane Compliance for Backend Services</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="7" style="text-align: right; color: var(--text-muted); font-size: 12px;">7d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8906" target="_blank" class="ticket-key">FEAT-8906</a></td>
+                                <td>DFS: Quality Work for Alpha</td>
+                                <td><span style="color: var(--info-text);">Committed</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="7" style="text-align: right; color: var(--text-muted); font-size: 12px;">7d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8556" target="_blank" class="ticket-key">FEAT-8556</a></td>
+                                <td>[FE] DFS: Foundations</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8853" target="_blank" class="ticket-key">FEAT-8853</a></td>
+                                <td>DFS: Event Page</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8812" target="_blank" class="ticket-key">FEAT-8812</a></td>
+                                <td>DFS: API gRPC</td>
+                                <td><span style="color: var(--success-text);">Released</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8501" target="_blank" class="ticket-key">FEAT-8501</a></td>
+                                <td>DFS: Pick Selection</td>
+                                <td><span style="color: var(--text-faint);">Abandoned</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="19" style="text-align: right; color: var(--text-muted); font-size: 12px;">19d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8502" target="_blank" class="ticket-key">FEAT-8502</a></td>
+                                <td>DFS: Experience Levels</td>
+                                <td><span style="color: var(--text-faint);">Abandoned</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="22" style="text-align: right; color: var(--text-muted); font-size: 12px;">22d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8503" target="_blank" class="ticket-key">FEAT-8503</a></td>
+                                <td>DFS: Checkout</td>
+                                <td><span style="color: var(--text-faint);">Abandoned</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="19" style="text-align: right; color: var(--text-muted); font-size: 12px;">19d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8504" target="_blank" class="ticket-key">FEAT-8504</a></td>
+                                <td>DFS: Entry Tracking</td>
+                                <td><span style="color: var(--text-faint);">Abandoned</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="20" style="text-align: right; color: var(--text-muted); font-size: 12px;">20d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8505" target="_blank" class="ticket-key">FEAT-8505</a></td>
+                                <td>DFS: Retention Promotions: Boost Tokens</td>
+                                <td><span style="color: var(--text-faint);">Abandoned</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="9" style="text-align: right; color: var(--text-muted); font-size: 12px;">9d ago</td>
+                            </tr>
+                
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+            
+                    <details class="launch-group">
+                        <summary class="launch-group-summary">
+                            <span class="launch-group-caret">▸</span>
+                            <span class="launch-badge beta">Beta</span>
+                            <span class="launch-group-counts">
+                                <strong>16</strong> features
+                                · 0 done · 10 in flight · 6 discovery
+                            </span>
+                            <span class="launch-group-pct">0%</span>
+                        </summary>
+                        <div class="launch-group-body">
+                            <div class="status-bar"><div class="status-bar-seg" style="width: 62.5%; background: var(--info);" title="In Flight: 10 (62%)"></div><div class="status-bar-seg" style="width: 37.5%; background: var(--text-muted);" title="Discovery: 6 (38%)"></div></div>
+                            <table class="launch-group-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 0, 'string')">Key</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 1, 'string')">Summary</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 2, 'string')">Status</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'string')">Status Owner</th>
+                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 4, 'number')">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8256" target="_blank" class="ticket-key">FEAT-8256</a></td>
+                                <td>[DFS] GRID | Data, Financial and Regulatory Readiness</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td>Linda Terrell</td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8506" target="_blank" class="ticket-key">FEAT-8506</a></td>
+                                <td>DFS: Acquisition Promotions: Play &amp; Get, RAF, CYO-A</td>
+                                <td><span style="color: var(--info-text);">Engineering Unpacking</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8507" target="_blank" class="ticket-key">FEAT-8507</a></td>
+                                <td>DFS: FanCash Earn</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8508" target="_blank" class="ticket-key">FEAT-8508</a></td>
+                                <td>DFS: FanCash Burn</td>
+                                <td><span style="color: var(--info-text);">Engineering Unpacking</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8509" target="_blank" class="ticket-key">FEAT-8509</a></td>
+                                <td>[CAT] DFS: RG Limits &amp; Entry Limits </td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td>Lea King</td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8600" target="_blank" class="ticket-key">FEAT-8600</a></td>
+                                <td>[CAT] App Switcher for Super app Concept </td>
+                                <td><span style="color: var(--info-text);">Committed</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8605" target="_blank" class="ticket-key">FEAT-8605</a></td>
+                                <td>DFS: Tooling - Playmaker/NATS/Dolly</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8811" target="_blank" class="ticket-key">FEAT-8811</a></td>
+                                <td>DFS: Profit Boost</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8813" target="_blank" class="ticket-key">FEAT-8813</a></td>
+                                <td>DFS: Quality and Performance Testing</td>
+                                <td><span style="color: var(--info-text);">In Progress</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="2" style="text-align: right; color: var(--text-muted); font-size: 12px;">2d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8814" target="_blank" class="ticket-key">FEAT-8814</a></td>
+                                <td>DFS: Permissibility</td>
+                                <td><span style="color: var(--info-text);">Engineering Unpacking</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="1" style="text-align: right; color: var(--text-muted); font-size: 12px;">1d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-7243" target="_blank" class="ticket-key">FEAT-7243</a></td>
+                                <td>[CAT] DFS: Eligibility Service Part 1 [to be defined]</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="7" style="text-align: right; color: var(--text-muted); font-size: 12px;">7d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8512" target="_blank" class="ticket-key">FEAT-8512</a></td>
+                                <td>[CAT] DFS: Tax &amp; Regulatory Reports </td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="9" style="text-align: right; color: var(--text-muted); font-size: 12px;">9d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8852" target="_blank" class="ticket-key">FEAT-8852</a></td>
+                                <td>DFS: Player Page</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="9" style="text-align: right; color: var(--text-muted); font-size: 12px;">9d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8876" target="_blank" class="ticket-key">FEAT-8876</a></td>
+                                <td>DFS: FairPlay + Notifications &amp; Badging</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8880" target="_blank" class="ticket-key">FEAT-8880</a></td>
+                                <td>DFS: Live Pick Tracking</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="0" style="text-align: right; color: var(--text-muted); font-size: 12px;">0d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8902" target="_blank" class="ticket-key">FEAT-8902</a></td>
+                                <td>[OF] DFS: Trading Engineering/Product Requirements [Beta]</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td>John Groves</td>
+                                <td data-sort="6" style="text-align: right; color: var(--text-muted); font-size: 12px;">6d ago</td>
+                            </tr>
+                
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+            
+                    <details class="launch-group">
+                        <summary class="launch-group-summary">
+                            <span class="launch-group-caret">▸</span>
+                            <span class="launch-badge public-launch">Public Launch</span>
+                            <span class="launch-group-counts">
+                                <strong>3</strong> features
+                                · 0 done · 0 in flight · 3 discovery
+                            </span>
+                            <span class="launch-group-pct">0%</span>
+                        </summary>
+                        <div class="launch-group-body">
+                            <div class="status-bar"><div class="status-bar-seg" style="width: 100.0%; background: var(--text-muted);" title="Discovery: 3 (100%)"></div></div>
+                            <table class="launch-group-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 0, 'string')">Key</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 1, 'string')">Summary</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 2, 'string')">Status</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'string')">Status Owner</th>
+                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 4, 'number')">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8518" target="_blank" class="ticket-key">FEAT-8518</a></td>
+                                <td>DFS: Retention Promotions: NSTs</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="22" style="text-align: right; color: var(--text-muted); font-size: 12px;">22d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8520" target="_blank" class="ticket-key">FEAT-8520</a></td>
+                                <td>Daily Engagement Mechanic </td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="28" style="text-align: right; color: var(--text-muted); font-size: 12px;">28d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8569" target="_blank" class="ticket-key">FEAT-8569</a></td>
+                                <td>DFS: Fanatics ONE </td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="9" style="text-align: right; color: var(--text-muted); font-size: 12px;">9d ago</td>
+                            </tr>
+                
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+            
+                    <details class="launch-group">
+                        <summary class="launch-group-summary">
+                            <span class="launch-group-caret">▸</span>
+                            <span class="launch-badge post-launch">Post Launch</span>
+                            <span class="launch-group-counts">
+                                <strong>4</strong> features
+                                · 0 done · 0 in flight · 4 discovery
+                            </span>
+                            <span class="launch-group-pct">0%</span>
+                        </summary>
+                        <div class="launch-group-body">
+                            <div class="status-bar"><div class="status-bar-seg" style="width: 100.0%; background: var(--text-muted);" title="Discovery: 4 (100%)"></div></div>
+                            <table class="launch-group-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 0, 'string')">Key</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 1, 'string')">Summary</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 2, 'string')">Status</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'string')">Status Owner</th>
+                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 4, 'number')">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8789" target="_blank" class="ticket-key">FEAT-8789</a></td>
+                                <td>DFS: Free to Play — Daily Streaks</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="17" style="text-align: right; color: var(--text-muted); font-size: 12px;">17d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8873" target="_blank" class="ticket-key">FEAT-8873</a></td>
+                                <td>[OF] DFS: Trading Engineering/Product Requirements [Post MVP Launch]</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="8" style="text-align: right; color: var(--text-muted); font-size: 12px;">8d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8877" target="_blank" class="ticket-key">FEAT-8877</a></td>
+                                <td>DFS: Combined Entries</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="14" style="text-align: right; color: var(--text-muted); font-size: 12px;">14d ago</td>
+                            </tr>
+                
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8878" target="_blank" class="ticket-key">FEAT-8878</a></td>
+                                <td>DFS: Flex Payouts/Contests</td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="16" style="text-align: right; color: var(--text-muted); font-size: 12px;">16d ago</td>
+                            </tr>
+                
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+            
+                    <details class="launch-group">
+                        <summary class="launch-group-summary">
+                            <span class="launch-group-caret">▸</span>
+                            <span class="launch-badge unassigned">Unassigned</span>
+                            <span class="launch-group-counts">
+                                <strong>1</strong> feature
+                                · 0 done · 0 in flight · 1 discovery
+                            </span>
+                            <span class="launch-group-pct">0%</span>
+                        </summary>
+                        <div class="launch-group-body">
+                            <div class="status-bar"><div class="status-bar-seg" style="width: 100.0%; background: var(--text-muted);" title="Discovery: 1 (100%)"></div></div>
+                            <table class="launch-group-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 0, 'string')">Key</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 1, 'string')">Summary</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 2, 'string')">Status</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'string')">Status Owner</th>
+                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 4, 'number')">Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                            <tr>
+                                <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8513" target="_blank" class="ticket-key">FEAT-8513</a></td>
+                                <td>DFS: Privacy / CCPA </td>
+                                <td><span style="color: var(--text-muted);">Product Discovery</span></td>
+                                <td><span style="color: var(--text-faint);">unassigned</span></td>
+                                <td data-sort="13" style="text-align: right; color: var(--text-muted); font-size: 12px;">13d ago</td>
+                            </tr>
+                
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+            
+                </div>
+            </div>
+        
+            <div class="section">
+                <h2 class="section-title">🔗 Useful Links</h2>
+                <ul class="useful-links">
+    <li><a href="https://playmaker-internal.dev1.fanatics.bet/fantasy/contests" target="_blank">Playmaker</a> <span style="color: var(--text-muted); font-size: 12px;">— Internal contest admin (dev1)</span></li><li><a href="https://betfanatics.atlassian.net/jira/apps/94d5de1a-112d-4549-bd03-5f910d5fd27b/880424a7-af14-4c77-b446-5ef9feee797a/structure/board/6464" target="_blank">Fantasy Structure Board</a> <span style="color: var(--text-muted); font-size: 12px;">— Jira Structure board</span></li>
+                </ul>
+            </div>
+    
+            <div class="section">
+                <h2 class="section-title">📚 Confluence Docs</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+                    Curated links to working docs in the
+                    <a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/overview" target="_blank" style="color: var(--accent-text);">DFS space</a>.
+                </p>
+                <div class="confluence-grid">
+        
+                    <div class="confluence-group">
+                        <div class="confluence-group-title">North Star</div>
+                        <ul class="confluence-links">
+            <li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2455044194" target="_blank">DFS+ Product Mission (Working Draft)</a></li>
+                        </ul>
+                    </div>
+            
+                    <div class="confluence-group">
+                        <div class="confluence-group-title">Strategy & Positioning</div>
+                        <ul class="confluence-links">
+            <li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2527199593" target="_blank">Go-To-Market Strategy (Working Draft)</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2402025546" target="_blank">Competitive Landscape</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2557509843" target="_blank">Market & User Psychology</a></li>
+                        </ul>
+                    </div>
+            
+                    <div class="confluence-group">
+                        <div class="confluence-group-title">Experience Design</div>
+                        <ul class="confluence-links">
+            <li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2532081716" target="_blank">DFS+ Design Spec – F2P to Paid Conversion (Working Draft)</a></li>
+                        </ul>
+                    </div>
+            
+                    <div class="confluence-group">
+                        <div class="confluence-group-title">Product & Platform Requirements</div>
+                        <ul class="confluence-links">
+            <li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2481094747" target="_blank">MVP Requirements Summary</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2910650913" target="_blank">Copy of MVP Requirements Summary – MVP SCOPE COMMITMENT</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2533589073" target="_blank">F2P Pick'em – Functional Requirements (Working Draft)</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2535588180" target="_blank">Cross-Product Conversion Requirements – F2P to DFS+/Sportsbook (Working Draft)</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2652667966" target="_blank">CRM Platform</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2688123229" target="_blank">Acquisition Platform / Setup Summary</a></li>
+                        </ul>
+                    </div>
+            
+                    <div class="confluence-group">
+                        <div class="confluence-group-title">Economics & Incentives</div>
+                        <ul class="confluence-links">
+            <li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2541224063" target="_blank">Financial Model & GTM Economics (Working Draft)</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2443870249" target="_blank">DFS+ Generosity Strategy – v0 (Working Draft)</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2520154372" target="_blank">Loyalty & Token System – Concept Brief (v0)</a></li>
+                        </ul>
+                    </div>
+            
+                    <div class="confluence-group">
+                        <div class="confluence-group-title">Operating & Meetings</div>
+                        <ul class="confluence-links">
+            <li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2466447482" target="_blank">Glossary</a></li><li><a href="https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/2682159243" target="_blank">DFS Team Weekly Sync Agendas</a></li>
+                        </ul>
+                    </div>
+            
+                </div>
+            </div>
+        
+            <footer>
+                Generated by Engineering Management Dashboard
+            </footer>
+        </div>
+    
+    </div>
+</body>
+</html>
