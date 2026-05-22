@@ -645,8 +645,11 @@ function initDependenciesPage() {
     if (!isLocal) {
         document.querySelectorAll('.dep-notes').forEach(ta => {
             ta.readOnly = true;
-            ta.style.backgroundColor = '#f5f5f5';
+            ta.style.backgroundColor = 'var(--bg-page, #0f0f0f)';
+            ta.style.color = 'var(--text-secondary, #999)';
+            ta.style.border = '1px solid var(--border, #333)';
             ta.style.cursor = 'default';
+            ta.style.opacity = '0.8';
             ta.title = 'Read-only: Dashboard is hosted on GitHub Pages';
         });
 
