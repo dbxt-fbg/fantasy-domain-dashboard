@@ -1,4 +1,5 @@
 // Shared dashboard interactions. Safe to load on every page.
+// Version: 2.0 - Environment-aware dependencies (updated 2026-05-22)
 (function () {
     'use strict';
 

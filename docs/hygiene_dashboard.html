@@ -13,7 +13,7 @@
         
         <header>
             <h1>🔍 Ticket Hygiene Dashboard</h1>
-            <div class="subtitle">Generated May 21, 2026 at 12:01</div>
+            <div class="subtitle">Generated May 22, 2026 at 10:30</div>
         </header>
                 <nav class="top-nav">
             <ul class="nav-menu">
@@ -66,25 +66,25 @@
                     <div class="metric-label">Epics Missing Description</div>
                     <div class="metric-value">0</div>
                 </button>
-                <button type="button" class="metric-card clean" onclick="showSection('epics_no_prefix')" aria-controls="epics_no_prefix">
+                <button type="button" class="metric-card" onclick="showSection('epics_no_prefix')" aria-controls="epics_no_prefix">
                     <div class="metric-label">Epics Without [BE]/[FE] Prefix</div>
-                    <div class="metric-value">0</div>
+                    <div class="metric-value">1</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_no_designs')" aria-controls="epics_no_designs">
                     <div class="metric-label">[FE] Epics Without Figma</div>
-                    <div class="metric-value">1</div>
+                    <div class="metric-value">2</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_no_work_items')" aria-controls="epics_no_work_items">
                     <div class="metric-label">Epics Without Child Stories</div>
-                    <div class="metric-value">5</div>
+                    <div class="metric-value">4</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_missing_acceptance_criteria')" aria-controls="epics_missing_acceptance_criteria">
                     <div class="metric-label">Epics Missing AC</div>
-                    <div class="metric-value">11</div>
+                    <div class="metric-value">10</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_no_sprint')" aria-controls="epics_no_sprint">
                     <div class="metric-label">Epics Without Sprint</div>
-                    <div class="metric-value">1</div>
+                    <div class="metric-value">3</div>
                 </button>
                 <button type="button" class="metric-card clean" onclick="showSection('epics_in_progress_no_assignee')" aria-controls="epics_in_progress_no_assignee">
                     <div class="metric-label">Epics In Progress · No Assignee</div>
@@ -104,11 +104,11 @@
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('stories_no_description')" aria-controls="stories_no_description">
                     <div class="metric-label">Stories Missing Description</div>
-                    <div class="metric-value">4</div>
+                    <div class="metric-value">3</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('code_review_24h')" aria-controls="code_review_24h">
                     <div class="metric-label">Code Review > 24 Hours</div>
-                    <div class="metric-value">2</div>
+                    <div class="metric-value">1</div>
                 </button>
             </div>
         
@@ -161,15 +161,24 @@
                 </div>
                 </div>
             <div class="section" id="epics_no_prefix">
-                <h2 class="section-title">Epics Without [BE]/[FE] Prefix (0)</h2>
-            
-                <div class="empty-state">
-                    <div class="icon">✅</div>
-                    <div>No issues found. Great job!</div>
-                </div>
-                </div>
+                <h2 class="section-title">Epics Without [BE]/[FE] Prefix (1)</h2>
+            <div class="issue-list">
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-597" target="_blank" class="issue-key">FNTSY-597</a>
+                            <span class="issue-summary">[FE BFF] Checkout: Submitting entry</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Paul Kang</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T13:15:57">open 0d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    </div></div>
             <div class="section" id="epics_no_designs">
-                <h2 class="section-title">[FE] Epics Without Figma Link (1)</h2>
+                <h2 class="section-title">[FE] Epics Without Figma Link (2)</h2>
             <div class="issue-list">
                     <div class="issue-item">
                         <div>
@@ -179,29 +188,29 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Jacob Tabak</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-05-13T13:45:56">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T13:45:56">open 8d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-601" target="_blank" class="issue-key">FNTSY-601</a>
+                            <span class="issue-summary">[FE] Integrate shared FUEL components for Single Event Page</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Jasmine Dacones</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T13:45:55">open 0d</span>
                             
                     
                         </div>
                     </div>
                     </div></div>
             <div class="section" id="epics_no_work_items">
-                <h2 class="section-title">Epics Without Child Stories (5)</h2>
+                <h2 class="section-title">Epics Without Child Stories (4)</h2>
             <div class="issue-list">
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-531" target="_blank" class="issue-key">FNTSY-531</a>
-                            <span class="issue-summary">[FE] UMB Pickslip</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Unassigned</span>
-                            <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-13T13:31:14">open 7d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
                     <div class="issue-item">
                         <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-535" target="_blank" class="issue-key">FNTSY-535</a>
@@ -210,7 +219,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:54">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:54">open 8d</span>
                             
                     
                         </div>
@@ -224,7 +233,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:55">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:55">open 8d</span>
                             
                     
                         </div>
@@ -238,7 +247,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-14T05:33:15">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-14T05:33:15">open 8d</span>
                             
                     
                         </div>
@@ -252,29 +261,15 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 1d</span>
+                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 2d</span>
                             
                     
                         </div>
                     </div>
                     </div></div>
             <div class="section" id="epics_missing_acceptance_criteria">
-                <h2 class="section-title">Epics Missing Acceptance Criteria (11)</h2>
+                <h2 class="section-title">Epics Missing Acceptance Criteria (10)</h2>
             <div class="issue-list">
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-486" target="_blank" class="issue-key">FNTSY-486</a>
-                            <span class="issue-summary">[BE] Playmaker App Settings Page</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Josh Schaefer</span>
-                            <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-05-11T08:15:51">open 10d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
                     <div class="issue-item">
                         <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-500" target="_blank" class="issue-key">FNTSY-500</a>
@@ -283,7 +278,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Patrick Kilburn</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 9d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 10d</span>
                             
                     
                         </div>
@@ -297,7 +292,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Patrick Kilburn</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 9d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 10d</span>
                             
                     
                         </div>
@@ -311,7 +306,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Patrick Kilburn</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 9d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 10d</span>
                             
                     
                         </div>
@@ -325,21 +320,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Nigel Young</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-05-12T09:30:47">open 9d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-531" target="_blank" class="issue-key">FNTSY-531</a>
-                            <span class="issue-summary">[FE] UMB Pickslip</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Unassigned</span>
-                            <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-13T13:34:46">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-12T09:30:47">open 10d</span>
                             
                     
                         </div>
@@ -353,7 +334,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:54">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:54">open 8d</span>
                             
                     
                         </div>
@@ -367,7 +348,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:55">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:55">open 8d</span>
                             
                     
                         </div>
@@ -381,7 +362,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Kevin Paquette</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-05-14T06:45:59">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-14T06:45:59">open 8d</span>
                             
                     
                         </div>
@@ -395,7 +376,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Kevin Paquette</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-05-14T06:45:59">open 7d</span>
+                            <span class="badge age-warning" title="First seen 2026-05-14T06:45:59">open 8d</span>
                             
                     
                         </div>
@@ -409,14 +390,28 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 1d</span>
+                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 2d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-601" target="_blank" class="issue-key">FNTSY-601</a>
+                            <span class="issue-summary">[FE] Integrate shared FUEL components for Single Event Page</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Jasmine Dacones</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T13:45:55">open 0d</span>
                             
                     
                         </div>
                     </div>
                     </div></div>
             <div class="section" id="epics_no_sprint">
-                <h2 class="section-title">Epics Not Assigned to a Sprint (1)</h2>
+                <h2 class="section-title">Epics Not Assigned to a Sprint (3)</h2>
             <div class="issue-list">
                     <div class="issue-item">
                         <div>
@@ -426,7 +421,35 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 1d</span>
+                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 2d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-597" target="_blank" class="issue-key">FNTSY-597</a>
+                            <span class="issue-summary">[FE BFF] Checkout: Submitting entry</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Paul Kang</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T13:15:57">open 0d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-601" target="_blank" class="issue-key">FNTSY-601</a>
+                            <span class="issue-summary">[FE] Integrate shared FUEL components for Single Event Page</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Jasmine Dacones</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T13:45:55">open 0d</span>
                             
                     
                         </div>
@@ -457,22 +480,8 @@
                 </div>
                 </div>
             <div class="section" id="stories_no_description">
-                <h2 class="section-title">Stories In Progress Without Description (4)</h2>
+                <h2 class="section-title">Stories In Progress Without Description (3)</h2>
             <div class="issue-list">
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-566" target="_blank" class="issue-key">FNTSY-566</a>
-                            <span class="issue-summary">jurisdiction id save to contest entry for wallet calls</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Tanya Phanich</span>
-                            <span class="badge status">In Progress</span>
-                            <span class="badge age-info" title="First seen 2026-05-18T09:45:54">open 3d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
                     <div class="issue-item">
                         <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-580" target="_blank" class="issue-key">FNTSY-580</a>
@@ -481,21 +490,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Michael Goodwin</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-muted" title="First seen 2026-05-19T14:00:51">open 1d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-524" target="_blank" class="issue-key">FNTSY-524</a>
-                            <span class="issue-summary">C4 environment setup - TEST / CERT</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jacob Tabak</span>
-                            <span class="badge status">In Progress</span>
-                            <span class="badge age-muted" title="First seen 2026-05-20T10:30:57">open 1d</span>
+                            <span class="badge age-muted" title="First seen 2026-05-19T14:00:51">open 2d</span>
                             
                     
                         </div>
@@ -509,29 +504,29 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Liam Butler</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-muted" title="First seen 2026-05-21T06:30:57">open 0d</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T06:30:57">open 1d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-567" target="_blank" class="issue-key">FNTSY-567</a>
+                            <span class="issue-summary">EntryOffer submission via fingerprint</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Michael Goodwin</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-muted" title="First seen 2026-05-22T09:45:51">open 0d</span>
                             
                     
                         </div>
                     </div>
                     </div></div>
             <div class="section" id="code_review_24h">
-                <h2 class="section-title">Tickets In Code Review > 24 Hours (2)</h2>
+                <h2 class="section-title">Tickets In Code Review > 24 Hours (1)</h2>
             <div class="issue-list">
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-484" target="_blank" class="issue-key">FNTSY-484</a>
-                            <span class="issue-summary">Account Index Page</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Ryan Taylor</span>
-                            <span class="badge status">In code review</span>
-                            <span class="badge age-info" title="First seen 2026-05-16T08:31:04">open 5d</span>
-                            
-                    <span class="badge hours">147.5h in review</span>
-                        </div>
-                    </div>
-                    
                     <div class="issue-item">
                         <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-562" target="_blank" class="issue-key">FNTSY-562</a>
@@ -540,9 +535,9 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Liam Butler</span>
                             <span class="badge status">In code review</span>
-                            <span class="badge age-muted" title="First seen 2026-05-21T10:00:59">open 0d</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T10:00:59">open 1d</span>
                             
-                    <span class="badge hours">26.0h in review</span>
+                    <span class="badge hours">48.5h in review</span>
                         </div>
                     </div>
                     </div></div>
