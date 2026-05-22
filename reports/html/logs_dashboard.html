@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agents and Logs</title>
     <link rel="stylesheet" href="assets/dashboard.css">
-    <script src="assets/dashboard.js" defer></script>
+    <script src="assets/dashboard.js?v=2.0" defer></script>
     <!-- toggleAgentLogs / toggleLog / triggerAgent live in assets/dashboard.js -->
 </head>
 <body class="page-logs">
@@ -13,7 +13,7 @@
         
         <header>
             <h1>🤖 Agents and Logs</h1>
-            <div class="subtitle">Agent Activity & System Logs • Updated May 22, 2026 at 10:45</div>
+            <div class="subtitle">Agent Activity & System Logs • Updated May 22, 2026 at 11:00</div>
         </header>
                 <nav class="top-nav">
             <ul class="nav-menu">
@@ -279,7 +279,7 @@
                             <div class="log-line warning">WARNING - No GitHub username for Anthony Porter</div>
                             <div class="log-line success">INFO - ✅ GitHub PR collection completed successfully!</div>
                             <div class="log-line success">✅ GitHub PR Agent completed successfully</div>
-                            <div class="log-line info">=== GitHub PR Agent starting at Fri May 22 10:45:00 PDT 2026 ===</div>
+                            <div class="log-line info">=== GitHub PR Agent starting at Fri May 22 11:00:00 PDT 2026 ===</div>
 
                         </div>
                     </div>
@@ -288,7 +288,7 @@
                 <div id="agent-card-jira-collector" class="status-card " style="scroll-margin-top: 20px;">
                     <h3>🔄 Jira Collector</h3>
                     <div class="status-detail">Schedule: On demand</div>
-                            <div class="status-detail">Last Run: 2026-05-22T10:30:42.022611</div>
+                            <div class="status-detail">Last Run: 2026-05-22T10:45:36.799306</div>
                     <div class="status-detail">Duration: —</div>
                     <div class="status-detail">Tickets in Database: 202</div>
                     <div class="status-detail">Sprints Tracked: 5</div>
@@ -301,7 +301,11 @@
                     </div>
                     <div id="jira-collector-logs" class="agent-logs">
                         <div class="log-container">
-                                    <div class="log-line info">INFO - Got 100 issues in this page, total so far: 7900</div>
+                                    <div class="log-line info">INFO - Got 100 issues in this page, total so far: 7700</div>
+                            <div class="log-line info">INFO - Fetching page starting at 7700, page size 100</div>
+                            <div class="log-line info">INFO - Got 100 issues in this page, total so far: 7800</div>
+                            <div class="log-line info">INFO - Fetching page starting at 7800, page size 100</div>
+                            <div class="log-line info">INFO - Got 100 issues in this page, total so far: 7900</div>
                             <div class="log-line info">INFO - Fetching page starting at 7900, page size 100</div>
                             <div class="log-line info">INFO - Got 100 issues in this page, total so far: 8000</div>
                             <div class="log-line info">INFO - Fetching page starting at 8000, page size 100</div>
@@ -358,12 +362,8 @@
                             <div class="log-line info">INFO - Josh Schaefer: 0 done, 5 in progress, 1 todo</div>
                             <div class="log-line info">INFO - Scott Schmitz: 2 done, 3 in progress, 1 todo</div>
                             <div class="log-line success">INFO - ✅ Jira data refresh complete!</div>
-                            <div class="log-line info">INFO - Logging configured successfully</div>
-                            <div class="log-line info">INFO - Known: 17 jira_ids, 16 github_logins</div>
-                            <div class="log-line info">INFO - Raw candidates across all signals: 0</div>
-                            <div class="log-line info">INFO - Unique new members (after merging by id/login): 0</div>
-                            <div class="log-line info">INFO - No new members to add.</div>
-                            <div class="log-line info">INFO - Skipping sync_project_fantasy.py (last ran 5.7h ago, cooldown 6.0h)</div>
+                            <div class="log-line info">INFO - Skipping discover_team_members.py (last ran 0.2h ago, cooldown 1.0h)</div>
+                            <div class="log-line info">INFO - Skipping sync_project_fantasy.py (last ran 6.0h ago, cooldown 6.0h)</div>
                             <div class="log-line success">INFO - ✅ Unified Jira collection complete!</div>
                             <div class="log-line info">INFO - Data available for: Stories, Epics, Story Points, Hygiene</div>
                             <div class="log-line success">INFO - Jira collector agent complete.</div>
@@ -400,7 +400,7 @@
                             <div class="log-line info"></div>
                             <div class="log-line info">Open team dashboard: open /Users/davidbaxter/sync/claude/em_dashboard/reports/html/team_dashboard.html</div>
                             <div class="log-line success">✅ HTML reports regenerated</div>
-                            <div class="log-line info">=== Jira Collector starting at Fri May 22 10:45:00 PDT 2026 ===</div>
+                            <div class="log-line info">=== Jira Collector starting at Fri May 22 11:00:01 PDT 2026 ===</div>
 
                         </div>
                     </div>
@@ -409,8 +409,8 @@
                 <div id="agent-card-hygiene" class="status-card warning" style="scroll-margin-top: 20px;">
                     <h3>🧹 Jira Hygiene Agent</h3>
                     <div class="status-detail">Schedule: On demand</div>
-                            <div class="status-detail">Last Run: 2026-05-22T10:30:56</div>
-                    <div class="status-detail">Duration: 15.0s</div>
+                            <div class="status-detail">Last Run: 2026-05-22T10:45:51</div>
+                    <div class="status-detail">Duration: 51.0s</div>
                     <div class="status-detail">Open Issues: 179</div>
                     <div class="status-detail">  · features_missing_designs: 40</div>
                     <div class="status-detail">  · epics_no_work_items: 25</div>
@@ -657,9 +657,9 @@
                 <div id="agent-card-qa" class="status-card error" style="scroll-margin-top: 20px;">
                     <h3>🔬 QA Agent</h3>
                     <div class="status-detail">Schedule: On demand · use --deep for Jira-backed hygiene checks</div>
-                            <div class="status-detail">Last Run: 2026-05-22 10:40:01.755771</div>
+                            <div class="status-detail">Last Run: 2026-05-22 10:55:01.055102</div>
                     <div class="status-detail">Duration: —</div>
-                    <div class="status-detail">Checks: 21 passed, 1 failed</div>
+                    <div class="status-detail">Checks: 2 passed, 1 failed</div>
                     <div class="status-detail">Issues: 🚨 1 critical, ⚠️ 0 warnings, ℹ️ 0 info</div>
                     <div class="status-detail">🚨 [Agent Schedules] Could not parse scheduled_tasks.json: Expecting value: line 59 column 12 (char 2271)</div>
                     <div class="status-detail">Local consistency + (with --deep) Jira-backed hygiene validation</div>
@@ -671,10 +671,7 @@
                     </div>
                     <div id="qa-logs" class="agent-logs">
                         <div class="log-container">
-                                    <div class="log-line info">INFO - ============================================================</div>
-                            <div class="log-line info">INFO - Running check: sprint_data_quality</div>
-                            <div class="log-line info">INFO - Checking sprint data quality...</div>
-                            <div class="log-line info">INFO -   ⊘ skip temporal_consistency — inputs unchanged since last pass (ce6910c5)</div>
+                                    <div class="log-line info">INFO -   ⊘ skip temporal_consistency — inputs unchanged since last pass (ce6910c5)</div>
                             <div class="log-line info">INFO - Running check: html_reports</div>
                             <div class="log-line info">INFO - Checking HTML reports...</div>
                             <div class="log-line info">INFO -   ⊘ skip hygiene_tracking — inputs unchanged since last pass (81ef49a2)</div>
@@ -717,35 +714,33 @@
                             <div class="log-line info">INFO - ============================================================</div>
                             <div class="log-line info">INFO - Applied: 0</div>
                             <div class="log-line info">INFO -</div>
-                            <div class="log-line info">INFO - Run report written → data/qa_runs.jsonl  (run_id=093c7d4f1c7a)</div>
+                            <div class="log-line info">INFO - Run report written → data/qa_runs.jsonl  (run_id=370eb314b043)</div>
                             <div class="log-line success">✅ QA Agent completed successfully</div>
-                            <div class="log-line info">=== QA Agent starting at Fri May 22 10:40:00 PDT 2026 ===</div>
+                            <div class="log-line info">=== QA Agent starting at Fri May 22 10:55:00 PDT 2026 ===</div>
                             <div class="log-line info">INFO - Loading configuration from /Users/davidbaxter/sync/claude/em_dashboard/config/team_config.yaml</div>
                             <div class="log-line info">INFO - Configuration validated successfully. Team members: 17</div>
                             <div class="log-line info">INFO - ============================================================</div>
-                            <div class="log-line info">INFO - QA Agent - 2026-05-22 10:40:01.755771</div>
+                            <div class="log-line info">INFO - QA Agent - 2026-05-22 10:55:01.055102</div>
                             <div class="log-line info">INFO - ============================================================</div>
                             <div class="log-line info">INFO -   ⊘ skip sprint_data_quality — inputs unchanged since last pass (f87c20cc)</div>
                             <div class="log-line info">INFO -   ⊘ skip temporal_consistency — inputs unchanged since last pass (ce6910c5)</div>
-                            <div class="log-line info">INFO - Running check: html_reports</div>
-                            <div class="log-line info">INFO - Checking HTML reports...</div>
+                            <div class="log-line info">INFO -   ⊘ skip html_reports — inputs unchanged since last pass (927e6f81)</div>
                             <div class="log-line info">INFO -   ⊘ skip hygiene_tracking — inputs unchanged since last pass (81ef49a2)</div>
                             <div class="log-line info">INFO - Running check: github_collection_saturation</div>
                             <div class="log-line info">INFO - Checking for GitHub collection saturation...</div>
                             <div class="log-line info">INFO - Running check: agent_schedules</div>
                             <div class="log-line info">INFO - Checking scheduled-agent coverage...</div>
                             <div class="log-line info">INFO -   ⊘ skip ticket_integrity — inputs unchanged since last pass (ce6910c5)</div>
-                            <div class="log-line info">INFO - Running check: logs_page_accuracy</div>
-                            <div class="log-line info">INFO - Checking logs page accuracy...</div>
+                            <div class="log-line info">INFO -   ⊘ skip logs_page_accuracy — inputs unchanged since last pass (927e6f81)</div>
                             <div class="log-line info">INFO -   ⊘ skip story_points_consistency — inputs unchanged since last pass (ce6910c5)</div>
                             <div class="log-line info">INFO -   ⊘ skip epic_consistency — inputs unchanged since last pass (ce6910c5)</div>
-                            <div class="log-line info">INFO -   ⊘ skip developer_metrics — inputs unchanged since last pass (ed154d5b)</div>
+                            <div class="log-line info">INFO -   ⊘ skip developer_metrics — inputs unchanged since last pass (d2915722)</div>
                             <div class="log-line info">INFO -</div>
                             <div class="log-line info">INFO - ============================================================</div>
                             <div class="log-line info">INFO - QA SUMMARY</div>
                             <div class="log-line info">INFO - ============================================================</div>
-                            <div class="log-line info">INFO - Total Checks: 22  (ran 11 this pass in 0.4s)</div>
-                            <div class="log-line success">INFO - ✅ Passed: 21</div>
+                            <div class="log-line info">INFO - Total Checks: 3  (ran 11 this pass in 0.4s)</div>
+                            <div class="log-line success">INFO - ✅ Passed: 2</div>
                             <div class="log-line error">INFO - ❌ Failed: 1</div>
                             <div class="log-line info">INFO -</div>
                             <div class="log-line info">INFO - 🚨 Critical Issues: 1</div>
@@ -768,9 +763,14 @@
                             <div class="log-line info">INFO - ============================================================</div>
                             <div class="log-line info">INFO - Applied: 0</div>
                             <div class="log-line info">INFO -</div>
-                            <div class="log-line info">INFO - Run report written → data/qa_runs.jsonl  (run_id=98cdb7ea11ba)</div>
+                            <div class="log-line info">INFO - Run report written → data/qa_runs.jsonl  (run_id=9f80d2d5fe7a)</div>
                             <div class="log-line success">✅ QA Agent completed successfully</div>
-                            <div class="log-line info">=== QA Agent starting at Fri May 22 10:45:00 PDT 2026 ===</div>
+                            <div class="log-line info">=== QA Agent starting at Fri May 22 11:00:00 PDT 2026 ===</div>
+                            <div class="log-line info">INFO - Loading configuration from /Users/davidbaxter/sync/claude/em_dashboard/config/team_config.yaml</div>
+                            <div class="log-line info">INFO - Configuration validated successfully. Team members: 17</div>
+                            <div class="log-line info">INFO - ============================================================</div>
+                            <div class="log-line info">INFO - QA Agent - 2026-05-22 11:00:01.611333</div>
+                            <div class="log-line info">INFO - ============================================================</div>
 
                         </div>
                     </div>
@@ -783,6 +783,48 @@
             </div>
             <div>
                 
+            <div class="status-card" style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                    <div>
+                        <h3 style="margin: 0;">🧠 Run 9f80d2d5fe7a  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 10:55:01</span>  <span style="color: var(--text-faint); font-family: var(--font-mono); font-size: 11px;">546c8db</span></h3>
+                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
+                            2 check(s) ran · 9 skipped/deferred · 0 fix action(s) · <span style="color: var(--text-muted); font-size: 11px;">took 0.5s</span>
+                        </div>
+                    </div>
+                    <span class="status-badge status-critical">1 critical</span>
+                </div>
+                <div style="margin-top: 8px;"><span title="sprint_data_quality — inputs unchanged since last pass (f87c20cc)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">sprint_data_quality</span><span title="temporal_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">temporal_consistency</span><span title="html_reports — inputs unchanged since last pass (927e6f81)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">html_reports</span><span title="hygiene_tracking — inputs unchanged since last pass (81ef49a2)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene_tracking</span><span title="github_collection_saturation — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">github_collection_saturation</span><span title="agent_schedules — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">agent_schedules</span><span title="ticket_integrity — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">ticket_integrity</span><span title="logs_page_accuracy — inputs unchanged since last pass (927e6f81)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">logs_page_accuracy</span><span title="story_points_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">story_points_consistency</span><span title="epic_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">epic_consistency</span><span title="developer_metrics — inputs unchanged since last pass (d2915722)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">developer_metrics</span></div>
+                
+            </div>
+        
+            <div class="status-card" style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                    <div>
+                        <h3 style="margin: 0;">🧠 Run 370eb314b043  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 10:50:01</span>  <span style="color: var(--text-faint); font-family: var(--font-mono); font-size: 11px;">546c8db</span></h3>
+                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
+                            6 check(s) ran · 5 skipped/deferred · 0 fix action(s) · <span style="color: var(--text-muted); font-size: 11px;">took 0.4s</span>
+                        </div>
+                    </div>
+                    <span class="status-badge status-critical">1 critical</span>
+                </div>
+                <div style="margin-top: 8px;"><span title="sprint_data_quality — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">sprint_data_quality</span><span title="temporal_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">temporal_consistency</span><span title="html_reports — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">html_reports</span><span title="hygiene_tracking — inputs unchanged since last pass (81ef49a2)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene_tracking</span><span title="github_collection_saturation — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">github_collection_saturation</span><span title="agent_schedules — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">agent_schedules</span><span title="ticket_integrity — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">ticket_integrity</span><span title="logs_page_accuracy — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">logs_page_accuracy</span><span title="story_points_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">story_points_consistency</span><span title="epic_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">epic_consistency</span><span title="developer_metrics — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">developer_metrics</span></div>
+                
+            </div>
+        
+            <div class="status-card" style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                    <div>
+                        <h3 style="margin: 0;">🧠 Run 6e65109a7cee  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 10:45:01</span>  <span style="color: var(--text-faint); font-family: var(--font-mono); font-size: 11px;">546c8db</span></h3>
+                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
+                            3 check(s) ran · 8 skipped/deferred · 0 fix action(s) · <span style="color: var(--text-muted); font-size: 11px;">took 1.2s</span>
+                        </div>
+                    </div>
+                    <span class="status-badge status-critical">1 critical</span>
+                </div>
+                <div style="margin-top: 8px;"><span title="sprint_data_quality — inputs unchanged since last pass (f87c20cc)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">sprint_data_quality</span><span title="temporal_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">temporal_consistency</span><span title="html_reports — inputs unchanged since last pass (e4249c9a)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">html_reports</span><span title="hygiene_tracking — inputs unchanged since last pass (81ef49a2)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene_tracking</span><span title="github_collection_saturation — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">github_collection_saturation</span><span title="agent_schedules — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">agent_schedules</span><span title="ticket_integrity — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">ticket_integrity</span><span title="logs_page_accuracy — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">logs_page_accuracy</span><span title="story_points_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">story_points_consistency</span><span title="epic_consistency — inputs unchanged since last pass (ce6910c5)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">epic_consistency</span><span title="developer_metrics — inputs unchanged since last pass (ed154d5b)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">developer_metrics</span></div>
+                
+            </div>
+        
             <div class="status-card" style="margin-bottom: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
                     <div>
@@ -881,48 +923,6 @@
                 
             </div>
         
-            <div class="status-card" style="margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
-                    <div>
-                        <h3 style="margin: 0;">🧠 Run 22ef9d931e13  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 10:05:01</span>  </h3>
-                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
-                            10 check(s) ran · 1 skipped/deferred · 0 fix action(s) · <span style="color: var(--text-muted); font-size: 11px;">took 0.3s</span>
-                        </div>
-                    </div>
-                    <span class="status-badge status-critical">1 critical</span>
-                </div>
-                <div style="margin-top: 8px;"><span title="sprint_data_quality — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">sprint_data_quality</span><span title="temporal_consistency — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">temporal_consistency</span><span title="html_reports — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">html_reports</span><span title="hygiene_tracking — inputs unchanged since last pass (81ef49a2)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene_tracking</span><span title="github_collection_saturation — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">github_collection_saturation</span><span title="agent_schedules — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">agent_schedules</span><span title="ticket_integrity — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">ticket_integrity</span><span title="logs_page_accuracy — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">logs_page_accuracy</span><span title="story_points_consistency — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">story_points_consistency</span><span title="epic_consistency — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">epic_consistency</span><span title="developer_metrics — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">developer_metrics</span></div>
-                
-            </div>
-        
-            <div class="status-card" style="margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
-                    <div>
-                        <h3 style="margin: 0;">🧠 Run 11383a2dd6dc  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 10:00:01</span>  </h3>
-                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
-                            3 check(s) ran · 8 skipped/deferred · 0 fix action(s) · <span style="color: var(--text-muted); font-size: 11px;">took 0.9s</span>
-                        </div>
-                    </div>
-                    <span class="status-badge status-critical">1 critical</span>
-                </div>
-                <div style="margin-top: 8px;"><span title="sprint_data_quality — inputs unchanged since last pass (f87c20cc)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">sprint_data_quality</span><span title="temporal_consistency — inputs unchanged since last pass (88c3ed84)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">temporal_consistency</span><span title="html_reports — inputs unchanged since last pass (ad1d0a5e)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">html_reports</span><span title="hygiene_tracking — inputs unchanged since last pass (81ef49a2)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene_tracking</span><span title="github_collection_saturation — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">github_collection_saturation</span><span title="agent_schedules — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">agent_schedules</span><span title="ticket_integrity — inputs unchanged since last pass (88c3ed84)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">ticket_integrity</span><span title="logs_page_accuracy — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">logs_page_accuracy</span><span title="story_points_consistency — inputs unchanged since last pass (88c3ed84)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">story_points_consistency</span><span title="epic_consistency — inputs unchanged since last pass (88c3ed84)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">epic_consistency</span><span title="developer_metrics — inputs unchanged since last pass (969b7b14)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">developer_metrics</span></div>
-                
-            </div>
-        
-            <div class="status-card" style="margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
-                    <div>
-                        <h3 style="margin: 0;">🧠 Run b0322fda26f1  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 09:55:01</span>  </h3>
-                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
-                            2 check(s) ran · 9 skipped/deferred · 0 fix action(s) · <span style="color: var(--text-muted); font-size: 11px;">took 0.4s</span>
-                        </div>
-                    </div>
-                    <span class="status-badge status-critical">1 critical</span>
-                </div>
-                <div style="margin-top: 8px;"><span title="sprint_data_quality — inputs unchanged since last pass (f87c20cc)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">sprint_data_quality</span><span title="temporal_consistency — inputs unchanged since last pass (88c3ed84)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">temporal_consistency</span><span title="html_reports — inputs unchanged since last pass (ad1d0a5e)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">html_reports</span><span title="hygiene_tracking — inputs unchanged since last pass (81ef49a2)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene_tracking</span><span title="github_collection_saturation — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">github_collection_saturation</span><span title="agent_schedules — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">agent_schedules</span><span title="ticket_integrity — inputs unchanged since last pass (88c3ed84)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">ticket_integrity</span><span title="logs_page_accuracy — inputs unchanged since last pass (ad1d0a5e)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">logs_page_accuracy</span><span title="story_points_consistency — inputs unchanged since last pass (88c3ed84)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">story_points_consistency</span><span title="epic_consistency — inputs unchanged since last pass (88c3ed84)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">epic_consistency</span><span title="developer_metrics — inputs unchanged since last pass (969b7b14)" style="display:inline-block; background:#1e293b; color:#94a3b8; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">developer_metrics</span></div>
-                
-            </div>
-        
             </div>
         
             <h2 style="font-size: 18px; color: #f1f5f9; margin: 32px 0 12px 0;">🧼 Hygiene Agent — Recent Runs</h2>
@@ -931,6 +931,20 @@
             </div>
             <div>
                 
+            <div class="status-card" style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                    <div>
+                        <h3 style="margin: 0;">🧠 Run 6aee49fbbe07  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 10:45:01</span>  </h3>
+                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
+                            16 rule(s) evaluated · 24 open · 0 resolved this run · <span style="color: var(--text-muted); font-size: 11px;">took 50.4s</span>
+                        </div>
+                    </div>
+                    <span class="status-badge status-critical">24 open</span>
+                </div>
+                <div style="margin-top: 8px;"><span title="hygiene:code_review_24h — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:code_review_24h (1)</span><span title="hygiene:epics_in_progress_no_assignee — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_in_progress_no_assignee</span><span title="hygiene:epics_missing_acceptance_criteria — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_missing_acceptance_criteria (10)</span><span title="hygiene:epics_no_description — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_description</span><span title="hygiene:epics_no_designs — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_designs (2)</span><span title="hygiene:epics_no_parent — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_parent</span><span title="hygiene:epics_no_prefix — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_prefix (1)</span><span title="hygiene:epics_no_sprint — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_sprint (3)</span><span title="hygiene:epics_no_work_items — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_work_items (4)</span><span title="hygiene:epics_status_unknown — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_status_unknown</span><span title="hygiene:features_missing_designs — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:features_missing_designs</span><span title="hygiene:features_missing_launch_phase — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:features_missing_launch_phase</span><span title="hygiene:features_missing_milestone — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:features_missing_milestone</span><span title="hygiene:stories_no_description — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:stories_no_description (3)</span><span title="hygiene:stories_no_parent — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:stories_no_parent</span><span title="hygiene:stories_no_points — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:stories_no_points</span></div>
+                
+            </div>
+        
             <div class="status-card" style="margin-bottom: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
                     <div>
@@ -1049,20 +1063,6 @@
                         <h3 style="margin: 0;">🧠 Run c34d5eed7fee  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 08:30:01</span>  </h3>
                         <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
                             16 rule(s) evaluated · 24 open · 0 resolved this run · <span style="color: var(--text-muted); font-size: 11px;">took 56.1s</span>
-                        </div>
-                    </div>
-                    <span class="status-badge status-critical">24 open</span>
-                </div>
-                <div style="margin-top: 8px;"><span title="hygiene:code_review_24h — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:code_review_24h (1)</span><span title="hygiene:epics_in_progress_no_assignee — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_in_progress_no_assignee</span><span title="hygiene:epics_missing_acceptance_criteria — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_missing_acceptance_criteria (10)</span><span title="hygiene:epics_no_description — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_description</span><span title="hygiene:epics_no_designs — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_designs (2)</span><span title="hygiene:epics_no_parent — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_parent</span><span title="hygiene:epics_no_prefix — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_prefix (1)</span><span title="hygiene:epics_no_sprint — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_sprint (3)</span><span title="hygiene:epics_no_work_items — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_no_work_items (4)</span><span title="hygiene:epics_status_unknown — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:epics_status_unknown</span><span title="hygiene:features_missing_designs — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:features_missing_designs</span><span title="hygiene:features_missing_launch_phase — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:features_missing_launch_phase</span><span title="hygiene:features_missing_milestone — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:features_missing_milestone</span><span title="hygiene:stories_no_description — failed" style="display:inline-block; background:#7f1d1d; color:#fca5a5; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:stories_no_description (3)</span><span title="hygiene:stories_no_parent — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:stories_no_parent</span><span title="hygiene:stories_no_points — passed" style="display:inline-block; background:#064e3b; color:#6ee7b7; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-family: var(--font-mono); margin: 2px 3px 2px 0;">hygiene:stories_no_points</span></div>
-                
-            </div>
-        
-            <div class="status-card" style="margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
-                    <div>
-                        <h3 style="margin: 0;">🧠 Run ab3e77450b60  <span style="color: var(--text-muted); font-size: 13px; font-weight: 400;">· May 22, 08:15:01</span>  </h3>
-                        <div style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">
-                            16 rule(s) evaluated · 24 open · 0 resolved this run · <span style="color: var(--text-muted); font-size: 11px;">took 55.7s</span>
                         </div>
                     </div>
                     <span class="status-badge status-critical">24 open</span>

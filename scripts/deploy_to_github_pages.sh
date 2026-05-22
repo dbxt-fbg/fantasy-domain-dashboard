@@ -25,6 +25,10 @@ fi
 echo "🔗 Updating internal links..."
 cd docs
 find . -name "*.html" -type f -exec sed -i '' 's/project_fantasy\.html/index.html/g' {} +
+
+# Add version parameter to JavaScript includes for cache busting
+echo "🔧 Adding cache-busting version to JS includes..."
+find . -name "*.html" -type f -exec sed -i '' 's|assets/dashboard\.js"|assets/dashboard.js?v=2.0"|g' {} +
 cd ..
 
 echo "✓ Dashboard files prepared in docs/"
