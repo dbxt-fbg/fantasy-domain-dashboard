@@ -620,8 +620,17 @@ window.toggleLog = function (id) {
 // Detect if we're running locally or on GitHub Pages
 function isLocalEnvironment() {
     const hostname = window.location.hostname;
+    // Return false (not local) if on GitHub Pages or other hosting
+    if (hostname.includes('github.io') ||
+        hostname.includes('githubusercontent.com') ||
+        hostname.includes('netlify.app') ||
+        hostname.includes('vercel.app')) {
+        return false;
+    }
+    // Return true for local development environments
     return hostname === 'localhost' ||
            hostname === '127.0.0.1' ||
+           hostname === '' || // file:// protocol
            hostname.startsWith('192.168.') ||
            hostname.startsWith('10.') ||
            hostname.endsWith('.local');
