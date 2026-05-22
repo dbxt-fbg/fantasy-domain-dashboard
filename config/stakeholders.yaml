@@ -1,0 +1,143 @@
+# DFS / Project Fantasy stakeholders.
+#
+# Edited via conversation: tell the assistant "add X to OSB", "remove Y from
+# DSEA", "move Z from Tech Compliance to Shared Services", and they'll update
+# this file and regenerate the page.
+#
+# Schema:
+#   groups:
+#     - label: <chip text on the left>          (required)
+#       slug: <stable id, lowercase-hyphen>     (required, unique)
+#       members:                                (optional — for flat groups)
+#         - name, title, role_tag, color
+#       subgroups:                              (optional — for nested rows)
+#         - label, slug, members
+#
+# `color` picks the avatar-circle background. Recognized values:
+#   indigo, teal, orange, purple, blue, pink, green, red, slate
+#   (or pass any CSS color directly)
+
+groups:
+  - label: "Executive Sponsor"
+    slug: executive-sponsor
+    members:
+      - name: "Scot McClintic"
+        title: "Chief Operating Officer"
+        role_tag: "Executive Sponsor"
+        color: blue
+
+  - label: "Strategic Projects"
+    slug: strategic-projects
+    members:
+      - name: "Laura Freeman Rock"
+        title: "Vice President — Strategic Projects"
+        role_tag: "VP Strategic Projects"
+        color: teal
+
+  - label: "Fantasy Teams"
+    slug: fantasy-teams
+    subgroups:
+      - label: "Engineering"
+        slug: fantasy-engineering
+        members:
+          - name: "Liz Mackie"
+            title: "Senior Director, Engineering — Fantasy"
+            role_tag: "Engineering Lead"
+            color: orange
+          - name: "David Baxter"
+            title: "Senior Software Engineering Manager, Fantasy"
+            role_tag: "Engineering Manager"
+            color: indigo
+      - label: "Design"
+        slug: fantasy-design
+        members:
+          - name: "Lauren Pluschke"
+            title: "Director, Product Design"
+            role_tag: "Design Lead"
+            color: blue
+          - name: "Dwight Battle"
+            title: "Senior Principal Experience Designer"
+            role_tag: "UX Lead"
+            color: indigo
+      - label: "Product"
+        slug: fantasy-product
+        members:
+          - name: "Tom Boettner"
+            title: "Senior Principal Product Manager"
+            role_tag: "Product Lead"
+            color: indigo
+      - label: "TPM"
+        slug: fantasy-tpm
+        members:
+          - name: "Adam Brett"
+            title: "Senior Staff Technical Program Manager"
+            role_tag: "TPM — DFS Lead"
+            color: teal
+
+  - label: "Shared Services"
+    slug: shared-services
+    members:
+      - name: "Alexandra Congleton"
+        title: "Director, Product"
+        role_tag: "Product Director"
+        color: orange
+      - name: "Kaylee Kohfeldt"
+        title: "Director, Software Engineering"
+        role_tag: "Eng Director"
+        color: pink
+      - name: "Loren Crowe"
+        title: "Director of Tech Program Management"
+        role_tag: "TPM — Shared Services"
+        color: blue
+
+  - label: "Odds Factory"
+    slug: odds-factory
+    members:
+      - name: "Atul Shrivastava"
+        title: "Senior Technical Program Manager"
+        role_tag: "TPM — Odds Factory"
+        color: orange
+      - name: "Thomas O'Donnell"
+        title: "Senior Product Manager"
+        role_tag: "Product Manager"
+        color: orange
+
+  - label: "DSEA"
+    slug: dsea
+    members:
+      - name: "Gabriel Ruskin"
+        title: "Sr. Staff Product Manager, Technical"
+        role_tag: "DSEA"
+        color: teal
+      - name: "Linda Terrell"
+        title: "Staff Technical Program Manager"
+        role_tag: "TPM — DSEA"
+        color: orange
+      - name: "Burzin Daruwalla"
+        title: "Director, Finance & Regulatory Analytics"
+        role_tag: "DSEA — Director"
+        color: pink
+
+  - label: "OSB"
+    slug: osb
+    members:
+      - name: "Asha Nair"
+        title: "Director, Software Engineering"
+        role_tag: "Eng Director"
+        color: blue
+      - name: "Kunal Sharma"
+        title: "Staff Technical Program Manager"
+        role_tag: "TPM — OSB"
+        color: orange
+
+  - label: "Tech Compliance"
+    slug: tech-compliance
+    members:
+      - name: "Rebecca Cangey"
+        title: "Director"
+        role_tag: "Tech Compliance"
+        color: blue
+      - name: "Sawyer Coleman"
+        title: "Senior Technical Program Manager"
+        role_tag: "TPM Tech Compliance"
+        color: teal

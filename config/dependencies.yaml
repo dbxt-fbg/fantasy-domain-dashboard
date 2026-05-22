@@ -1,0 +1,87 @@
+# Cross-team / cross-project dependencies the Fantasy team is tracking.
+#
+# Schema:
+#   dependencies:
+#     - key:     "FNTSY-1234" | "CAT-567" | "FEAT-89"   (required)
+#       team:    "DSEA" | "Shared Services" | etc.       (optional — chip)
+#       summary: "..."                                   (optional override; FNTSY pulls from DB)
+#       owner:   "..."                                   (optional override)
+#       status:  "Open" | "In Progress" | "Done" | etc.  (optional override)
+#       url:     "https://..."                            (optional override)
+#       notes:   |                                        (free-text, edited
+#         Multi-line notes the team writes.                in-page or here)
+#
+# FNTSY-prefixed keys auto-populate summary/owner/status/url from the local
+# tickets table when present. Other projects (CAT, FEAT, …) live entirely in
+# this YAML — fill in summary/owner/status manually.
+#
+# Edits via conversation: tell the assistant "add CAT-123 to dependencies"
+# or "update notes on FNTSY-456 to say …"; or type directly into the page's
+# textarea and click Save (writes here via /api/dependency-notes).
+#
+# IMPORTANT: when /api/dependency-notes saves notes, ruamel.yaml preserves
+# this comment block if installed. Plain PyYAML strips it on round-trip —
+# so prefer ruamel where possible. Keep this header tidy so users editing
+# by hand still see the schema.
+
+dependencies:
+- key: "FEAT-8216"
+  team: "Shared Services"
+  summary: "[CAT] DFS: Universal Balance (Unified Wallet)"
+  status: "In Progress"
+  notes: "DATA, PAY, and MAGU are all in progress.  \n\n***  This one may not make it by the end of M30. We are still spiking on the implementation and expect to have a better idea before the end of this sprint."
+- key: "FEAT-8217"
+  team: "Shared Services"
+  summary: "[CAT] DFS: Payments MVP - Payment Methods (Deposit+Withdrawals)"
+  status: "Engineering Unpacking"
+  notes: "Tanya to start M30.3."
+- key: "FEAT-8511"
+  team: "Shared Services"
+  summary: "[CAT] DFS: Geolocation Support"
+  status: "In Progress"
+  notes: "Tanya is working on the Fantasy epic in M30.2.  "
+- key: "FEAT-8495"
+  team: "Shared Services"
+  summary: "[CAT] DFS: Payments Launch and Certification"
+  status: "Product Discovery"
+  notes: "Slated for M31.  Needs requirements."
+- key: "FEAT-7243"
+  team: "Shared Services"
+  summary: "[CAT] DFS: Eligibility Service Part 1 [to be defined]"
+  status: "Product Discovery"
+  notes: "Slated for M31.  Needs an engineering breakdown if all requirements are final."
+- key: "FEAT-8600"
+  team: "Shared Services"
+  summary: "[CAT] App Switcher for Super app Concept"
+  status: "Engineering Unpacking"
+  notes: "FE Work: @Nate Clay to share by May 29, sizing and feasibility of getting this done by M31.2 for Beta. Will have dependencies on the DFS team porting the standalone app code and Atlas for supporting app switcher functionality\nAUTH work: @Griffin Sandler has confirmed that PROF has things ready for the supporting engineer to pick up work starting M30.3"
+- key: "FEAT-8509"
+  team: "Shared Services"
+  summary: "[CAT] DFS: RG Limits & Entry Limits"
+  status: "In Progress"
+  notes: "Fu Shen and Tanya are meeting 5/21 to sort out the requirements.  Nigel to start work M30.3\n\nThe GATE team is prioritizing a spike this week to be ready for the supporting engineer. @sean.roy can you provide updates as this progresses? CC @Griffin Sandler for other coordination work happening with MAGU and SWAT (that I'll help with)\nThis needs to be ready for Beta, but the expectation is that the support from DFS in M30 will ensure, with full confidence, that the timeline can be met for all the RG work."
+- key: "FEAT-8512"
+  team: "Shared Services"
+  summary: "[CAT] DFS: Tax & Regulatory Reports"
+  status: "Product Discovery"
+  notes: "Slated for M31.  Needs requirements."
+- key: "FEAT-8554"
+  team: "Odds Factory"
+  summary: "[OF] DFS: Trading Engineering/Product Requirements [Alpha]"
+  status: "In Progress"
+  notes: "Targeted M30.  All VAMO Epics in progress.\nShould be delivered M30.3\nA week late due to an engineer quitting"
+- key: "FEAT-8902"
+  team: "Odds Factory"
+  summary: "[OF] DFS: Trading Engineering/Product Requirements [Beta]"
+  status: "Product Discovery"
+  notes: "Targeting M30.  Work to start M30.3."
+- key: "FEAT-7883"
+  team: "Sportsbook"
+  summary: "[ENG] Migrate Bet placement flow to wallet-transaction-api"
+  status: "Product Discovery"
+  notes: "Per Tanya, we should be fine as we're already connected to wallet-transaction-api.  Will reach out to Sean to determine if there are additional concerns."
+- key: "FEAT-8991"
+  team: "Sportsbook"
+  summary: "RAD Prod Phase 1"
+  status: "In Progress"
+  notes: "Getting documentation on RAD 5/22"

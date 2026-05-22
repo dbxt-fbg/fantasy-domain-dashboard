@@ -1,0 +1,4 @@
+# Ignore sensitive credential files
+.env
+*.pickle
+google_credentials.json

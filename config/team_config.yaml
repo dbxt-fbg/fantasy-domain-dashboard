@@ -1,0 +1,154 @@
+# Jira Configuration
+jira:
+  cloud_id: "betfanatics.atlassian.net"
+  story_points_field: "customfield_10016"
+  story_points_fallback_fields:
+    - "customfield_10026"
+    - "customfield_10028"
+    - "Story Points"
+  sprint_prefix: "FNTSY"
+  project_key: "FNTSY"
+
+# GitHub Configuration
+github:
+  organization: "fanatics-gaming"
+  team_slug: "fantasy-backend"
+  repositories: []  # Empty list means track all repos in the organization
+
+# Team Member Mappings
+# Discovered from Jira and GitHub
+team_members:
+  - name: "Anushri Patel"
+    role: "FE"
+    level: "Engineer III"
+    jira_account_id: "712020:38773bfb-2311-4127-a8ce-cfc07d764443"
+    github_username: "anushri-patel"  # Update if different
+
+  - name: "Brooks Taylor"
+    role: "BE"
+    jira_account_id: "638df2cc77acd224b34258e5"
+    github_username: "BrooksAtFanatics"
+    level: "Staff Engineer"
+
+  - name: "Kevin Paquette"
+    role: "BE"
+    jira_account_id: "712020:fc94c716-4570-4f43-833e-ef4ef3598c58"
+    github_username: "KevinPaquetteAtFanatics"
+    level: "Staff Engineer"
+
+  - name: "Liam Butler"
+    role: "BE"
+    jira_account_id: "712020:ae26c2f0-9f3a-4e5c-8af3-35df5ec8c133"
+    github_username: "liambfbg"
+    level: "Engineer III"
+
+  - name: "Michael Goodwin"
+    role: "BE"
+    level: "Principal Engineer"
+    jira_account_id: "6372b409a593cb822e924296"
+    github_username: "mjgoodwin"
+
+  - name: "Nigel Young"
+    role: "BE"
+    jira_account_id: "712020:540ac79b-9902-4756-b67c-d157cc977b46"
+    github_username: "NigelYoungAtFanatics"
+    level: "Engineer III"
+
+  - name: "Patrick Kilburn"
+    role: "BE"
+    level: "Senior Staff Engineer"
+    jira_account_id: "6400c3c50d9b61193c250165"
+    github_username: "patrick-kilburn"
+
+  - name: "Ryan Taylor"
+    role: "BE"
+    jira_account_id: "712020:efdfebfd-e03b-48f2-9c44-cd6eba377a92"
+    github_username: "RyanTaylorAtFanatics"
+    level: "Engineer II"
+
+  - name: "Scott Schmitz"
+    role: "FE"
+    jira_account_id: "712020:4eb11e93-9714-4d39-a660-6207665464ed"
+    github_username: "scott-schmitz-fbg"
+    level: "Senior Engineer"
+
+  - name: "Tanya Phanich"
+    role: "BE"
+    jira_account_id: "62da9a2a5eeecd39350a6774"
+    github_username: "tanya-pha"
+    level: "Staff Engineer"
+
+  - name: "Jacob Tabak"
+    role: "FE"
+    jira_account_id: "712020:773185a3-dcc2-4492-8577-58463fce0327"
+    github_username: "jacobtabak-bet"  # Update if different
+
+  - name: "Jasmine Dacones"
+    role: "FE"
+    level: "Engineer III"
+    jira_account_id: "712020:4cf3c3f9-1579-45e5-90e4-8941951a4fb2"
+    github_username: "jasminedacones"  # Update if different
+
+  - name: "Josh Schaefer"
+    role: "BE"
+    jira_account_id: "712020:ac04afd5-13dd-401e-ab22-5fe00fd9d623"
+    github_username: "JoshSchaeferAtFanatics"  # Update if different
+    level: "Senior Engineer"
+
+  - name: "Kevin Jacob"
+    role: "FE"
+    level: "Staff Engineer"
+    jira_account_id: "712020:5f5b45c8-656b-4c8c-81c6-1f36450485ec"
+    github_username: "kevin-jacob"  # Update if different
+
+  - name: "Paul Kang"
+    role: "FE"
+    level: "Staff Engineer"
+    jira_account_id: "712020:ed61f340-98fd-4c0b-9e5e-50e9f6e3f0a4"
+    github_username: "paul-kang"  # Update if different
+
+  - name: "Salmaan Khan"
+    role: "BE"
+    jira_account_id: "712020:0effd921-c06c-4330-9818-aac83f8d04cf"
+    github_username: "SalmaanKhanAtFanatics"  # Update if different
+    level: "Engineer II"
+
+
+  - name: "Anthony Porter"
+    jira_account_id: "712020:df8179ca-5274-4b0d-a690-37a7bd84e4b9"
+    # auto-added via jira_assignee
+
+# Collection Settings
+collection:
+  cron_schedule: "*/15 * * * *"  # Every 15 minutes
+  max_sprints_to_track: 3  # Track current + recent sprints
+  github_pr_lookback_days: 90  # How far back to analyze merged PRs
+
+# Epics that should NEVER appear on the dashboard — hygiene checks, the
+# Epics page (Gantt + accordion + line chart), Past Sprints, and any other
+# epic listing all read this same list. Most are personal onboarding epics
+# that aren't real product work. Add new keys here, not under `hygiene:`.
+ignored_epics:
+  - FNTSY-128  # Onboarding / non-product work
+  - FNTSY-368  # Paul Kang - Fantasy Client Engineer Onboarding
+  - FNTSY-373  # Kevin Jacob - Fantasy Client Engineer Onboarding
+  - FNTSY-383  # Paul Kang - COP Client Onboarding Beta Guide
+  - FNTSY-385  # Kevin Jacob - COP Client Onboarding Beta Guide
+  - FNTSY-548  # Anthony Porter - COP Client Onboarding Beta Guide
+  - FNTSY-554  # Anthony Porter - Fantasy Client Engineer Onboarding
+
+# Hygiene Settings
+hygiene:
+  # Legacy location for ignored_epics — still read by the helper, but new
+  # entries should go in the top-level `ignored_epics:` block above so
+  # every page (not just hygiene) suppresses them.
+  ignored_epics: []
+
+# Database Settings
+database:
+  path: "/Users/davidbaxter/sync/claude/em_dashboard/data/metrics.db"
+
+# Logging
+logging:
+  level: "INFO"
+  file: "/Users/davidbaxter/sync/claude/em_dashboard/logs/collector.log"

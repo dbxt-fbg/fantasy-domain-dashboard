@@ -1,0 +1,13 @@
+ticket_key,sprint,summary,status,assignee,story_points,ticket_url
+FNTSY-18,"FNTSY M30.3 Sprint 2026.12","[BE] UMB Pickslip","To Do",Unassigned,0.0,https://betfanatics.atlassian.net/browse/FNTSY-18
+FNTSY-305,"FNTSY M30.3 Sprint 2026.12","[BE] Max Stake Calculation and Validation","To Do",Unassigned,0.0,https://betfanatics.atlassian.net/browse/FNTSY-305
+FNTSY-307,"FNTSY M30.3 Sprint 2026.12","[BE] Playmaker Editing Contest Entries","To Do",Unassigned,0.0,https://betfanatics.atlassian.net/browse/FNTSY-307
+FNTSY-308,"FNTSY M30.3 Sprint 2026.12","[BE] Player Page RPCs","To Do",Unassigned,0.0,https://betfanatics.atlassian.net/browse/FNTSY-308
+FNTSY-310,"FNTSY M30.3 Sprint 2026.12","[BE] Market Permissability","To Do",Unassigned,0.0,https://betfanatics.atlassian.net/browse/FNTSY-310
+FNTSY-501,"FNTSY M30.3 Sprint 2026.12","[BE] Fast Lane M30.3","To Do","Patrick Kilburn",0.0,https://betfanatics.atlassian.net/browse/FNTSY-501
+FNTSY-409,"FNTSY M30.4 Sprint 2026.13","[BE] End-to-End User Scenario Validation","To Do","Patrick Kilburn",0.0,https://betfanatics.atlassian.net/browse/FNTSY-409
+FNTSY-413,"FNTSY M30.4 Sprint 2026.13","[BE] Pick Selection: Single Market Player Card","To Do",Unassigned,0.0,https://betfanatics.atlassian.net/browse/FNTSY-413
+FNTSY-414,"FNTSY M30.4 Sprint 2026.13","[BE] OF Kafka Integration",Blocked,Unassigned,0.0,https://betfanatics.atlassian.net/browse/FNTSY-414
+FNTSY-475,"FNTSY M30.4 Sprint 2026.13","[BE] Contest Unsettlement","To Do",Unassigned,0.0,https://betfanatics.atlassian.net/browse/FNTSY-475
+FNTSY-502,"FNTSY M30.4 Sprint 2026.13","[BE] Fast Lane M30.4","To Do","Patrick Kilburn",0.0,https://betfanatics.atlassian.net/browse/FNTSY-502
+FNTSY-57,"FNTSY M30.4 Sprint 2026.13","[BE] Service: Orchestrator","To Do","Brooks Taylor",5.0,https://betfanatics.atlassian.net/browse/FNTSY-57

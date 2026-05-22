@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Hygiene Dashboard</title>
+    <link rel="stylesheet" href="assets/dashboard.css">
+    <script src="assets/dashboard.js" defer></script>
+    <!-- showSection lives in assets/dashboard.js -->
+</head>
+<body class="page-hygiene">
+    <div class="container">
+        
+        <header>
+            <h1>🔍 Ticket Hygiene Dashboard</h1>
+            <div class="subtitle">Generated May 21, 2026 at 12:01</div>
+        </header>
+                <nav class="top-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="active">Project: Fantasy</a></li>
+                <li class="nav-item"><a href="team_members_dashboard.html">Team Members</a></li>
+                <li class="nav-item"><a href="logs_dashboard.html">Agents and Logs</a></li>
+            </ul>
+        </nav>
+        <nav class="sub-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="team_dashboard.html#team-metrics">Stories</a></li>
+                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="epics_dashboard.html">Epics</a></li>
+                <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
+                <li class="nav-item"><a href="hygiene_dashboard.html" class="active">Ticket Hygiene</a></li>
+                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
+                <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
+                <li class="nav-item"><a href="dependencies.html">Dependencies</a></li>
+                <li class="nav-item"><a href="mbr.html">MBR</a></li>
+            </ul>
+        </nav>
+        <div class="content">
+            <h2 class="section-title" style="margin-top: 0;">🎯 Feature Hygiene Rules</h2>
+            <div class="metrics-grid">
+                <button type="button" class="metric-card clean" onclick="showSection('features_missing_requirements')" aria-controls="features_missing_requirements">
+                    <div class="metric-label">Features Missing Requirements</div>
+                    <div class="metric-value">0</div>
+                </button>
+                <button type="button" class="metric-card clean" onclick="showSection('features_missing_designs')" aria-controls="features_missing_designs">
+                    <div class="metric-label">Features Missing Designs</div>
+                    <div class="metric-value">0</div>
+                </button>
+                <button type="button" class="metric-card clean" onclick="showSection('features_missing_launch_phase')" aria-controls="features_missing_launch_phase">
+                    <div class="metric-label">Features Missing Launch Phase</div>
+                    <div class="metric-value">0</div>
+                </button>
+                <button type="button" class="metric-card clean" onclick="showSection('features_missing_milestone')" aria-controls="features_missing_milestone">
+                    <div class="metric-label">Features Missing Proposed Milestone</div>
+                    <div class="metric-value">0</div>
+                </button>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 40px;">📋 Epic Hygiene Rules</h2>
+            <div class="metrics-grid">
+                <button type="button" class="metric-card  clean" onclick="showSection('epics_no_parent')" aria-controls="epics_no_parent">
+                    <div class="metric-label">Epics Without Parent</div>
+                    <div class="metric-value">0</div>
+                </button>
+                <button type="button" class="metric-card clean" onclick="showSection('epics_no_description')" aria-controls="epics_no_description">
+                    <div class="metric-label">Epics Missing Description</div>
+                    <div class="metric-value">0</div>
+                </button>
+                <button type="button" class="metric-card clean" onclick="showSection('epics_no_prefix')" aria-controls="epics_no_prefix">
+                    <div class="metric-label">Epics Without [BE]/[FE] Prefix</div>
+                    <div class="metric-value">0</div>
+                </button>
+                <button type="button" class="metric-card" onclick="showSection('epics_no_designs')" aria-controls="epics_no_designs">
+                    <div class="metric-label">[FE] Epics Without Figma</div>
+                    <div class="metric-value">1</div>
+                </button>
+                <button type="button" class="metric-card" onclick="showSection('epics_no_work_items')" aria-controls="epics_no_work_items">
+                    <div class="metric-label">Epics Without Child Stories</div>
+                    <div class="metric-value">5</div>
+                </button>
+                <button type="button" class="metric-card" onclick="showSection('epics_missing_acceptance_criteria')" aria-controls="epics_missing_acceptance_criteria">
+                    <div class="metric-label">Epics Missing AC</div>
+                    <div class="metric-value">11</div>
+                </button>
+                <button type="button" class="metric-card" onclick="showSection('epics_no_sprint')" aria-controls="epics_no_sprint">
+                    <div class="metric-label">Epics Without Sprint</div>
+                    <div class="metric-value">1</div>
+                </button>
+                <button type="button" class="metric-card clean" onclick="showSection('epics_in_progress_no_assignee')" aria-controls="epics_in_progress_no_assignee">
+                    <div class="metric-label">Epics In Progress · No Assignee</div>
+                    <div class="metric-value">0</div>
+                </button>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 40px;">📝 Story Hygiene Rules</h2>
+            <div class="metrics-grid">
+                <button type="button" class="metric-card clean" onclick="showSection('stories_no_parent')" aria-controls="stories_no_parent">
+                    <div class="metric-label">Stories Without Epic</div>
+                    <div class="metric-value">0</div>
+                </button>
+                <button type="button" class="metric-card clean" onclick="showSection('stories_no_points')" aria-controls="stories_no_points">
+                    <div class="metric-label">Stories Without Points</div>
+                    <div class="metric-value">0</div>
+                </button>
+                <button type="button" class="metric-card" onclick="showSection('stories_no_description')" aria-controls="stories_no_description">
+                    <div class="metric-label">Stories Missing Description</div>
+                    <div class="metric-value">4</div>
+                </button>
+                <button type="button" class="metric-card" onclick="showSection('code_review_24h')" aria-controls="code_review_24h">
+                    <div class="metric-label">Code Review > 24 Hours</div>
+                    <div class="metric-value">2</div>
+                </button>
+            </div>
+        
+            <div class="section" id="features_missing_requirements">
+                <h2 class="section-title">Features Missing Requirements (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="features_missing_designs">
+                <h2 class="section-title">Features Missing Designs (No Figma/Screenshots) (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="features_missing_launch_phase">
+                <h2 class="section-title">Features Missing Launch Phase (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="features_missing_milestone">
+                <h2 class="section-title">Features Missing Proposed Milestone (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="epics_no_parent">
+                <h2 class="section-title">Epics Without Parent Feature (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="epics_no_description">
+                <h2 class="section-title">Epics Without Description (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="epics_no_prefix">
+                <h2 class="section-title">Epics Without [BE]/[FE] Prefix (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="epics_no_designs">
+                <h2 class="section-title">[FE] Epics Without Figma Link (1)</h2>
+            <div class="issue-list">
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-532" target="_blank" class="issue-key">FNTSY-532</a>
+                            <span class="issue-summary">[FE] [UMB] Realtime Updates for Events, Markets, and Propositions</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Jacob Tabak</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T13:45:56">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    </div></div>
+            <div class="section" id="epics_no_work_items">
+                <h2 class="section-title">Epics Without Child Stories (5)</h2>
+            <div class="issue-list">
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-531" target="_blank" class="issue-key">FNTSY-531</a>
+                            <span class="issue-summary">[FE] UMB Pickslip</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T13:31:14">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-535" target="_blank" class="issue-key">FNTSY-535</a>
+                            <span class="issue-summary">[BE] Entry Tracking: Track picks</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:54">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-534" target="_blank" class="issue-key">FNTSY-534</a>
+                            <span class="issue-summary">[BE] Payout line items</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:55">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-537" target="_blank" class="issue-key">FNTSY-537</a>
+                            <span class="issue-summary">[BE] League Pages - Events Endpoint</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-14T05:33:15">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-586" target="_blank" class="issue-key">FNTSY-586</a>
+                            <span class="issue-summary">[BE] Playmaker - Risk Requirements (Liability Management) - MVP</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 1d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    </div></div>
+            <div class="section" id="epics_missing_acceptance_criteria">
+                <h2 class="section-title">Epics Missing Acceptance Criteria (11)</h2>
+            <div class="issue-list">
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-486" target="_blank" class="issue-key">FNTSY-486</a>
+                            <span class="issue-summary">[BE] Playmaker App Settings Page</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Josh Schaefer</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-warning" title="First seen 2026-05-11T08:15:51">open 10d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-500" target="_blank" class="issue-key">FNTSY-500</a>
+                            <span class="issue-summary">[BE] Fast Lane M30.2</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Patrick Kilburn</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 9d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-501" target="_blank" class="issue-key">FNTSY-501</a>
+                            <span class="issue-summary">[BE] Fast Lane M30.3</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Patrick Kilburn</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 9d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-502" target="_blank" class="issue-key">FNTSY-502</a>
+                            <span class="issue-summary">[BE] Fast Lane M30.4</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Patrick Kilburn</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-11T15:30:47">open 9d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-508" target="_blank" class="issue-key">FNTSY-508</a>
+                            <span class="issue-summary">[BE] Oddsfactory Ingestion Updates 30.2</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Nigel Young</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-warning" title="First seen 2026-05-12T09:30:47">open 9d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-531" target="_blank" class="issue-key">FNTSY-531</a>
+                            <span class="issue-summary">[FE] UMB Pickslip</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T13:34:46">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-535" target="_blank" class="issue-key">FNTSY-535</a>
+                            <span class="issue-summary">[BE] Entry Tracking: Track picks</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:54">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-534" target="_blank" class="issue-key">FNTSY-534</a>
+                            <span class="issue-summary">[BE] Payout line items</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-13T14:15:55">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-538" target="_blank" class="issue-key">FNTSY-538</a>
+                            <span class="issue-summary">[BE] Playmaker Pick Scoring Tiers Page</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Kevin Paquette</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-warning" title="First seen 2026-05-14T06:45:59">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-539" target="_blank" class="issue-key">FNTSY-539</a>
+                            <span class="issue-summary">[BE] Playmaker Leaderboard Payout Tiers Page</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Kevin Paquette</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-warning" title="First seen 2026-05-14T06:45:59">open 7d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-586" target="_blank" class="issue-key">FNTSY-586</a>
+                            <span class="issue-summary">[BE] Playmaker - Risk Requirements (Liability Management) - MVP</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 1d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    </div></div>
+            <div class="section" id="epics_no_sprint">
+                <h2 class="section-title">Epics Not Assigned to a Sprint (1)</h2>
+            <div class="issue-list">
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-586" target="_blank" class="issue-key">FNTSY-586</a>
+                            <span class="issue-summary">[BE] Playmaker - Risk Requirements (Liability Management) - MVP</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Unassigned</span>
+                            <span class="badge status">To Do</span>
+                            <span class="badge age-muted" title="First seen 2026-05-20T08:30:58">open 1d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    </div></div>
+            <div class="section" id="epics_in_progress_no_assignee">
+                <h2 class="section-title">Epics In Progress Without Assignee (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="stories_no_parent">
+                <h2 class="section-title">Stories In Progress Without Parent Epic (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="stories_no_points">
+                <h2 class="section-title">Stories In Progress Without Story Points (0)</h2>
+            
+                <div class="empty-state">
+                    <div class="icon">✅</div>
+                    <div>No issues found. Great job!</div>
+                </div>
+                </div>
+            <div class="section" id="stories_no_description">
+                <h2 class="section-title">Stories In Progress Without Description (4)</h2>
+            <div class="issue-list">
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-566" target="_blank" class="issue-key">FNTSY-566</a>
+                            <span class="issue-summary">jurisdiction id save to contest entry for wallet calls</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Tanya Phanich</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-info" title="First seen 2026-05-18T09:45:54">open 3d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-580" target="_blank" class="issue-key">FNTSY-580</a>
+                            <span class="issue-summary">REST endpoint for returning offer fingerprint</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Michael Goodwin</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-muted" title="First seen 2026-05-19T14:00:51">open 1d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-524" target="_blank" class="issue-key">FNTSY-524</a>
+                            <span class="issue-summary">C4 environment setup - TEST / CERT</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Jacob Tabak</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-muted" title="First seen 2026-05-20T10:30:57">open 1d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-574" target="_blank" class="issue-key">FNTSY-574</a>
+                            <span class="issue-summary">Integrate FC Earn into fantasy-fancash-earnrate-api</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Liam Butler</span>
+                            <span class="badge status">In Progress</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T06:30:57">open 0d</span>
+                            
+                    
+                        </div>
+                    </div>
+                    </div></div>
+            <div class="section" id="code_review_24h">
+                <h2 class="section-title">Tickets In Code Review > 24 Hours (2)</h2>
+            <div class="issue-list">
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-484" target="_blank" class="issue-key">FNTSY-484</a>
+                            <span class="issue-summary">Account Index Page</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Ryan Taylor</span>
+                            <span class="badge status">In code review</span>
+                            <span class="badge age-info" title="First seen 2026-05-16T08:31:04">open 5d</span>
+                            
+                    <span class="badge hours">147.5h in review</span>
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-562" target="_blank" class="issue-key">FNTSY-562</a>
+                            <span class="issue-summary">Update FanCash Services with DFS Ledger details</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Liam Butler</span>
+                            <span class="badge status">In code review</span>
+                            <span class="badge age-muted" title="First seen 2026-05-21T10:00:59">open 0d</span>
+                            
+                    <span class="badge hours">26.0h in review</span>
+                        </div>
+                    </div>
+                    </div></div>
+        </div>
+    </div>
+    
+    </div>
+</body>
+</html>

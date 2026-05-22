@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dependencies — Project: Fantasy</title>
+    <link rel="stylesheet" href="assets/dashboard.css">
+    <script src="assets/dashboard.js" defer></script>
+    <style>
+        /* Page-specific overrides only — shared styles live in assets/dashboard.css */
+    </style>
+    <!-- Interactive handlers (toggleAccordion, sortTable, etc.) live in assets/dashboard.js -->
+</head>
+<body class="page-project">
+    <div class="container">
+        
+        <header>
+            <h1>🔗 Dependencies</h1>
+            <div class="subtitle">Project: Fantasy · 12 tracked · Source: config/dependencies.yaml · Last edited May 21, 2026 at 09:59</div>
+        </header>
+        <nav class="top-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="active">Project: Fantasy</a></li>
+                <li class="nav-item"><a href="team_members_dashboard.html">Team Members</a></li>
+                <li class="nav-item"><a href="logs_dashboard.html">Agents and Logs</a></li>
+            </ul>
+        </nav>
+        <nav class="sub-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="team_dashboard.html#team-metrics">Stories</a></li>
+                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="epics_dashboard.html">Epics</a></li>
+                <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
+                <li class="nav-item"><a href="hygiene_dashboard.html">Ticket Hygiene</a></li>
+                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
+                <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
+                <li class="nav-item"><a href="dependencies.html" class="active">Dependencies</a></li>
+                <li class="nav-item"><a href="mbr.html">MBR</a></li>
+            </ul>
+        </nav>
+        <div class="content">
+            <div class="intro-banner">
+                <p>Cross-team / cross-project tickets the Fantasy team is waiting on. Status notes are free-text — no history kept; the latest text wins. Save writes back to <code>config/dependencies.yaml</code>.</p>
+            </div>
+            <div class="dep-team-section"><div class="dep-team-header"><span class="dep-team-name">Shared Services</span><span class="dep-team-count">8</span></div><div class="dep-grid">
+        <div class="dep-card" data-key="FEAT-7243">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-7243" target="_blank" rel="noopener">FEAT-7243</a>
+                <span class="dep-team">Shared Services</span>
+                <span class="dep-status todo">Product Discovery</span>
+            </div>
+            <div class="dep-summary">[CAT] DFS: Eligibility Service Part 1 [to be defined]</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-7243">Status notes</label>
+            <textarea id="dep-notes-FEAT-7243" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Slated for M31.  Needs an engineering breakdown if all requirements are final.</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-7243', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8216">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8216" target="_blank" rel="noopener">FEAT-8216</a>
+                <span class="dep-team">Shared Services</span>
+                <span class="dep-status inprogress">In Progress</span>
+            </div>
+            <div class="dep-summary">[CAT] DFS: Universal Balance (Unified Wallet)</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8216">Status notes</label>
+            <textarea id="dep-notes-FEAT-8216" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">DATA, PAY, and MAGU are all in progress.  
+
+***  This one may not make it by the end of M30. We are still spiking on the implementation and expect to have a better idea before the end of this sprint.</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8216', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8217">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8217" target="_blank" rel="noopener">FEAT-8217</a>
+                <span class="dep-team">Shared Services</span>
+                <span class="dep-status inprogress">Engineering Unpacking</span>
+            </div>
+            <div class="dep-summary">[CAT] DFS: Payments MVP - Payment Methods (Deposit+Withdrawals)</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8217">Status notes</label>
+            <textarea id="dep-notes-FEAT-8217" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Tanya to start M30.3.</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8217', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8495">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8495" target="_blank" rel="noopener">FEAT-8495</a>
+                <span class="dep-team">Shared Services</span>
+                <span class="dep-status todo">Product Discovery</span>
+            </div>
+            <div class="dep-summary">[CAT] DFS: Payments Launch and Certification</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8495">Status notes</label>
+            <textarea id="dep-notes-FEAT-8495" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Slated for M31.  Needs requirements.</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8495', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8509">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8509" target="_blank" rel="noopener">FEAT-8509</a>
+                <span class="dep-team">Shared Services</span>
+                <span class="dep-status inprogress">In Progress</span>
+            </div>
+            <div class="dep-summary">[CAT] DFS: RG Limits &amp; Entry Limits</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8509">Status notes</label>
+            <textarea id="dep-notes-FEAT-8509" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Fu Shen and Tanya are meeting 5/21 to sort out the requirements.  Nigel to start work M30.3
+
+The GATE team is prioritizing a spike this week to be ready for the supporting engineer. @sean.roy can you provide updates as this progresses? CC @Griffin Sandler for other coordination work happening with MAGU and SWAT (that I&#x27;ll help with)
+This needs to be ready for Beta, but the expectation is that the support from DFS in M30 will ensure, with full confidence, that the timeline can be met for all the RG work.</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8509', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8511">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8511" target="_blank" rel="noopener">FEAT-8511</a>
+                <span class="dep-team">Shared Services</span>
+                <span class="dep-status inprogress">In Progress</span>
+            </div>
+            <div class="dep-summary">[CAT] DFS: Geolocation Support</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8511">Status notes</label>
+            <textarea id="dep-notes-FEAT-8511" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Tanya is working on the Fantasy epic in M30.2.  </textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8511', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8512">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8512" target="_blank" rel="noopener">FEAT-8512</a>
+                <span class="dep-team">Shared Services</span>
+                <span class="dep-status todo">Product Discovery</span>
+            </div>
+            <div class="dep-summary">[CAT] DFS: Tax &amp; Regulatory Reports</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8512">Status notes</label>
+            <textarea id="dep-notes-FEAT-8512" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Slated for M31.  Needs requirements.</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8512', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8600">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8600" target="_blank" rel="noopener">FEAT-8600</a>
+                <span class="dep-team">Shared Services</span>
+                <span class="dep-status inprogress">Engineering Unpacking</span>
+            </div>
+            <div class="dep-summary">[CAT] App Switcher for Super app Concept</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8600">Status notes</label>
+            <textarea id="dep-notes-FEAT-8600" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">FE Work: @Nate Clay to share by May 29, sizing and feasibility of getting this done by M31.2 for Beta. Will have dependencies on the DFS team porting the standalone app code and Atlas for supporting app switcher functionality
+AUTH work: @Griffin Sandler has confirmed that PROF has things ready for the supporting engineer to pick up work starting M30.3</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8600', this)">Save</button>
+            </div>
+        </div>
+    </div></div><div class="dep-team-section"><div class="dep-team-header"><span class="dep-team-name">Odds Factory</span><span class="dep-team-count">2</span></div><div class="dep-grid">
+        <div class="dep-card" data-key="FEAT-8554">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8554" target="_blank" rel="noopener">FEAT-8554</a>
+                <span class="dep-team">Odds Factory</span>
+                <span class="dep-status inprogress">In Progress</span>
+            </div>
+            <div class="dep-summary">[OF] DFS: Trading Engineering/Product Requirements [Alpha]</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8554">Status notes</label>
+            <textarea id="dep-notes-FEAT-8554" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Targeted M30.  All VAMO Epics in progress.
+Should be delivered M30.3
+A week late due to an engineer quitting</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8554', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8902">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8902" target="_blank" rel="noopener">FEAT-8902</a>
+                <span class="dep-team">Odds Factory</span>
+                <span class="dep-status todo">Product Discovery</span>
+            </div>
+            <div class="dep-summary">[OF] DFS: Trading Engineering/Product Requirements [Beta]</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8902">Status notes</label>
+            <textarea id="dep-notes-FEAT-8902" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Targeting M30.  Work to start M30.3.</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8902', this)">Save</button>
+            </div>
+        </div>
+    </div></div><div class="dep-team-section"><div class="dep-team-header"><span class="dep-team-name">Sportsbook</span><span class="dep-team-count">2</span></div><div class="dep-grid">
+        <div class="dep-card" data-key="FEAT-7883">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-7883" target="_blank" rel="noopener">FEAT-7883</a>
+                <span class="dep-team">Sportsbook</span>
+                <span class="dep-status todo">Product Discovery</span>
+            </div>
+            <div class="dep-summary">[ENG] Migrate Bet placement flow to wallet-transaction-api</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-7883">Status notes</label>
+            <textarea id="dep-notes-FEAT-7883" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Per Tanya, we should be fine as we&#x27;re already connected to wallet-transaction-api.  Will reach out to Sean to determine if there are additional concerns.</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-7883', this)">Save</button>
+            </div>
+        </div>
+    
+        <div class="dep-card" data-key="FEAT-8991">
+            <div class="dep-head">
+                <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8991" target="_blank" rel="noopener">FEAT-8991</a>
+                <span class="dep-team">Sportsbook</span>
+                <span class="dep-status inprogress">In Progress</span>
+            </div>
+            <div class="dep-summary">RAD Prod Phase 1</div>
+            <div class="dep-meta">
+                <span><strong>Owner:</strong>Unassigned</span>
+            </div>
+            <label class="dep-notes-label" for="dep-notes-FEAT-8991">Status notes</label>
+            <textarea id="dep-notes-FEAT-8991" class="dep-notes" rows="4"
+                placeholder="What's the latest? (free-text — no history kept)">Getting documentation on RAD 5/22</textarea>
+            <div class="dep-actions">
+                <span class="dep-save-msg"></span>
+                <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8991', this)">Save</button>
+            </div>
+        </div>
+    </div></div>
+            <footer>
+                Generated by Engineering Management Dashboard · May 21, 2026 at 12:00
+            </footer>
+        </div>
+    
+    </div>
+</body>
+</html>

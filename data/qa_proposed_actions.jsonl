@@ -1,0 +1,5 @@
+{"fingerprint": "c64f92cefa06", "proposed_at": "2026-05-11T07:21:24.898085+00:00", "action": {"scope": "propose", "type": "delete_orphan_ticket", "ticket_key": "FAKE-999"}, "issue": {"check_key": "", "severity": "warning", "message": "FAKE-999 references sprint_id 999999"}, "confidence": 0.6, "rationale": "demo", "status": "pending"}
+{"fingerprint": "c64f92cefa06", "resolved_at": "2026-05-11T07:21:24.898402+00:00", "status": "rejected", "reason": "not a real ticket"}
+{"fingerprint": "754ff6703148", "proposed_at": "2026-05-11T07:21:35.410241+00:00", "action": {"scope": "propose", "type": "regenerate_reports"}, "issue": {"check_key": "", "severity": "info", "message": "test approve flow"}, "confidence": 0.9, "rationale": "demo approve", "status": "pending"}
+{"fingerprint": "754ff6703148", "resolved_at": "2026-05-11T07:21:35.410370+00:00", "status": "approved", "reason": ""}
+{"fingerprint": "754ff6703148", "executed_at": "2026-05-11T07:21:35.410523+00:00", "status": "executed", "outcome": "applied", "detail": ""}
