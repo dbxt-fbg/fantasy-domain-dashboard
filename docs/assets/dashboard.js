@@ -662,7 +662,7 @@ function initDependenciesPage() {
         const introBanner = document.querySelector('.intro-banner');
         if (introBanner && window.location.pathname.includes('dependencies')) {
             const notice = document.createElement('p');
-            notice.style.cssText = 'margin-top: 10px; padding: 8px 12px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; font-size: 13px;';
+            notice.style.cssText = 'margin-top: 10px; padding: 8px 12px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; font-size: 13px; color: #000;';
             notice.innerHTML = '<strong>📌 Read-only mode:</strong> This dashboard is hosted on GitHub Pages. To edit dependency notes, run the dashboard locally.';
             introBanner.appendChild(notice);
         }
