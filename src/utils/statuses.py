@@ -16,6 +16,7 @@ CLOSED_STATUSES: Tuple[str, ...] = (
     'Done',
     'Closed',
     'Resolved',
+    'Released to Prod',
 )
 
 # Work is in flight. Counts toward WIP.
