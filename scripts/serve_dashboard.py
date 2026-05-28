@@ -731,12 +731,12 @@ def main():
         return 2
     os.chdir(REPORTS_DIR)
 
-    # Default landing page: project_fantasy.html. We accomplish this by
+    # Default landing page: logs_dashboard.html. We accomplish this by
     # rewriting "/" before the handler reads a file.
     class RootRedirectHandler(DashboardHandler):
         def do_GET(self):
             if self.path in ("/", "/index.html"):
-                self.path = "/project_fantasy.html"
+                self.path = "/logs_dashboard.html"
             return super().do_GET()
 
     server = HTTPServer((args.host, args.port), RootRedirectHandler)

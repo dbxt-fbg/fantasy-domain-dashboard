@@ -146,9 +146,9 @@ hygiene:
 
 # Database Settings
 database:
-  path: "/Users/davidbaxter/sync/claude/em_dashboard/data/metrics.db"
+  path: "/Users/davidbaxter/sync/claude/fantasy-domain-dashboard/data/metrics.db"
 
 # Logging
 logging:
   level: "INFO"
-  file: "/Users/davidbaxter/sync/claude/em_dashboard/logs/collector.log"
+  file: "/Users/davidbaxter/sync/claude/fantasy-domain-dashboard/logs/collector.log"

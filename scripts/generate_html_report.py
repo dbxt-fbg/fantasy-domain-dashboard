@@ -109,7 +109,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
-    <link rel="stylesheet" href="assets/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/dashboard.css?v=ff-logo-1">
     <script src="assets/dashboard.js?v=2.0" defer></script>
     <style>
         /* Page-specific overrides only — shared styles live in assets/dashboard.css */
@@ -1773,12 +1776,10 @@ def _build_member_past_sprints_html(
 
 
 def generate_team_members_html(config: dict, output_path: Path):
-    """Generate the Team Members index page + one page per developer.
+    """Generate one page per developer with team members in the top nav.
 
-    The primary Team Members nav link points to `team_members_dashboard.html`,
-    which renders the first developer alphabetically. Each developer also gets
-    their own `member_<First_Last>.html` page. The secondary nav lets you
-    jump between them; the active member's pill is highlighted.
+    Each developer gets their own `member_<First_Last>.html` page. The team
+    member links appear in the top navigation instead of in a sub-nav.
     """
     db_path = config['database']['path']
     sprint_prefix = config['jira']['sprint_prefix']
@@ -1816,7 +1817,6 @@ def generate_team_members_html(config: dict, output_path: Path):
     dev_role_map = {m['name']: m.get('role', 'BE') for m in config.get('team_members', [])}
 
     def _render_page(active_dev_name, card_html, page_title):
-        sub_nav = _build_member_sub_nav(nav_devs, dev_status_map, active_dev_name, dev_role_map)
         header = f"""
         <style>
             details.member-current-sprint {{ background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px 16px; margin: 14px 0; }}
@@ -1830,11 +1830,10 @@ def generate_team_members_html(config: dict, output_path: Path):
             details.member-current-sprint .member-current-sprint-body {{ margin-top: 14px; }}
         </style>
         <header>
-            <h1>👥 Team Members</h1>
+            <h1>👥 {active_dev_name or "Team Members"}</h1>
             <div class="subtitle">{fmt_sprint_long(sprint['sprint_name'])} • Day {sprint_elapsed_days} of {sprint_total_days} ({sprint_days_remaining} remaining) • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
         </header>
-{generate_nav_menu('team-members')}
-{sub_nav}
+{generate_nav_menu()}
         <div class="content">
             <div class="intro-banner">
                 <p>Performance analysis based on sprint metrics, ticket velocity, PR activity, and work patterns. Completion rate is compared against expected progress given {sprint_elapsed_days}/{sprint_total_days} days elapsed (~{expected_completion_pct:.0f}% of sprint).</p>
@@ -1847,10 +1846,7 @@ def generate_team_members_html(config: dict, output_path: Path):
         return render_html(title=page_title, content=header, body_class=_PAGE_THEME["team-members"])
 
     if not developers:
-        # Empty state — still write the index page so the nav link doesn't 404
-        empty_card = '<div class="empty-state"><div class="icon">👥</div><div>No team members with sprint data yet.</div></div>'
-        _atomic_write(output_path, _render_page(None, empty_card, f"Team Members - {fmt_sprint_long(sprint['sprint_name'])}"))
-        print(f"✅ Team members dashboard generated: {output_path}")
+        print("No team members with sprint data found")
         return
 
     # Surface engineers who have past-sprint work but no current-sprint
@@ -1926,8 +1922,8 @@ def generate_team_members_html(config: dict, output_path: Path):
         'id_to_level':     id_to_level,
     }
 
-    # Write one page per developer; index page mirrors the first one
-    for idx, dev in enumerate(sorted_devs):
+    # Write one page per developer
+    for dev in sorted_devs:
         card_html, _status = _build_member_card_html(
             dev, config, db_path, sprint,
             sprint_elapsed_days, sprint_total_days,
@@ -1941,15 +1937,6 @@ def generate_team_members_html(config: dict, output_path: Path):
             f"{dev['developer_name']} - Team Members",
         ))
         print(f"✅ Member page generated: {member_path}")
-
-        if idx == 0:
-            # The primary "Team Members" nav link points to the index page
-            _atomic_write(output_path, _render_page(
-                dev['developer_name'],
-                card_html,
-                f"Team Members - {fmt_sprint_long(sprint['sprint_name'])}",
-            ))
-            print(f"✅ Team members dashboard generated: {output_path}")
 
     return
 
@@ -5526,7 +5513,7 @@ def main():
         # Generate past sprint reports
         generate_past_sprints_html(config, report_dir / "past_sprints_dashboard.html")
 
-        # Generate team members report
+        # Generate team members pages (individual member pages only, no dashboard)
         generate_team_members_html(config, report_dir / "team_members_dashboard.html")
 
         # Generate pull requests report
@@ -5535,15 +5522,10 @@ def main():
         # Stakeholders matrix (driven by config/stakeholders.yaml)
         generate_stakeholders_html(config, report_dir / "stakeholders.html")
 
-        # Dependencies (driven by config/dependencies.yaml)
+        # Dependencies dashboard (driven by config/dependencies.yaml)
         generate_dependencies_html(config, report_dir / "dependencies.html")
 
-        # Sync the manually-curated MBR page's nav with the canonical menu so
-        # adding/removing a tab in nav.py keeps the MBR page in step.
-        refresh_mbr_nav(report_dir / "mbr.html")
-
         print(f"\n✅ HTML reports generated in {report_dir}")
-        print(f"\nOpen team dashboard: open {report_dir / 'team_dashboard.html'}")
         return 0
 
     except Exception as e:

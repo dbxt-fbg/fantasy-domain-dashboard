@@ -90,17 +90,40 @@ body {
 header {
     background: var(--header-gradient);
     color: white;
-    padding: var(--space-8);
+    padding: calc(var(--space-8) * 1.25) var(--space-8) var(--space-8);
+    position: relative;
+    text-align: center;
 }
 header h1 {
-    font-size: var(--fs-4xl);
-    margin-bottom: var(--space-2);
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', serif;
+    font-size: 4.25rem;
+    margin: 0 auto var(--space-4);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #f8fafc;
+    text-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 28px rgba(255, 255, 255, 0.08);
+    display: inline-block;
+    padding: 0 var(--space-6) var(--space-3);
+    border-bottom: 3px solid rgba(248, 250, 252, 0.95);
+    position: relative;
+}
+header h1::first-letter {
+    font-size: 1.18em;
+    font-weight: 900;
 }
 header .subtitle {
-    opacity: 0.9;
+    opacity: 0.85;
     font-size: var(--fs-md);
+    font-style: italic;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: var(--space-3);
+    text-align: center;
 }
 .content {
     padding: var(--space-8) var(--space-10);

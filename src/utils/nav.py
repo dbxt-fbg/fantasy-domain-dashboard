@@ -10,7 +10,6 @@ from __future__ import annotations
 
 PRIMARY_NAV = [
     ('project-fantasy', 'project_fantasy.html', 'Project: Fantasy'),
-    ('team-members',    'team_members_dashboard.html', 'Team Members'),
     ('logs',            'logs_dashboard.html', 'Agents and Logs'),
 ]
 

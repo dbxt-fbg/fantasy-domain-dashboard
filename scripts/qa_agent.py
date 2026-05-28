@@ -695,7 +695,6 @@ class QAAgent:
             'story_points_dashboard.html',
             'epics_dashboard.html',
             'past_sprints_dashboard.html',
-            'team_members_dashboard.html',
             'pull_requests_dashboard.html',
             'logs_dashboard.html'
         ]

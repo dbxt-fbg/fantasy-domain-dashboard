@@ -12,28 +12,6 @@
       "createdByProcStart": "Thu May  8 11:40:00 2026"
     },
     {
-      "id": "qa_agent_auto_fix",
-      "cron": "*/5 * * * *",
-      "prompt": "Run the QA Agent (auto-fix local + pipelines): cd /Users/davidbaxter/sync/claude/em_dashboard && python3 scripts/qa_agent.py >> logs/qa_agent.log 2>&1",
-      "createdAt": 1778310000000,
-      "lastFiredAt": 1779916813003,
-      "recurring": true,
-      "createdBySessionId": "current",
-      "createdByPid": 0,
-      "createdByProcStart": "Thu May  8 20:00:00 2026"
-    },
-    {
-      "id": "github_pr_agent",
-      "cron": "*/15 * * * *",
-      "prompt": "Run the GitHub PR Agent: cd /Users/davidbaxter/sync/claude/em_dashboard && bash scripts/run_team_member_agent.sh >> logs/github_pr_agent.log 2>&1",
-      "createdAt": 1778320000000,
-      "lastFiredAt": 1779916753832,
-      "recurring": true,
-      "createdBySessionId": "current",
-      "createdByPid": 0,
-      "createdByProcStart": "Thu May  8 22:00:00 2026"
-    },
-    {
       "id": "db_backup",
       "cron": "0 2 * * *",
       "prompt": "Nightly DB backup: cd /Users/davidbaxter/sync/claude/em_dashboard && python3 scripts/backup_db.py >> logs/backup_db.log 2>&1",
@@ -43,17 +21,6 @@
       "createdBySessionId": "current",
       "createdByPid": 0,
       "createdByProcStart": "Fri May  9 00:00:00 2026"
-    },
-    {
-      "id": "jira_collector",
-      "cron": "*/15 * * * *",
-      "prompt": "Run the Jira Collector: cd /Users/davidbaxter/sync/claude/em_dashboard && bash scripts/run_jira_collector_agent.sh >> logs/jira_collector_agent.log 2>&1",
-      "createdAt": 1778500000000,
-      "lastFiredAt": 1779916537594,
-      "recurring": true,
-      "createdBySessionId": "current",
-      "createdByPid": 0,
-      "createdByProcStart": "Sat May 10 00:00:00 2026"
     }
   ]
 }
