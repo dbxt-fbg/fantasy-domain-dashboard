@@ -5513,9 +5513,6 @@ def main():
         # Generate past sprint reports
         generate_past_sprints_html(config, report_dir / "past_sprints_dashboard.html")
 
-        # Generate team members pages (individual member pages only, no dashboard)
-        generate_team_members_html(config, report_dir / "team_members_dashboard.html")
-
         # Generate pull requests report
         generate_pull_requests_html(config, report_dir / "pull_requests_dashboard.html")
 

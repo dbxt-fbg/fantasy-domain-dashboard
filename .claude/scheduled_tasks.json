@@ -5,22 +5,11 @@
       "cron": "0 0 * * *",
       "prompt": "Run the Calendar Sync Agent: cd /Users/davidbaxter/sync/claude/em_dashboard && python3 scripts/sync_calendar.py >> logs/calendar_sync.log 2>&1",
       "createdAt": 1778270000000,
-      "lastFiredAt": 1779865207367,
+      "lastFiredAt": 1780028107799,
       "recurring": true,
       "createdBySessionId": "current",
       "createdByPid": 0,
       "createdByProcStart": "Thu May  8 11:40:00 2026"
-    },
-    {
-      "id": "db_backup",
-      "cron": "0 2 * * *",
-      "prompt": "Nightly DB backup: cd /Users/davidbaxter/sync/claude/em_dashboard && python3 scripts/backup_db.py >> logs/backup_db.log 2>&1",
-      "createdAt": 1778400000000,
-      "lastFiredAt": 1779872401215,
-      "recurring": true,
-      "createdBySessionId": "current",
-      "createdByPid": 0,
-      "createdByProcStart": "Fri May  9 00:00:00 2026"
     }
   ]
 }
