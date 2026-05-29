@@ -19,7 +19,7 @@
         
         <header>
             <h1>🔗 Dependencies</h1>
-            <div class="subtitle">Project: Fantasy · 12 tracked · Source: config/dependencies.yaml · Last edited May 21, 2026 at 12:15</div>
+            <div class="subtitle">Project: Fantasy · 12 tracked · Source: config/dependencies.yaml · Last edited May 29, 2026 at 09:25</div>
         </header>
         <nav class="top-nav">
             <ul class="nav-menu">
@@ -76,9 +76,10 @@
             </div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8216">Status notes</label>
             <textarea id="dep-notes-FEAT-8216" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">DATA, PAY, and MAGU are all in progress.  
+                placeholder="What's the latest? (free-text — no history kept)">**** 5/29 ****
+DATA, PAY, and MAGU are all in progress.  
 
-***  This one may not make it by the end of M30. We are still spiking on the implementation and expect to have a better idea before the end of this sprint.</textarea>
+** We are shooting for end of M30 completion for internal alpha (which only requires bet placement/settlement), M31.2 for public beta, M31.3 for prod readiness **</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8216', this)">Save</button>
@@ -89,7 +90,7 @@
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8217" target="_blank" rel="noopener">FEAT-8217</a>
                 <span class="dep-team">Shared Services</span>
-                <span class="dep-status inprogress">Engineering Unpacking</span>
+                <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">[CAT] DFS: Payments MVP - Payment Methods (Deposit+Withdrawals)</div>
             <div class="dep-meta">
@@ -97,7 +98,8 @@
             </div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8217">Status notes</label>
             <textarea id="dep-notes-FEAT-8217" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Tanya to start M30.3.</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">**** 5/29 ****
+Tanya started M30.3.  No issues to report.</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8217', this)">Save</button>
@@ -108,7 +110,7 @@
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8495" target="_blank" rel="noopener">FEAT-8495</a>
                 <span class="dep-team">Shared Services</span>
-                <span class="dep-status todo">Product Discovery</span>
+                <span class="dep-status todo">Ready for Prioritization Review</span>
             </div>
             <div class="dep-summary">[CAT] DFS: Payments Launch and Certification</div>
             <div class="dep-meta">
@@ -135,10 +137,10 @@
             </div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8509">Status notes</label>
             <textarea id="dep-notes-FEAT-8509" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Fu Shen and Tanya are meeting 5/21 to sort out the requirements.  Nigel to start work M30.3
+                placeholder="What's the latest? (free-text — no history kept)">**** 5/29 ****
+Nigel started work M30.3.  He&#x27;s happy with the onboarding and level of documentation they have to kick things off.
 
-The GATE team is prioritizing a spike this week to be ready for the supporting engineer. @sean.roy can you provide updates as this progresses? CC @Griffin Sandler for other coordination work happening with MAGU and SWAT (that I&#x27;ll help with)
-This needs to be ready for Beta, but the expectation is that the support from DFS in M30 will ensure, with full confidence, that the timeline can be met for all the RG work.</textarea>
+** May 27, 2026 GATE spike for DFS Entry Limits complete, work planned for completion M30.4. GATE still in process of spike to define &#x27;Spend threshold alert&#x27; work. We have concerns around how frequently the endpoint is called - as a spend limit being checked per action would mean an additional check during bet placement. Exploring alternative solutions. Not expected to complete in M30. Pay in process of determining work for DFS entry limit enforcement in the wallet. **</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8509', this)">Save</button>
@@ -157,7 +159,10 @@ This needs to be ready for Beta, but the expectation is that the support from DF
             </div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8511">Status notes</label>
             <textarea id="dep-notes-FEAT-8511" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Tanya is working on the Fantasy epic in M30.2.  </textarea>
+                placeholder="What's the latest? (free-text — no history kept)">**** 5/29 ****
+Tanya&#x27;s work is done.  Onus on MAGU and GATE to wrap the feature. 
+
+** May 27, 2026 Backend implementation to consume/propogate the new canUseDfs field is planned for this sprint, dependent on OpenBet to add the field to the payload. ** </textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8511', this)">Save</button>
@@ -187,7 +192,7 @@ This needs to be ready for Beta, but the expectation is that the support from DF
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8600" target="_blank" rel="noopener">FEAT-8600</a>
                 <span class="dep-team">Shared Services</span>
-                <span class="dep-status inprogress">Engineering Unpacking</span>
+                <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">[CAT] App Switcher for Super app Concept</div>
             <div class="dep-meta">
@@ -228,7 +233,7 @@ A week late due to an engineer quitting</textarea>
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8902" target="_blank" rel="noopener">FEAT-8902</a>
                 <span class="dep-team">Odds Factory</span>
-                <span class="dep-status todo">Product Discovery</span>
+                <span class="dep-status inprogress">Engineering Unpacking</span>
             </div>
             <div class="dep-summary">[OF] DFS: Trading Engineering/Product Requirements [Beta]</div>
             <div class="dep-meta">
@@ -236,7 +241,8 @@ A week late due to an engineer quitting</textarea>
             </div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8902">Status notes</label>
             <textarea id="dep-notes-FEAT-8902" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Targeting M30.  Work to start M30.3.</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">**** 5/29 ****
+All epics are in progress.</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8902', this)">Save</button>
@@ -247,7 +253,7 @@ A week late due to an engineer quitting</textarea>
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-7883" target="_blank" rel="noopener">FEAT-7883</a>
                 <span class="dep-team">Sportsbook</span>
-                <span class="dep-status todo">Product Discovery</span>
+                <span class="dep-status inprogress">Engineering Unpacking</span>
             </div>
             <div class="dep-summary">[ENG] Migrate Bet placement flow to wallet-transaction-api</div>
             <div class="dep-meta">
@@ -274,7 +280,8 @@ A week late due to an engineer quitting</textarea>
             </div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8991">Status notes</label>
             <textarea id="dep-notes-FEAT-8991" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Getting documentation on RAD 5/22</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">**** 5/29 ****
+Meeting on 6/2 to discuss RAD viability.</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8991', this)">Save</button>
@@ -282,7 +289,7 @@ A week late due to an engineer quitting</textarea>
         </div>
     </div></div>
             <footer>
-                Generated by Engineering Management Dashboard · May 28, 2026 at 12:32
+                Generated by Engineering Management Dashboard · May 29, 2026 at 12:30
             </footer>
         </div>
     

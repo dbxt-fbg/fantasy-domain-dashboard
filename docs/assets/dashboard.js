@@ -81,6 +81,29 @@
                 '</div>';
         }
 
+        // Equalize the i-th child's height in both .competency-col elements so
+        // that "Leadership" on the right lines up with "Leadership" on the left,
+        // etc. Skipped on narrow viewports (single-column stack).
+        function alignCompetencyRows() {
+            if (window.innerWidth < 760) return;
+            const cols = bodyEl.querySelectorAll('.competency-col');
+            if (cols.length !== 2) return;
+            const left = cols[0].children;
+            const right = cols[1].children;
+            const n = Math.min(left.length, right.length);
+            for (let i = 0; i < n; i++) {
+                left[i].style.minHeight = '';
+                right[i].style.minHeight = '';
+            }
+            for (let i = 0; i < n; i++) {
+                const h = Math.max(left[i].offsetHeight, right[i].offsetHeight);
+                left[i].style.minHeight = h + 'px';
+                right[i].style.minHeight = h + 'px';
+            }
+        }
+
+        function onResize() { if (!modal.hidden) alignCompetencyRows(); }
+
         function open(btn) {
             const title = btn.getAttribute('data-level-title');
             const devName = btn.getAttribute('data-dev-name') || '';
@@ -111,11 +134,15 @@
             const close = modal.querySelector('.competency-close');
             if (close) close.focus();
             document.body.style.overflow = 'hidden';
+            // Wait one frame so the browser has laid out the new content.
+            requestAnimationFrame(alignCompetencyRows);
+            window.addEventListener('resize', onResize);
         }
 
         function close() {
             modal.hidden = true;
             document.body.style.overflow = '';
+            window.removeEventListener('resize', onResize);
         }
 
         document.querySelectorAll('.competency-btn').forEach(function (btn) {
