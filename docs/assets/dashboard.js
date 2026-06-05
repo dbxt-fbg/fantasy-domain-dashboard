@@ -748,12 +748,146 @@ window.saveDependencyNotes = async function (key, btn) {
     }
 };
 
+// Features page — toggle BE/FE work-complete checkboxes. Posts the changed
+// flag to /api/feature-work-status; the server flips it in
+// config/feature_work_status.yaml and re-renders features.html. Optimistic
+// UI: the checkbox shows the new state immediately and reverts on failure.
+window.saveFeatureWorkStatus = async function (cb) {
+    if (!cb) return;
+    const key = cb.dataset.key;
+    const kind = cb.dataset.kind;
+    if (!key || !(kind === 'be' || kind === 'fe')) return;
+
+    // GitHub Pages has no API — revert and tell the user.
+    if (!isLocalEnvironment()) {
+        cb.checked = !cb.checked;
+        cb.disabled = true;
+        cb.title = 'Read-only on GitHub Pages — run the dashboard locally to edit.';
+        return;
+    }
+
+    const previous = !cb.checked; // optimistic-revert target
+    const field = kind === 'be' ? 'be_done' : 'fe_done';
+    const cell = cb.closest('td');
+    const row = cb.closest('tr.feature-row');
+    cb.disabled = true;
+    try {
+        const resp = await fetch('/api/feature-work-status', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({key: key, [field]: cb.checked}),
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+            throw new Error(data.error || ('HTTP ' + resp.status));
+        }
+        if (cell) cell.dataset.sort = cb.checked ? '1' : '0';
+        // Sync the row-level data attr the filter bar reads, so a freshly
+        // checked BE Done row hides immediately if "Hide BE Done" is on.
+        if (row) {
+            row.dataset[kind === 'be' ? 'beDone' : 'feDone'] = cb.checked ? '1' : '0';
+            applyFeatureFilters();
+        }
+    } catch (e) {
+        cb.checked = previous;
+        if (cell) cell.dataset.sort = previous ? '1' : '0';
+        cb.title = 'Save failed: ' + e.message;
+    } finally {
+        cb.disabled = false;
+    }
+};
+
+// Features page — top-of-page filter bar (Hide Completed / BE Done / FE Done).
+// Reads each .feature-row's data-bucket / data-be-done / data-fe-done and
+// toggles a `hidden-by-filter` class. Also rewrites the per-launch summary
+// count chip so the user sees how many rows are currently visible.
+function applyFeatureFilters() {
+    const bar = document.getElementById('feature-filter-bar');
+    if (!bar) return;
+    const hideCompleted = bar.querySelector('input[data-filter="completed"]')?.checked;
+    const hideBe = bar.querySelector('input[data-filter="be"]')?.checked;
+    const hideFe = bar.querySelector('input[data-filter="fe"]')?.checked;
+
+    document.querySelectorAll('.launch-group').forEach(group => {
+        const rows = group.querySelectorAll('tr.feature-row');
+        let visible = 0;
+        rows.forEach(row => {
+            const isCompleted = row.dataset.completed === '1';
+            const isBeDone = row.dataset.beDone === '1';
+            const isFeDone = row.dataset.feDone === '1';
+            const hide = (hideCompleted && isCompleted)
+                || (hideBe && isBeDone)
+                || (hideFe && isFeDone);
+            row.classList.toggle('hidden-by-filter', hide);
+            if (!hide) visible += 1;
+        });
+        const counts = group.querySelector('.launch-group-counts');
+        if (counts && !counts.dataset.totalLabel) {
+            // Snapshot the original count chip on first run so we can swap
+            // back to it when no filters are active.
+            counts.dataset.totalLabel = counts.innerHTML;
+        }
+        if (counts) {
+            const anyFilter = hideCompleted || hideBe || hideFe;
+            if (anyFilter) {
+                const total = rows.length;
+                counts.innerHTML = `<strong>${visible}</strong> of ${total} feature${total === 1 ? '' : 's'} shown`;
+            } else {
+                counts.innerHTML = counts.dataset.totalLabel;
+            }
+        }
+    });
+}
+
 // Auto-save on blur for dependency note textareas. Only fires when the
 // value actually changed since the last load/save, so clicking through
 // cards without typing doesn't spam the API.
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize dependencies page (read-only mode on GitHub Pages)
     initDependenciesPage();
+
+    // GitHub Pages: feature-work-status checkboxes are read-only.
+    if (!isLocalEnvironment()) {
+        document.querySelectorAll('.feature-toggle').forEach(cb => {
+            cb.disabled = true;
+            cb.title = 'Read-only on GitHub Pages — run the dashboard locally to edit.';
+        });
+    }
+
+    // Wire up the Features-page filter bar. Independent of GH Pages: filters
+    // only hide rendered rows, no API call.
+    const filterBar = document.getElementById('feature-filter-bar');
+    if (filterBar) {
+        filterBar.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', applyFeatureFilters);
+        });
+        applyFeatureFilters();
+    }
+
+    // Epics page — "Hide Completed Epics" toolbar above the Gantt chart.
+    // Persists the user's choice in localStorage so a refresh keeps the
+    // filter on. Pure DOM toggle: no server round-trip.
+    const ganttHideCompleted = document.getElementById('gantt-hide-completed');
+    if (ganttHideCompleted) {
+        const STORAGE_KEY = 'gantt.hideCompletedEpics';
+        const apply = (hide) => {
+            document.querySelectorAll('.gantt-row').forEach(row => {
+                const isCompleted = row.dataset.completed === '1';
+                row.classList.toggle('hidden-by-filter', hide && isCompleted);
+            });
+        };
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved === '1') ganttHideCompleted.checked = true;
+        } catch (_) { /* localStorage may be blocked — start unchecked */ }
+        apply(ganttHideCompleted.checked);
+        ganttHideCompleted.addEventListener('change', () => {
+            apply(ganttHideCompleted.checked);
+            try {
+                localStorage.setItem(STORAGE_KEY, ganttHideCompleted.checked ? '1' : '0');
+            } catch (_) { /* ignore quota / privacy-mode errors */ }
+        });
+    }
 
     // Only enable auto-save if running locally
     if (isLocalEnvironment()) {
@@ -783,3 +917,383 @@ window.triggerAgent = function (agentType) {
           'bash scripts/trigger_agent.sh ' + agentType + '\n\n' +
           'The dashboard will refresh automatically when complete.');
 };
+
+// ----- Refresh Data button + modal --------------------------------------
+// On local runs (serve_dashboard.py), inject a "Refresh Data" button into
+// every page's header. Clicking it kicks off /api/refresh and opens a modal
+// that polls /api/refresh/status until the job finishes, then reloads the
+// page so the user sees the freshly-regenerated HTML.
+
+(function () {
+    function buildModal() {
+        const modal = document.createElement('div');
+        modal.className = 'refresh-modal';
+        modal.id = 'refresh-modal';
+        modal.hidden = true;
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'refresh-modal-title');
+        modal.innerHTML = `
+            <div class="refresh-modal-backdrop"></div>
+            <div class="refresh-modal-dialog">
+                <div class="refresh-modal-title" id="refresh-modal-title">Refreshing dashboard data…</div>
+                <div class="refresh-modal-status" id="refresh-modal-status">Starting…</div>
+                <div class="refresh-progress"><div class="refresh-progress-fill" id="refresh-progress-fill"></div></div>
+                <div class="refresh-modal-percent" id="refresh-modal-percent">0%</div>
+                <div class="refresh-modal-error" id="refresh-modal-error" hidden></div>
+                <div class="refresh-modal-actions" id="refresh-modal-actions" hidden>
+                    <button type="button" class="refresh-modal-btn" id="refresh-modal-close">Close</button>
+                    <button type="button" class="refresh-modal-btn primary" id="refresh-modal-retry">Retry</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#refresh-modal-close').addEventListener('click', () => {
+            modal.hidden = true;
+        });
+        modal.querySelector('#refresh-modal-retry').addEventListener('click', () => {
+            startRefresh();
+        });
+        return modal;
+    }
+
+    function setProgress(percent, label, opts) {
+        opts = opts || {};
+        const fill = document.getElementById('refresh-progress-fill');
+        const pct = document.getElementById('refresh-modal-percent');
+        const status = document.getElementById('refresh-modal-status');
+        const errBox = document.getElementById('refresh-modal-error');
+        const actions = document.getElementById('refresh-modal-actions');
+        const title = document.getElementById('refresh-modal-title');
+        if (fill) fill.style.width = Math.max(0, Math.min(100, percent)) + '%';
+        if (pct) pct.textContent = Math.round(percent) + '%';
+        if (status && label) status.textContent = label;
+        if (opts.error) {
+            if (errBox) {
+                errBox.hidden = false;
+                errBox.textContent = opts.error + (opts.tail ? '\n\n' + opts.tail : '');
+            }
+            if (actions) actions.hidden = false;
+            if (title) title.textContent = 'Refresh failed';
+        } else {
+            if (errBox) errBox.hidden = true;
+            if (actions) actions.hidden = true;
+            if (title) title.textContent = 'Refreshing dashboard data…';
+        }
+    }
+
+    let pollTimer = null;
+
+    function poll(jobId) {
+        clearTimeout(pollTimer);
+        fetch('/api/refresh/status?id=' + encodeURIComponent(jobId))
+            .then(r => r.json().then(d => ({ok: r.ok, data: d})))
+            .then(({ok, data}) => {
+                if (!ok) {
+                    setProgress(0, '', {error: data.error || 'Status request failed.'});
+                    return;
+                }
+                const label = data.step_label || 'Working…';
+                setProgress(data.percent || 0, label);
+                if (data.status === 'done') {
+                    setProgress(100, 'Done — reloading page…');
+                    setTimeout(() => window.location.reload(), 600);
+                    return;
+                }
+                if (data.status === 'failed') {
+                    setProgress(data.percent || 0, label, {
+                        error: data.error || 'Refresh failed.',
+                        tail: data.log_tail || '',
+                    });
+                    return;
+                }
+                pollTimer = setTimeout(() => poll(jobId), 800);
+            })
+            .catch(err => {
+                setProgress(0, '', {error: 'Network error: ' + err.message});
+            });
+    }
+
+    function startRefresh() {
+        const modal = document.getElementById('refresh-modal') || buildModal();
+        modal.hidden = false;
+        setProgress(0, 'Starting…');
+        fetch('/api/refresh', {method: 'POST'})
+            .then(r => r.json().then(d => ({ok: r.ok, data: d})))
+            .then(({ok, data}) => {
+                if (!ok || !data.job_id) {
+                    setProgress(0, '', {error: data.error || 'Could not start refresh.'});
+                    return;
+                }
+                poll(data.job_id);
+            })
+            .catch(err => {
+                setProgress(0, '', {error: 'Network error: ' + err.message});
+            });
+    }
+
+    function injectButton() {
+        const header = document.querySelector('body > .container > header')
+            || document.querySelector('header');
+        if (!header) return;
+        if (header.querySelector('.refresh-data-btn')) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'refresh-data-btn is-visible';
+        btn.textContent = '↻ Refresh Data';
+        btn.title = 'Pull the latest Jira data and regenerate the dashboards';
+        btn.addEventListener('click', startRefresh);
+        header.appendChild(btn);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Only show the button on the local dashboard server. The same
+        // bundle ships to GitHub Pages where the API endpoints don't exist.
+        if (typeof isLocalEnvironment === 'function' && !isLocalEnvironment()) return;
+        injectButton();
+    });
+})();
+
+// ----- Per-section "Export to PDF" --------------------------------------
+// The Jira link is just an <a target="_blank"> — the browser handles it.
+// For PDF, we let the user use their browser's native "Save as PDF" via
+// window.print(), but we temporarily isolate the chosen <details> so the
+// printed page only contains that section (rest of the dashboard is
+// hidden via the @media print rules in dashboard.css).
+//
+// Listener uses CAPTURE phase: the wrapping <span class="feature-export-actions">
+// has an inline `stopPropagation` to keep summary clicks from toggling the
+// accordion, which would otherwise swallow these clicks in the bubble phase.
+document.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-export-pdf]');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const groupId = btn.getAttribute('data-export-pdf');
+    const target = document.getElementById(groupId);
+    if (!target) {
+        console.warn('PDF export: no element with id', groupId);
+        return;
+    }
+
+    // Force the section open (and remember prior state) so the printed
+    // version contains the table even if the user collapsed the accordion.
+    const wasOpen = target.open;
+    if ('open' in target) target.open = true;
+
+    // Also expand any nested <details> so collapsed sub-blocks (e.g.
+    // engineers inside a sprint) appear in the printed PDF. Track state
+    // so we can restore on afterprint.
+    const nestedDetails = Array.from(target.querySelectorAll('details'));
+    const nestedPrior = nestedDetails.map(d => d.open);
+    nestedDetails.forEach(d => { d.open = true; });
+
+    target.classList.add('feature-print-target');
+    document.body.classList.add('feature-print-active');
+
+    // Update the print title temporarily so the browser's PDF filename
+    // prompt is helpful instead of the page title.
+    const originalTitle = document.title;
+    const exportLabel = btn.getAttribute('data-export-label') || 'Features';
+    document.title = exportLabel + ' — ' + originalTitle;
+
+    const restore = () => {
+        document.body.classList.remove('feature-print-active');
+        target.classList.remove('feature-print-target');
+        document.title = originalTitle;
+        nestedDetails.forEach((d, i) => { d.open = nestedPrior[i]; });
+        if (!wasOpen && 'open' in target) target.open = false;
+        window.removeEventListener('afterprint', restore);
+    };
+    window.addEventListener('afterprint', restore);
+
+    // Use rAF to let the layout settle (open the details, apply class)
+    // before invoking the print dialog.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        try {
+            window.print();
+        } finally {
+            // Some browsers (Safari) don't fire afterprint reliably —
+            // schedule a backup restore on the next tick.
+            setTimeout(() => {
+                if (document.body.classList.contains('feature-print-active')) {
+                    restore();
+                }
+            }, 1500);
+        }
+    }));
+}, true);
+
+// ----- Per-section "Export to Sheets" -----------------------------------
+// Google Sheets has no public URL prefill API, so the canonical workflow
+// is: copy table as TSV to the clipboard, open a blank sheet, user pastes.
+// We open sheets.new in a new tab and show a small toast confirming the
+// clipboard copy. If clipboard access fails (Safari without user gesture,
+// HTTP origins, etc.) we fall back to a modal with the TSV pre-selected
+// so the user can ⌘C manually.
+
+function sectionToTsv(section) {
+    // Prefer a hidden <table class="export-table"> if the generator emitted
+    // one — that's how non-tabular sections (sprint reports, etc.) ship
+    // structured TSV data. Otherwise fall back to the first visible table.
+    // Important: scope to direct-table-not-inside-nested-details so a sprint
+    // block's TSV doesn't include all its engineers' tables too.
+    const table = scopedTable(section, 'table.export-table')
+        || scopedTable(section, 'table');
+    if (!table) return '';
+    const lines = [];
+    // Headers come from <thead><tr><th>. Strip surrounding whitespace and
+    // any sort-arrow text injected by the sortable headers.
+    const headerCells = table.querySelectorAll('thead tr th');
+    if (headerCells.length) {
+        lines.push(Array.from(headerCells).map(th => cellText(th)).join('\t'));
+    }
+    // Body rows. Skip rows that only contain a colspan placeholder.
+    const bodyRows = table.querySelectorAll('tbody tr');
+    bodyRows.forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if (!cells.length) return;
+        lines.push(Array.from(cells).map(td => cellText(td)).join('\t'));
+    });
+    return lines.join('\n');
+}
+
+// Find the first matching descendant that isn't inside a nested <details>
+// of `section`. Prevents a parent's TSV from absorbing every child block's
+// table when sections are nested (e.g. sprint → engineers).
+function scopedTable(section, selector) {
+    const candidates = section.querySelectorAll(selector);
+    for (const el of candidates) {
+        let parent = el.parentElement;
+        let inside = false;
+        while (parent && parent !== section) {
+            if (parent.tagName === 'DETAILS' && parent !== section) {
+                inside = true;
+                break;
+            }
+            parent = parent.parentElement;
+        }
+        if (!inside) return el;
+    }
+    return null;
+}
+
+function cellText(cell) {
+    // Use textContent rather than innerHTML so HTML entities don't bleed
+    // into Sheets. Collapse runs of whitespace into single spaces and
+    // replace embedded tabs/newlines (which would break TSV) with spaces.
+    const txt = (cell.textContent || '').replace(/\s+/g, ' ').trim();
+    return txt.replace(/[\t\n\r]/g, ' ');
+}
+
+function showTsvFallback(tsv, label) {
+    let modal = document.getElementById('sheets-fallback-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'sheets-fallback-modal';
+        modal.className = 'refresh-modal';
+        modal.innerHTML = `
+            <div class="refresh-modal-backdrop"></div>
+            <div class="refresh-modal-dialog" style="width: min(720px, 92vw);">
+                <div class="refresh-modal-title">Copy to Google Sheets</div>
+                <div class="refresh-modal-status" id="sheets-fallback-status">
+                    Couldn't copy automatically. Select the text below, copy
+                    (⌘C / Ctrl+C), then click "Open Google Sheets" and paste.
+                </div>
+                <textarea id="sheets-fallback-textarea"
+                          style="width:100%; height:240px; font-family:ui-monospace,monospace; font-size:12px; background:var(--bg-surface-2); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--radius-md); padding:8px; resize:vertical;"
+                          spellcheck="false"></textarea>
+                <div class="refresh-modal-actions" style="display:flex;">
+                    <button type="button" class="refresh-modal-btn" id="sheets-fallback-close">Close</button>
+                    <button type="button" class="refresh-modal-btn" id="sheets-fallback-copy">Copy</button>
+                    <a class="refresh-modal-btn primary" href="https://sheets.new" target="_blank" rel="noopener" id="sheets-fallback-open">Open Google Sheets</a>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.querySelector('#sheets-fallback-close').addEventListener('click', () => { modal.hidden = true; });
+        modal.querySelector('.refresh-modal-backdrop').addEventListener('click', () => { modal.hidden = true; });
+        modal.querySelector('#sheets-fallback-copy').addEventListener('click', () => {
+            const ta = modal.querySelector('#sheets-fallback-textarea');
+            ta.focus();
+            ta.select();
+            try {
+                document.execCommand('copy');
+                modal.querySelector('#sheets-fallback-status').textContent = 'Copied. Click "Open Google Sheets" and paste.';
+            } catch (e) {
+                modal.querySelector('#sheets-fallback-status').textContent = 'Copy failed — select the text manually and press ⌘C.';
+            }
+        });
+    }
+    const ta = modal.querySelector('#sheets-fallback-textarea');
+    ta.value = tsv;
+    modal.querySelector('#sheets-fallback-status').textContent =
+        'Couldn’t copy automatically. Select the text below, copy (⌘C / Ctrl+C), then click "Open Google Sheets" and paste.';
+    modal.hidden = false;
+    // Auto-select so ⌘A isn't needed.
+    setTimeout(() => { ta.focus(); ta.select(); }, 0);
+}
+
+function showSheetsToast(message) {
+    let toast = document.getElementById('sheets-export-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'sheets-export-toast';
+        toast.className = 'sheets-export-toast';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(() => {
+        toast.classList.remove('is-visible');
+    }, 3500);
+}
+
+document.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-export-sheets]');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const groupId = btn.getAttribute('data-export-sheets');
+    const label = btn.getAttribute('data-export-label') || 'Features';
+    const section = document.getElementById(groupId);
+    if (!section) return;
+
+    // Open the <details> so sectionToTsv sees the table even if collapsed.
+    const wasOpen = section.open;
+    if ('open' in section) section.open = true;
+
+    const tsv = sectionToTsv(section);
+    if ('open' in section && !wasOpen) section.open = false;
+
+    if (!tsv) {
+        showSheetsToast('Nothing to export.');
+        return;
+    }
+
+    // Open Google Sheets first (must be in the user-gesture stack to avoid
+    // popup blockers). Then write to the clipboard.
+    const newSheet = window.open('https://sheets.new', '_blank', 'noopener');
+    const writePromise = navigator.clipboard && navigator.clipboard.writeText
+        ? navigator.clipboard.writeText(tsv)
+        : Promise.reject(new Error('clipboard unavailable'));
+
+    writePromise
+        .then(() => {
+            if (newSheet) {
+                showSheetsToast('Copied. Paste (⌘V) into the new Google Sheet.');
+            } else {
+                // Popup blocker swallowed the new tab — show fallback so
+                // the user has a way to get the data out.
+                showTsvFallback(tsv, label);
+            }
+        })
+        .catch(() => {
+            // Clipboard write failed (Safari without HTTPS, missing user
+            // gesture, etc.) — show the fallback modal regardless of
+            // whether the tab opened, since clipboard is empty.
+            showTsvFallback(tsv, label);
+        });
+}, true);  // capture-phase: see PDF handler comment above

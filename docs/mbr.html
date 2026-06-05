@@ -191,9 +191,497 @@
 
             <!-- Month picker -->
             <div class="mbr-month-nav">
-                <a href="mbr.html" class="mbr-month-chip active">April 2026</a>
-                <!-- Future months added here -->
+                <a href="#" class="mbr-month-chip active" data-mbr-month="may-2026">May 2026</a>
+                <a href="#" class="mbr-month-chip" data-mbr-month="april-2026">April 2026</a>
             </div>
+
+            <!-- ============================== MAY 2026 ============================== -->
+            <div class="mbr-month" data-mbr-month="may-2026">
+
+            <!-- Header -->
+            <div class="intro-banner">
+                <p style="font-weight: 600; font-size: 15px; margin-bottom: 6px; color: var(--text-primary);">
+                    Monthly Business Review — May 2026
+                </p>
+                <p style="color: var(--text-secondary); margin: 0;">
+                    <strong>Leaders:</strong> Tom Boettner, Liz Mackie &amp; Alex Congleton &nbsp;|&nbsp; <strong>Domain:</strong> Fantasy
+                </p>
+            </div>
+
+            <!-- Executive Summary -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📝 Executive Summary</h2>
+                <div class="intro-banner">
+                    <p style="color: var(--text-secondary); line-height: 1.7; margin: 0;">
+                        May was an execution month. Across two sprints (M30.1 and M30.2) the team closed roughly 134 stories
+                        and 122.5 story points — with M30.2 alone landing 98.5 of 139.5 SP (71% completion). The contest
+                        settlement pipeline went end-to-end (settle jobs, payout tiers, pick scoring tiers, experience-level
+                        calculation, ContestEntryResult enum), Geolocation Integration shipped to Done on the Fantasy API
+                        side, the Playmaker admin app's gRPC layer was migrated to REST behind Spring Cloud Gateway, and
+                        the UMB realtime stream POC for events/markets/propositions completed. Mobile foundations
+                        progressed in parallel: the C4 TEST environment came online, the super-app architecture spike
+                        landed, KYC + LaunchDarkly + DFS-in-CI wired up, and the iOS Datadog rollout started.
+                        <br><br>
+                        Risk picture shifted meaningfully. Geolocation (FEAT-8511), an April red flag, is now Green —
+                        Tanya's BE work is done; the remaining work sits with MAGU and GATE. RG &amp; Entry Limits
+                        (FEAT-8509) flipped to Red after CAT spiked it: the implementation needs a NATS UI owner and
+                        DFS doesn't have one with capacity, so the team is asking PROF to take it. Four mobile
+                        feature placeholders — Pick Selection, Checkout, Entry Tracking, and Boost Tokens (FEAT-8501,
+                        8503, 8504, 8505) — were Abandoned in May as the work consolidated into the C4/FUEL epics
+                        actually carrying it. Tenant ID is now resolved enough for engineering to proceed.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Key Numbers -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📊 May at a Glance</h2>
+                <div class="metric-row">
+                    <div class="metric-mini">
+                        <div class="val">134</div>
+                        <div class="lbl">Stories/bugs/tasks closed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">122.5</div>
+                        <div class="lbl">Story points completed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">M30.1<br><span style="font-size:16px">M30.2</span></div>
+                        <div class="lbl">Sprints completed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">71%</div>
+                        <div class="lbl">M30.2 SP commitment hit</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">5</div>
+                        <div class="lbl">Epics moved to Done</div>
+                    </div>
+                </div>
+
+                <p style="font-size: 12px; color: var(--text-faint); margin-top: 0;">
+                    * Closed counts cover M30.1 (Apr 30 – May 12) and M30.2 (May 13 – May 26). Story points are now
+                    consistently set on M30.2 — the velocity series begins here. M30.1 completed 24 of 40 SP that were
+                    eventually pointed; final M30.2 ended at 98.5/139.5 SP closed.
+                </p>
+
+                <!-- Work by workstream -->
+                <div style="margin-top: 16px;">
+                    <div class="workstream-row">
+                        <span class="workstream-name">Wallet, Geo &amp; Settlement (BE)</span>
+                        <span class="workstream-count">21 stories</span>
+                        <span class="workstream-engineers">Tanya Phanich</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Contest Templates &amp; Settlement Rules</span>
+                        <span class="workstream-count">15 stories</span>
+                        <span class="workstream-engineers">Josh Schaefer</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">FastLane / SLOs / Runbooks</span>
+                        <span class="workstream-count">12 stories</span>
+                        <span class="workstream-engineers">Patrick Kilburn</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Playmaker gRPC → REST Migration</span>
+                        <span class="workstream-count">11 stories</span>
+                        <span class="workstream-engineers">Kevin Paquette</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Loyalty Tokens &amp; FanCash Earn</span>
+                        <span class="workstream-count">10 stories</span>
+                        <span class="workstream-engineers">Liam Butler</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Mobile / Cascade / KYC / LaunchDarkly</span>
+                        <span class="workstream-count">10 stories</span>
+                        <span class="workstream-engineers">Scott Schmitz</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Playmaker Admin Pages (BE)</span>
+                        <span class="workstream-count">9 stories</span>
+                        <span class="workstream-engineers">Ryan Taylor</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">C4 / Playbook / Super-App Spike (FE)</span>
+                        <span class="workstream-count">8 stories</span>
+                        <span class="workstream-engineers">Jacob Tabak</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Contest Matching &amp; Scheduling Jobs</span>
+                        <span class="workstream-count">6 stories</span>
+                        <span class="workstream-engineers">Nigel Young</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">UMB Realtime Stream POC</span>
+                        <span class="workstream-count">4 stories</span>
+                        <span class="workstream-engineers">Brooks Taylor</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Player Cards CMS &amp; C4 Aggregation</span>
+                        <span class="workstream-count">4 stories</span>
+                        <span class="workstream-engineers">Anushri Patel</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Offer Fingerprint &amp; Access Policies</span>
+                        <span class="workstream-count">4 stories</span>
+                        <span class="workstream-engineers">Michael Goodwin</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">OF Ingestion &amp; Gimme Picks</span>
+                        <span class="workstream-count">5 stories</span>
+                        <span class="workstream-engineers">Salmaan Khan</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">iOS Datadog &amp; Document Verification</span>
+                        <span class="workstream-count">3 stories</span>
+                        <span class="workstream-engineers">Jasmine Dacones</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">In-Memory Pick Datastore + Onboarding</span>
+                        <span class="workstream-count">6 tickets</span>
+                        <span class="workstream-engineers">Paul Kang, Kevin Jacob</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Successes -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">✅ Successes</h2>
+                <div class="success-list">
+
+                    <div class="success-item">
+                        <div class="item-title">Contest Settlement Pipeline End-to-End</div>
+                        <div class="item-body">
+                            The full contest-to-payout chain is now functional:
+                            <ul>
+                                <li><strong>SettleContestJob / SettleContestEntryJob</strong> with enqueue infrastructure (Tanya Phanich)</li>
+                                <li>Contest payout tiers, pick scoring tiers, and minimum-payout app setting (Tanya, Josh)</li>
+                                <li>ContestEntryResult enum + automatic update on contest settlement (Josh Schaefer)</li>
+                                <li>Experience-level calculator: queries, calculator, UpdateAccountExperienceLevelJob (Josh Schaefer)</li>
+                                <li>Contest matching: matching queries, validation, slot reserve/release (Nigel Young)</li>
+                                <li>Automated contest creation from templates (Nigel Young — CreateContestsForTemplateJob)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Geolocation Integration Shipped (FNTSY-304)</div>
+                        <div class="item-body">
+                            Tanya integrated <code>fbg-geolocation-sdk</code> into Fantasy API, added the
+                            <code>geocache:read</code> Cognito scope, and wired geo checks into the Create-Contest-Entry
+                            pipeline. Jurisdiction ID now propagates to wallet calls and is persisted on every
+                            contest entry. This closes the BE half of FEAT-8511 — the dependency that was a top
+                            April risk has flipped from Red to Green; remaining work sits with MAGU and GATE.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Playmaker: gRPC → REST Migration Complete</div>
+                        <div class="item-body">
+                            Kevin Paquette migrated the entire Playmaker integration off gRPC to REST behind Spring
+                            Cloud Gateway in a single sprint:
+                            <ul>
+                                <li>Spring Cloud Gateway stood up for playmaker-fantasy-api</li>
+                                <li>RPC endpoints rewritten as REST in Fantasy API; gRPC integration code deprecated and removed</li>
+                                <li>Authentication / authorization for the new REST endpoints</li>
+                                <li>FAST RPC tests rewritten to exercise the REST surface — no test coverage gap</li>
+                                <li>App Settings, Pick Scoring Tiers, and Leaderboard Payout Tiers edit endpoints + UIs delivered alongside</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">UMB Realtime Stream POC Complete</div>
+                        <div class="item-body">
+                            Brooks Taylor closed FNTSY-295 (UMB realtime updates for events/markets/propositions):
+                            UMB message scheme defined, Ping/Pong POC implemented, PG Notify wired up, and event
+                            updates emitting over stream. This is the substrate the mobile app will use for live
+                            proposition data without polling.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">FanCash Earn Foundation</div>
+                        <div class="item-body">
+                            Liam Butler stood up the FanCash Earn architecture — <code>fantasy-fancash-worker</code>
+                            and <code>fantasy-fancash-earnrate</code> services created, FanCash services updated with
+                            DFS ledger details, plan documented. PBT (Promotional Bonus Tokens) flow also progressed:
+                            validate &amp; execute endpoints, contest_entry_promotion_tokens table, and
+                            PromotionTokenReconciliationJob landed.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">FastLane Coverage Across All Four Services</div>
+                        <div class="item-body">
+                            Patrick Kilburn pushed FastLane from "started" to "covering every service":
+                            SLOs and monitors live for <code>fantasy-api</code> and <code>fantasy-ingestion-worker</code>;
+                            runbooks shipped for <code>fantasy-c4-api</code>, <code>playmaker-fantasy-api</code>,
+                            and <code>fantasy-jobs-worker</code>; initial integration tests added to playmaker-fantasy-api;
+                            E2E UI test framework selected for Playmaker; and a k6 load-testing ramp-up began. Also
+                            chased down a Datadog Services API regression for fantasy-jobs-worker.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Mobile Foundations: C4 TEST + Super-App Spike + KYC</div>
+                        <div class="item-body">
+                            <ul>
+                                <li>C4 environment for TEST stood up (Jacob Tabak)</li>
+                                <li>DFS super-app architecture spike completed (Jacob Tabak — feeds App Switcher work in M31)</li>
+                                <li>FUEL-powered Wallet and KYC integration, LaunchDarkly configured for DFS, DFS added to FUEL CI integration pipeline (Scott Schmitz)</li>
+                                <li>Cascade sheeting navigation integrated (Scott Schmitz)</li>
+                                <li>Location-permission flow on first launch (Jasmine Dacones)</li>
+                                <li>iOS Datadog setup for DFS started (Jasmine Dacones)</li>
+                                <li>Document verification flow verified (Jasmine Dacones)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Playmaker Admin Pages Filled In</div>
+                        <div class="item-body">
+                            Ryan Taylor delivered the back half of the Playmaker admin surface area:
+                            Account Index &amp; Show, Contest Entry Show, Market &amp; Proposition Group pages,
+                            Create Gimme Pick button, plus a refactor pass to align Playmaker pages with MFE
+                            standards. Combined with Kevin Paquette's REST migration, the Playmaker app is now
+                            production-quality.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Stake Factor &amp; OSB Copy</div>
+                        <div class="item-body">
+                            Tanya shipped FNTSY-584: Stake Factor "Copy" from OSB — a structural piece for the
+                            Trading Engineering work and a quiet but important integration point with the OSB
+                            domain that lets Fantasy reuse OSB's stake-factor configuration rather than maintain a
+                            parallel one.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Challenges -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">⚠️ Challenges &amp; Risks</h2>
+                <div class="challenge-list">
+
+                    <div class="challenge-item">
+                        <div class="item-title">RG &amp; Entry Limits (FEAT-8509) Flipped Red</div>
+                        <div class="item-body">
+                            CAT/GATE completed a spike for RG &amp; Entry Limits implementation but the spike
+                            surfaced significant NATS UI work that no DFS engineer has the capacity or familiarity
+                            to take on. The team is asking PROF to own the NATS UI piece;
+                            <a href="https://betfanatics.slack.com/archives/C0AKSR3MMT9/p1780515900925289" target="_blank" style="color: var(--accent-text);">discussion in Slack</a>.
+                            Until ownership is settled this feature is unlikely to complete in M30; flipping Red.
+                            This is a public-launch dependency.
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Four Mobile Feature Placeholders Abandoned</div>
+                        <div class="item-body">
+                            FEAT-8501 (Pick Selection), FEAT-8503 (Checkout), FEAT-8504 (Entry Tracking), and
+                            FEAT-8505 (Retention Promotions: Boost Tokens) were Abandoned in May. The work itself
+                            isn't going away — it consolidated into the C4/FUEL epics actually doing it (FNTSY-15,
+                            FNTSY-17, FNTSY-28, FNTSY-29, FNTSY-205, etc.). But the feature-tracker churn is a
+                            signal we should be planning at the epic layer for FE work, not creating parallel
+                            FEAT placeholders that don't survive scrutiny.
+                            <div class="placeholder-box" style="margin-top: 10px; text-align: left;">
+                                📌 <strong>Action Item:</strong> Audit remaining FE FEAT-* tickets against the
+                                FNTSY epics to make sure we're not double-tracking the same work.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">OF Beta Requirements Pushed to M31</div>
+                        <div class="item-body">
+                            FEAT-8902 (OF DFS Trading Engineering Requirements [Beta]) was moved from M30 to M31
+                            after a conversation with Tommy. Alpha (FEAT-8554) is still on track for M30.3 dev-complete.
+                            Net effect: Beta-tier features are now an M31 conversation, not an M30 one — the team
+                            should plan the M31 sprint slate accordingly.
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Geolocation: BE Done, Integration Still Outstanding</div>
+                        <div class="item-body">
+                            FEAT-8511 moved from Red to Green in May because Tanya's BE work shipped, but the
+                            feature isn't fully closed: MAGU and GATE still need to wrap their portions. Watch
+                            this in M30.3 — if MAGU/GATE slips, the BE shipment doesn't help us hit the integrated
+                            test deadline before launch. Currently no Red flag, but it's the kind of thing that
+                            silently slides if no one chases it.
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">M30.1 Sprint: Mid-Sprint Carry-In</div>
+                        <div class="item-body">
+                            M30.1 closed at 24/40 SP — but it's worth noting that the sprint started Apr 30 with
+                            70 tickets / 90 SP committed and only 36 tickets / 40 SP were ultimately scored at
+                            sprint close (the rest moved out or got rescoped mid-sprint). The first sprint of
+                            a milestone often has noisy commitment data; the M30.2 baseline (139.5 SP committed,
+                            98.5 closed) is a cleaner velocity reference going forward.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Cross-team Dependencies -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">🔗 Cross-Team Dependencies (End of May)</h2>
+                <table class="dep-table">
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>Feature / Work</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8216" target="_blank" class="ticket-key">FEAT-8216</a> Universal Balance / Unified Wallet</td>
+                            <td><span class="status-tracking">In Progress</span></td>
+                            <td>Continuing through May; no major status change reported.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8217" target="_blank" class="ticket-key">FEAT-8217</a> Payments MVP</td>
+                            <td><span class="status-tracking">In Progress</span></td>
+                            <td>Tracking; no breaking change in May. Watch M30.3 for first real integration tests.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT/GATE</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8509" target="_blank" class="ticket-key">FEAT-8509</a> RG &amp; Entry Limits</td>
+                            <td><span class="status-risk">Red</span></td>
+                            <td>NATS UI work surfaced post-spike; asking PROF to own. Unlikely M30 complete.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8511" target="_blank" class="ticket-key">FEAT-8511</a> Geolocation Support</td>
+                            <td><span class="status-tracking">Green</span></td>
+                            <td>BE done (Tanya). Onus on MAGU + GATE to wrap. <em>Was Red in April.</em></td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8600" target="_blank" class="ticket-key">FEAT-8600</a> App Switcher (Super App)</td>
+                            <td><span class="status-tracking">Green / M31</span></td>
+                            <td>PROF work complete; MAGU in progress; GATE not yet started.</td>
+                        </tr>
+                        <tr>
+                            <td>OddsFactory</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8554" target="_blank" class="ticket-key">FEAT-8554</a> Trading Eng Reqs [Alpha]</td>
+                            <td><span class="status-tracking">Green</span></td>
+                            <td>VAMO epics in progress; targeting M30.3 dev-complete.</td>
+                        </tr>
+                        <tr>
+                            <td>OddsFactory</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8902" target="_blank" class="ticket-key">FEAT-8902</a> Trading Eng Reqs [Beta]</td>
+                            <td><span class="status-tracking">M31</span></td>
+                            <td>Moved to M31 with Beta scope (decision in May).</td>
+                        </tr>
+                        <tr>
+                            <td>CAT (Future)</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8512" target="_blank" class="ticket-key">FEAT-8512</a> Tax &amp; Regulatory Reports</td>
+                            <td><span class="status-open">Discovery</span></td>
+                            <td>Slated for M31. Needs requirements before engineering can break down.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT (Future)</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8495" target="_blank" class="ticket-key">FEAT-8495</a> Payments Launch &amp; Cert</td>
+                            <td><span class="status-open">Prioritization</span></td>
+                            <td>Slated for M31. Needs requirements.</td>
+                        </tr>
+                        <tr>
+                            <td>Monterosa</td>
+                            <td>Free-to-Play Daily Streak</td>
+                            <td><span class="status-tracking">On Track</span></td>
+                            <td>Monterosa build still targeting mid-July. NFL-season launch unchanged.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Appendix A: Sprint Demos -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">🎬 Appendix A: Sprint Demos</h2>
+                <table class="sprint-demo-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">Sprint</th>
+                            <th>Concepts Demoed</th>
+                            <th style="width: 120px;">Recording</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>M30.1<br><span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">Apr 30 – May 12</span></td>
+                            <td>
+                                Automated contest creation &amp; user matching · State-specific entry rules ·
+                                Contest settlement result columns · KYC + deposits · Bidirectional streaming for
+                                live proposition updates · Geolocation integration into Create-Contest-Entry
+                            </td>
+                            <td>
+                                <span style="color: var(--text-faint); font-style: italic;">Add link</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>M30.2<br><span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">May 13 – May 26</span></td>
+                            <td>
+                                Settlement jobs end-to-end (SettleContest, SettleContestEntry, payout tiers) ·
+                                Experience-level calculator · Playmaker REST migration via Spring Cloud Gateway ·
+                                UMB realtime stream POC · FastLane SLOs/monitors live · FanCash Earn services ·
+                                C4 TEST environment · Super-app architecture spike
+                            </td>
+                            <td>
+                                <span style="color: var(--text-faint); font-style: italic;">Add link</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Appendix B: Hiring -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">👥 Appendix B: Hiring</h2>
+                <div class="placeholder-box">
+                    📌 <strong>Placeholder — fill in May hiring updates.</strong><br><br>
+                    From April: Fantasy target was 20 roles; 17/20 hired. Add: any new starts in May, open
+                    requisitions still in pipeline, offers extended/accepted, departures.
+                </div>
+            </div>
+
+            <!-- Appendix C: Launch Metrics -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📈 Appendix C: Launch Metrics</h2>
+                <div class="placeholder-box">
+                    📌 <strong>Placeholder — pre-launch targets still being defined.</strong><br><br>
+                    No change since April. Targets for the August 2026 beta launch are still open with product
+                    and analytics. Carry forward to June MBR.
+                </div>
+            </div>
+
+            <!-- Appendix D: Incidents -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">🚨 Appendix D: Incidents &amp; On-Call</h2>
+                <div class="placeholder-box">
+                    📌 <strong>No production Fantasy service yet (pre-launch).</strong><br><br>
+                    FastLane SLOs and runbooks are now live across all four services (api, ingestion-worker,
+                    c4-api, playmaker-fantasy-api, jobs-worker), so when traffic does start, the incident-detection
+                    plumbing is in place.
+                </div>
+            </div>
+
+            </div><!-- /may-2026 -->
+
+            <!-- ============================== APRIL 2026 ============================== -->
+            <div class="mbr-month" data-mbr-month="april-2026" style="display: none;">
 
             <!-- Header -->
             <div class="intro-banner">
@@ -693,11 +1181,50 @@
                 </div>
             </div>
 
+            </div><!-- /april-2026 -->
+
         </div>
 
         <footer>
-            Generated by Engineering Management Dashboard · May 19, 2026
+            Generated by Engineering Management Dashboard · June 4, 2026
         </footer>
     </div>
+    <script>
+        // MBR month picker — show one month section at a time. Clicking a
+        // chip flips the active class and toggles display on the matching
+        // .mbr-month div. Hash routing (#may-2026) preserves the choice on
+        // refresh and lets us deep-link a month from elsewhere.
+        (function () {
+            const chips = document.querySelectorAll('.mbr-month-chip[data-mbr-month]');
+            const sections = document.querySelectorAll('.mbr-month[data-mbr-month]');
+            function activate(month) {
+                let matched = false;
+                chips.forEach(c => {
+                    const isActive = c.dataset.mbrMonth === month;
+                    c.classList.toggle('active', isActive);
+                    if (isActive) matched = true;
+                });
+                sections.forEach(s => {
+                    s.style.display = (s.dataset.mbrMonth === month) ? '' : 'none';
+                });
+                return matched;
+            }
+            chips.forEach(c => {
+                c.addEventListener('click', e => {
+                    e.preventDefault();
+                    const m = c.dataset.mbrMonth;
+                    if (activate(m)) {
+                        history.replaceState(null, '', '#' + m);
+                    }
+                });
+            });
+            const initial = (location.hash || '').replace('#', '');
+            if (!initial || !activate(initial)) {
+                // Default to the first chip — May at top-of-list as authored.
+                const first = chips[0];
+                if (first) activate(first.dataset.mbrMonth);
+            }
+        })();
+    </script>
 </body>
 </html>
