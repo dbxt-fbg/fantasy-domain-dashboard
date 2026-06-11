@@ -19,7 +19,7 @@
         
         <header>
             <h1>📊 Team Dashboard</h1>
-            <div class="subtitle">FNTSY M30.4 Sprint 2026.13 FE • Generated June 11, 2026 at 08:45</div>
+            <div class="subtitle">FNTSY M30.4 Sprint 2026.13 FE • Generated June 11, 2026 at 10:25</div>
         </header>
         <nav class="top-nav">
             <ul class="nav-menu">
@@ -46,7 +46,7 @@
         <div class="section" id="burndown-chart">
             <div class="chart-container">
                 <div class="chart-title">📈 Sprint Burndown Chart</div>
-                <div class="burndown-summary"><div class="burndown-summary-item"><div class="burndown-summary-label">Remaining</div><div class="burndown-summary-value">35</div><div class="burndown-summary-sub">of 35 tickets</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Pace</div><div class="burndown-summary-value"><span style='color: #fca5a5;'>↓ 4 behind ideal</span></div><div class="burndown-summary-sub">ideal: 31 remaining</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Time Left</div><div class="burndown-summary-value">12d</div><div class="burndown-summary-sub">working day 2 of 10</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Forecast Finish</div><div class="burndown-summary-value">—</div><div class="burndown-summary-sub">at current pace</div></div></div>
+                <div class="burndown-summary"><div class="burndown-summary-item"><div class="burndown-summary-label">Remaining</div><div class="burndown-summary-value">31</div><div class="burndown-summary-sub">of 35 tickets</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Pace</div><div class="burndown-summary-value"><span style='color: #cbd5e1;'>on pace</span></div><div class="burndown-summary-sub">ideal: 31 remaining</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Time Left</div><div class="burndown-summary-value">12d</div><div class="burndown-summary-sub">working day 2 of 10</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Forecast Finish</div><div class="burndown-summary-value">Jun 23</div><div class="burndown-summary-sub">at current pace (on time)</div></div></div>
                 <div class="burndown-svg-wrap">
                     <svg viewBox="0 0 900 280" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 320px; display: block;">
                         <line class="chart-grid-line" x1="52" y1="18.0" x2="880" y2="18.0" /><line class="chart-grid-line" x1="52" y1="76.6" x2="880" y2="76.6" /><line class="chart-grid-line" x1="52" y1="128.7" x2="880" y2="128.7" /><line class="chart-grid-line" x1="52" y1="187.4" x2="880" y2="187.4" /><line class="chart-grid-line" x1="52" y1="246.0" x2="880" y2="246.0" />
@@ -55,8 +55,8 @@
                         <line x1="52" y1="18" x2="52" y2="246" stroke="#475569" stroke-width="1" />
                         <line x1="52" y1="246" x2="880" y2="246" stroke="#475569" stroke-width="1" />
                         <polyline fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" points="46.0,18.0 880.0,246.0" />
-                        
-                        <polyline fill="none" stroke="#10b981" stroke-width="2.5" points="46.0,18.0 138.7,18.0" /><circle cx="46.0" cy="18.0" r="3" fill="#10b981" stroke="#1e293b" stroke-width="1.5" /><circle cx="138.7" cy="18.0" r="3" fill="#10b981" stroke="#1e293b" stroke-width="1.5" />
+                        <polyline fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,3" points="138.7,44.1 856.8,246.0" />
+                        <polyline fill="none" stroke="#10b981" stroke-width="2.5" points="46.0,18.0 138.7,44.1" /><circle cx="46.0" cy="18.0" r="3" fill="#10b981" stroke="#1e293b" stroke-width="1.5" /><circle cx="138.7" cy="44.1" r="3" fill="#10b981" stroke="#1e293b" stroke-width="1.5" />
                         <line x1="144.0" y1="18" x2="144.0" y2="246" stroke="#60a5fa" stroke-width="1" stroke-dasharray="3,3" opacity="0.6" /><text x="144.0" y="14" text-anchor="middle" fill="#60a5fa" font-size="10">Today</text>
                     </svg>
                 </div>
@@ -71,12 +71,12 @@
                 <div class="metrics-grid">
                     <div class="metric-card info">
                         <div class="metric-label">Avg Cycle Time</div>
-                        <div class="metric-value">10.4</div>
+                        <div class="metric-value">0.8</div>
                         <div class="metric-subtext">days to complete</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">Throughput</div>
-                        <div class="metric-value">17.3</div>
+                        <div class="metric-value">23.9</div>
                         <div class="metric-subtext">tickets per week</div>
                     </div>
                     <div class="metric-card">
@@ -86,8 +86,8 @@
                     </div>
                     <div class="metric-card info">
                         <div class="metric-label">Sprint Commitment</div>
-                        <div class="metric-value">0.0%</div>
-                        <div class="metric-subtext">0/46 tickets</div>
+                        <div class="metric-value">2.2%</div>
+                        <div class="metric-subtext">1/46 tickets</div>
                     </div>
                 </div>
         
@@ -158,44 +158,68 @@
                     </div>
                     <button type="button" class="metric-card success" onclick="toggleAccordion('fe-closed-panel')" aria-controls="fe-closed-panel" aria-expanded="false">
                         <div class="metric-label">Closed</div>
-                        <div class="metric-value clickable">0</div>
-                        <div class="metric-subtext">0.0% complete · Click to view</div>
+                        <div class="metric-value clickable">1</div>
+                        <div class="metric-subtext">2.3% complete · Click to view</div>
                     </button>
                     <button type="button" class="metric-card warning" onclick="toggleAccordion('fe-inprogress-panel')" aria-controls="fe-inprogress-panel" aria-expanded="false">
                         <div class="metric-label">In Progress</div>
-                        <div class="metric-value clickable">11</div>
+                        <div class="metric-value clickable">13</div>
                         <div class="metric-subtext">Click to view</div>
                     </button>
                     <button type="button" class="metric-card info" onclick="toggleAccordion('fe-open-panel')" aria-controls="fe-open-panel" aria-expanded="false">
                         <div class="metric-label">Open / To Do</div>
-                        <div class="metric-value clickable">33</div>
+                        <div class="metric-value clickable">30</div>
                         <div class="metric-subtext">Click to view</div>
                     </button>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0.0%"></div>
+                    <div class="progress-fill" style="width: 2.272727272727273%"></div>
                 </div>
                 <div style="margin-top: 16px;">
                     <div class="velocity-card">
-                        <div class="velocity-value">0</div>
+                        <div class="velocity-value">1</div>
                         <div class="velocity-label">Sprint Velocity (Stories Completed)</div>
                     </div>
                 </div>
 
                 <div id="fe-closed-panel" class="accordion-panel">
                     <div class="accordion-content">
-                        <div class="accordion-header">✅ Closed Tickets (0)</div>
+                        <div class="accordion-header">✅ Closed Tickets (1)</div>
                         <div class="ticket-grid">
             
+                                <div class="ticket-item">
+                                    <a href="https://betfanatics.atlassian.net/browse/FNTSY-715" class="ticket-key" target="_blank">FNTSY-715</a>
+                                    Create Parent Feed for Leaderboard View
+                                    <span style="color: #6b7280; font-size: 12px;"> • Kevin Jacob</span>
+                                </div>
+                
                         </div>
                     </div>
                 </div>
 
                 <div id="fe-inprogress-panel" class="accordion-panel">
                     <div class="accordion-content">
-                        <div class="accordion-header">🔄 In Progress Tickets (11)</div>
+                        <div class="accordion-header">🔄 In Progress Tickets (13)</div>
                         <div class="ticket-grid">
             
+                                <div class="ticket-item">
+                                    <a href="https://betfanatics.atlassian.net/browse/FNTSY-772" class="ticket-key" target="_blank">FNTSY-772</a>
+                                    Create event page in CMS
+                                    <span style="color: #6b7280; font-size: 12px;"> • Jasmine Dacones • In Progress</span>
+                                </div>
+                
+                                <div class="ticket-item">
+                                    <a href="https://betfanatics.atlassian.net/browse/FNTSY-605" class="ticket-key" target="_blank">FNTSY-605</a>
+                                    Create EventPageScreen on client
+                                    <span style="color: #6b7280; font-size: 12px;"> • Jasmine Dacones • In Progress</span>
+                                </div>
+                
+                                <div class="ticket-item">
+                                    <a href="https://betfanatics.atlassian.net/browse/FNTSY-764" class="ticket-key" target="_blank">FNTSY-764</a>
+                                    Player card: alt-line stepper arrows (left/right)
+                                    <span style="color: #6b7280; font-size: 12px;"> • Anushri Patel • In Progress</span>
+                                </div>
+                
                                 <div class="ticket-item">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-620" class="ticket-key" target="_blank">FNTSY-620</a>
                                     Implement Payout Tracker Section
@@ -233,12 +257,6 @@
                                 </div>
                 
                                 <div class="ticket-item">
-                                    <a href="https://betfanatics.atlassian.net/browse/FNTSY-715" class="ticket-key" target="_blank">FNTSY-715</a>
-                                    Create Parent Feed for Leaderboard View
-                                    <span style="color: #6b7280; font-size: 12px;"> • Kevin Jacob • In code review</span>
-                                </div>
-                
-                                <div class="ticket-item">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-744" class="ticket-key" target="_blank">FNTSY-744</a>
                                     Playbook deserialization over UMB does not work
                                     <span style="color: #6b7280; font-size: 12px;"> • Jacob Tabak • In code review</span>
@@ -268,7 +286,7 @@
 
                 <div id="fe-open-panel" class="accordion-panel">
                     <div class="accordion-content">
-                        <div class="accordion-header">📋 Open / To Do Tickets (33)</div>
+                        <div class="accordion-header">📋 Open / To Do Tickets (30)</div>
                         <div class="ticket-grid">
             
                                 <div class="ticket-item">
@@ -398,12 +416,6 @@
                                 </div>
                 
                                 <div class="ticket-item">
-                                    <a href="https://betfanatics.atlassian.net/browse/FNTSY-772" class="ticket-key" target="_blank">FNTSY-772</a>
-                                    Create event page in CMS
-                                    <span style="color: #6b7280; font-size: 12px;"> • Jasmine Dacones • To Do</span>
-                                </div>
-                
-                                <div class="ticket-item">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-771" class="ticket-key" target="_blank">FNTSY-771</a>
                                     Create a debug entry to open the event page based on an event ID
                                     <span style="color: #6b7280; font-size: 12px;"> • Jasmine Dacones • To Do</span>
@@ -412,12 +424,6 @@
                                 <div class="ticket-item">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-770" class="ticket-key" target="_blank">FNTSY-770</a>
                                     Create player card view mode toggle
-                                    <span style="color: #6b7280; font-size: 12px;"> • Jasmine Dacones • To Do</span>
-                                </div>
-                
-                                <div class="ticket-item">
-                                    <a href="https://betfanatics.atlassian.net/browse/FNTSY-605" class="ticket-key" target="_blank">FNTSY-605</a>
-                                    Create EventPageScreen on client
                                     <span style="color: #6b7280; font-size: 12px;"> • Jasmine Dacones • To Do</span>
                                 </div>
                 
@@ -460,12 +466,6 @@
                                 <div class="ticket-item">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-765" class="ticket-key" target="_blank">FNTSY-765</a>
                                     BFF: expose alt-line list on PlayerCardItem
-                                    <span style="color: #6b7280; font-size: 12px;"> • Anushri Patel • To Do</span>
-                                </div>
-                
-                                <div class="ticket-item">
-                                    <a href="https://betfanatics.atlassian.net/browse/FNTSY-764" class="ticket-key" target="_blank">FNTSY-764</a>
-                                    Player card: alt-line stepper arrows (left/right)
                                     <span style="color: #6b7280; font-size: 12px;"> • Anushri Patel • To Do</span>
                                 </div>
                 

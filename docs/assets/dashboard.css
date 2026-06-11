@@ -2711,14 +2711,20 @@ body.page-project .stakeholders-page .section { padding: 0; }
 }
 
 
-/* ----- Refresh Data button + modal ------------------------------------ */
-/* The button lives in the page header; dashboard.js positions it absolutely
-   in the upper-right of every page. Hidden by default — shown only when
-   isLocalEnvironment() is true (so static GitHub Pages copies stay clean). */
-.refresh-data-btn {
+/* ----- Header action buttons (Refresh + Publish) + modal -------------- */
+/* dashboard.js injects a `.header-actions` wrapper into each page header
+   containing the Refresh and Publish buttons. Hidden by default — shown
+   only when isLocalEnvironment() is true (so static GitHub Pages copies
+   stay clean). */
+.header-actions {
     position: absolute;
     top: 18px;
     right: 24px;
+    display: flex;
+    gap: 8px;
+    z-index: 5;
+}
+.header-action-btn {
     background: var(--brand);
     color: #fff;
     border: 1px solid transparent;
@@ -2732,12 +2738,35 @@ body.page-project .stakeholders-page .section { padding: 0; }
     align-items: center;
     gap: 6px;
     transition: background 0.15s, transform 0.05s;
+}
+.header-action-btn.is-visible { display: inline-flex; }
+.header-action-btn:hover     { background: var(--brand-hover, #6366f1); }
+.header-action-btn:active    { transform: translateY(1px); }
+.header-action-btn[disabled] { opacity: 0.6; cursor: progress; }
+
+/* Publish button gets a distinct hue so it reads as a separate action. */
+.publish-data-btn          { background: var(--success, #16a34a); }
+.publish-data-btn:hover    { background: var(--success-hover, #22c55e); }
+
+/* Legacy single-button selectors kept as alias so any older cached HTML
+   that injects just `.refresh-data-btn` (without the wrapper) still
+   positions correctly until the next page reload. */
+.refresh-data-btn:not(.header-action-btn) {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    background: var(--brand);
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    padding: 8px 16px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    cursor: pointer;
+    display: none;
     z-index: 5;
 }
-.refresh-data-btn.is-visible { display: inline-flex; }
-.refresh-data-btn:hover     { background: var(--brand-hover, #6366f1); }
-.refresh-data-btn:active    { transform: translateY(1px); }
-.refresh-data-btn[disabled] { opacity: 0.6; cursor: progress; }
+.refresh-data-btn:not(.header-action-btn).is-visible { display: inline-flex; }
 
 .refresh-modal {
     position: fixed;

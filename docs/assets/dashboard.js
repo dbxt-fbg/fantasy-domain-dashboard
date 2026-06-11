@@ -927,140 +927,195 @@ window.triggerAgent = function (agentType) {
           'The dashboard will refresh automatically when complete.');
 };
 
-// ----- Refresh Data button + modal --------------------------------------
-// On local runs (serve_dashboard.py), inject a "Refresh Data" button into
-// every page's header. Clicking it kicks off /api/refresh and opens a modal
-// that polls /api/refresh/status until the job finishes, then reloads the
-// page so the user sees the freshly-regenerated HTML.
+// ----- Header action buttons (Refresh Data + Publish to GitHub) ---------
+// On local runs (serve_dashboard.py), inject a pair of buttons into every
+// page header. Each kicks off its own background job on the server and
+// opens a modal that polls progress to completion. The same JS bundle
+// ships to GitHub Pages, where these are hidden because the API endpoints
+// don't exist there.
 
 (function () {
-    function buildModal() {
-        const modal = document.createElement('div');
-        modal.className = 'refresh-modal';
-        modal.id = 'refresh-modal';
-        modal.hidden = true;
-        modal.setAttribute('role', 'dialog');
-        modal.setAttribute('aria-modal', 'true');
-        modal.setAttribute('aria-labelledby', 'refresh-modal-title');
-        modal.innerHTML = `
-            <div class="refresh-modal-backdrop"></div>
-            <div class="refresh-modal-dialog">
-                <div class="refresh-modal-title" id="refresh-modal-title">Refreshing dashboard data…</div>
-                <div class="refresh-modal-status" id="refresh-modal-status">Starting…</div>
-                <div class="refresh-progress"><div class="refresh-progress-fill" id="refresh-progress-fill"></div></div>
-                <div class="refresh-modal-percent" id="refresh-modal-percent">0%</div>
-                <div class="refresh-modal-error" id="refresh-modal-error" hidden></div>
-                <div class="refresh-modal-actions" id="refresh-modal-actions" hidden>
-                    <button type="button" class="refresh-modal-btn" id="refresh-modal-close">Close</button>
-                    <button type="button" class="refresh-modal-btn primary" id="refresh-modal-retry">Retry</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+    // Generic factory: builds a modal+poller bound to a single job kind so
+    // Refresh and Publish each get their own DOM, IDs, and polling timer.
+    function makeJobUI(opts) {
+        const cfg = {
+            kind: opts.kind,                  // 'refresh' | 'publish'
+            startUrl: opts.startUrl,          // POST endpoint
+            statusUrl: opts.statusUrl,        // GET endpoint (takes ?id=)
+            runningTitle: opts.runningTitle,
+            failedTitle: opts.failedTitle,
+            doneLabel: opts.doneLabel,        // text shown at 100%
+            onDone: opts.onDone,              // (data) => void after success
+        };
+        const ids = {
+            modal:    cfg.kind + '-modal',
+            title:    cfg.kind + '-modal-title',
+            status:   cfg.kind + '-modal-status',
+            fill:     cfg.kind + '-progress-fill',
+            percent:  cfg.kind + '-modal-percent',
+            error:    cfg.kind + '-modal-error',
+            actions:  cfg.kind + '-modal-actions',
+            close:    cfg.kind + '-modal-close',
+            retry:    cfg.kind + '-modal-retry',
+        };
+        let pollTimer = null;
 
-        modal.querySelector('#refresh-modal-close').addEventListener('click', () => {
+        function buildModal() {
+            const modal = document.createElement('div');
+            modal.className = 'refresh-modal';
+            modal.id = ids.modal;
             modal.hidden = true;
-        });
-        modal.querySelector('#refresh-modal-retry').addEventListener('click', () => {
-            startRefresh();
-        });
-        return modal;
-    }
-
-    function setProgress(percent, label, opts) {
-        opts = opts || {};
-        const fill = document.getElementById('refresh-progress-fill');
-        const pct = document.getElementById('refresh-modal-percent');
-        const status = document.getElementById('refresh-modal-status');
-        const errBox = document.getElementById('refresh-modal-error');
-        const actions = document.getElementById('refresh-modal-actions');
-        const title = document.getElementById('refresh-modal-title');
-        if (fill) fill.style.width = Math.max(0, Math.min(100, percent)) + '%';
-        if (pct) pct.textContent = Math.round(percent) + '%';
-        if (status && label) status.textContent = label;
-        if (opts.error) {
-            if (errBox) {
-                errBox.hidden = false;
-                errBox.textContent = opts.error + (opts.tail ? '\n\n' + opts.tail : '');
-            }
-            if (actions) actions.hidden = false;
-            if (title) title.textContent = 'Refresh failed';
-        } else {
-            if (errBox) errBox.hidden = true;
-            if (actions) actions.hidden = true;
-            if (title) title.textContent = 'Refreshing dashboard data…';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-labelledby', ids.title);
+            modal.innerHTML = `
+                <div class="refresh-modal-backdrop"></div>
+                <div class="refresh-modal-dialog">
+                    <div class="refresh-modal-title" id="${ids.title}">${cfg.runningTitle}</div>
+                    <div class="refresh-modal-status" id="${ids.status}">Starting…</div>
+                    <div class="refresh-progress"><div class="refresh-progress-fill" id="${ids.fill}"></div></div>
+                    <div class="refresh-modal-percent" id="${ids.percent}">0%</div>
+                    <div class="refresh-modal-error" id="${ids.error}" hidden></div>
+                    <div class="refresh-modal-actions" id="${ids.actions}" hidden>
+                        <button type="button" class="refresh-modal-btn" id="${ids.close}">Close</button>
+                        <button type="button" class="refresh-modal-btn primary" id="${ids.retry}">Retry</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.querySelector('#' + ids.close).addEventListener('click', () => { modal.hidden = true; });
+            modal.querySelector('#' + ids.retry).addEventListener('click', start);
+            return modal;
         }
+
+        function setProgress(percent, label, errOpts) {
+            errOpts = errOpts || {};
+            const fill = document.getElementById(ids.fill);
+            const pct = document.getElementById(ids.percent);
+            const status = document.getElementById(ids.status);
+            const errBox = document.getElementById(ids.error);
+            const actions = document.getElementById(ids.actions);
+            const title = document.getElementById(ids.title);
+            if (fill) fill.style.width = Math.max(0, Math.min(100, percent)) + '%';
+            if (pct) pct.textContent = Math.round(percent) + '%';
+            if (status && label) status.textContent = label;
+            if (errOpts.error) {
+                if (errBox) {
+                    errBox.hidden = false;
+                    errBox.textContent = errOpts.error + (errOpts.tail ? '\n\n' + errOpts.tail : '');
+                }
+                if (actions) actions.hidden = false;
+                if (title) title.textContent = cfg.failedTitle;
+            } else {
+                if (errBox) errBox.hidden = true;
+                if (actions) actions.hidden = true;
+                if (title) title.textContent = cfg.runningTitle;
+            }
+        }
+
+        function poll(jobId) {
+            clearTimeout(pollTimer);
+            fetch(cfg.statusUrl + '?id=' + encodeURIComponent(jobId))
+                .then(r => r.json().then(d => ({ok: r.ok, data: d})))
+                .then(({ok, data}) => {
+                    if (!ok) {
+                        setProgress(0, '', {error: data.error || 'Status request failed.'});
+                        return;
+                    }
+                    const label = data.step_label || 'Working…';
+                    setProgress(data.percent || 0, label);
+                    if (data.status === 'done') {
+                        setProgress(100, cfg.doneLabel || 'Done.');
+                        if (typeof cfg.onDone === 'function') cfg.onDone(data);
+                        return;
+                    }
+                    if (data.status === 'failed') {
+                        setProgress(data.percent || 0, label, {
+                            error: data.error || (cfg.failedTitle + '.'),
+                            tail: data.log_tail || '',
+                        });
+                        return;
+                    }
+                    pollTimer = setTimeout(() => poll(jobId), 800);
+                })
+                .catch(err => {
+                    setProgress(0, '', {error: 'Network error: ' + err.message});
+                });
+        }
+
+        function start() {
+            const modal = document.getElementById(ids.modal) || buildModal();
+            modal.hidden = false;
+            setProgress(0, 'Starting…');
+            fetch(cfg.startUrl, {method: 'POST'})
+                .then(r => r.json().then(d => ({ok: r.ok, data: d})))
+                .then(({ok, data}) => {
+                    if (!ok || !data.job_id) {
+                        setProgress(0, '', {error: data.error || 'Could not start.'});
+                        return;
+                    }
+                    poll(data.job_id);
+                })
+                .catch(err => {
+                    setProgress(0, '', {error: 'Network error: ' + err.message});
+                });
+        }
+
+        return {start};
     }
 
-    let pollTimer = null;
+    const refreshUI = makeJobUI({
+        kind: 'refresh',
+        startUrl: '/api/refresh',
+        statusUrl: '/api/refresh/status',
+        runningTitle: 'Refreshing dashboard data…',
+        failedTitle: 'Refresh failed',
+        doneLabel: 'Done — reloading page…',
+        onDone: () => setTimeout(() => window.location.reload(), 600),
+    });
 
-    function poll(jobId) {
-        clearTimeout(pollTimer);
-        fetch('/api/refresh/status?id=' + encodeURIComponent(jobId))
-            .then(r => r.json().then(d => ({ok: r.ok, data: d})))
-            .then(({ok, data}) => {
-                if (!ok) {
-                    setProgress(0, '', {error: data.error || 'Status request failed.'});
-                    return;
-                }
-                const label = data.step_label || 'Working…';
-                setProgress(data.percent || 0, label);
-                if (data.status === 'done') {
-                    setProgress(100, 'Done — reloading page…');
-                    setTimeout(() => window.location.reload(), 600);
-                    return;
-                }
-                if (data.status === 'failed') {
-                    setProgress(data.percent || 0, label, {
-                        error: data.error || 'Refresh failed.',
-                        tail: data.log_tail || '',
-                    });
-                    return;
-                }
-                pollTimer = setTimeout(() => poll(jobId), 800);
-            })
-            .catch(err => {
-                setProgress(0, '', {error: 'Network error: ' + err.message});
-            });
-    }
+    const publishUI = makeJobUI({
+        kind: 'publish',
+        startUrl: '/api/publish',
+        statusUrl: '/api/publish/status',
+        runningTitle: 'Publishing to GitHub Pages…',
+        failedTitle: 'Publish failed',
+        doneLabel: 'Published — GitHub Pages will rebuild shortly.',
+    });
 
-    function startRefresh() {
-        const modal = document.getElementById('refresh-modal') || buildModal();
-        modal.hidden = false;
-        setProgress(0, 'Starting…');
-        fetch('/api/refresh', {method: 'POST'})
-            .then(r => r.json().then(d => ({ok: r.ok, data: d})))
-            .then(({ok, data}) => {
-                if (!ok || !data.job_id) {
-                    setProgress(0, '', {error: data.error || 'Could not start refresh.'});
-                    return;
-                }
-                poll(data.job_id);
-            })
-            .catch(err => {
-                setProgress(0, '', {error: 'Network error: ' + err.message});
-            });
-    }
-
-    function injectButton() {
+    function injectButtons() {
         const header = document.querySelector('body > .container > header')
             || document.querySelector('header');
         if (!header) return;
-        if (header.querySelector('.refresh-data-btn')) return;
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'refresh-data-btn is-visible';
-        btn.textContent = '↻ Refresh Data';
-        btn.title = 'Pull the latest Jira data and regenerate the dashboards';
-        btn.addEventListener('click', startRefresh);
-        header.appendChild(btn);
+        if (header.querySelector('.header-actions')) return;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'header-actions';
+
+        const refreshBtn = document.createElement('button');
+        refreshBtn.type = 'button';
+        refreshBtn.className = 'header-action-btn refresh-data-btn is-visible';
+        refreshBtn.textContent = '↻ Refresh Data';
+        refreshBtn.title = 'Pull the latest Jira data and regenerate the dashboards';
+        refreshBtn.addEventListener('click', refreshUI.start);
+        wrap.appendChild(refreshBtn);
+
+        const publishBtn = document.createElement('button');
+        publishBtn.type = 'button';
+        publishBtn.className = 'header-action-btn publish-data-btn is-visible';
+        publishBtn.textContent = '⤴ Publish to GitHub';
+        publishBtn.title = 'Sync the current dashboards to docs/ and push to GitHub Pages';
+        publishBtn.addEventListener('click', publishUI.start);
+        wrap.appendChild(publishBtn);
+
+        header.appendChild(wrap);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Only show the button on the local dashboard server. The same
-        // bundle ships to GitHub Pages where the API endpoints don't exist.
+        // Buttons only make sense on the local dashboard server — GitHub
+        // Pages copies don't have the /api endpoints behind them.
         if (typeof isLocalEnvironment === 'function' && !isLocalEnvironment()) return;
-        injectButton();
+        injectButtons();
     });
 })();
 
