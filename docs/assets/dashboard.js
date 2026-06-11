@@ -867,6 +867,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Epics page — "Hide Completed Epics" toolbar above the Gantt chart.
     // Persists the user's choice in localStorage so a refresh keeps the
     // filter on. Pure DOM toggle: no server round-trip.
+    //
+    // The chart above the Gantt is server-rendered SVG, so we can't filter
+    // it live in JS. Instead the generator emits two variants — a default
+    // and an "exclude completed" one — and the toggle flips display on
+    // both at once.
     const ganttHideCompleted = document.getElementById('gantt-hide-completed');
     if (ganttHideCompleted) {
         const STORAGE_KEY = 'gantt.hideCompletedEpics';
@@ -875,6 +880,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isCompleted = row.dataset.completed === '1';
                 row.classList.toggle('hidden-by-filter', hide && isCompleted);
             });
+            const fullChart = document.querySelector('.epics-chart-full');
+            const filteredChart = document.querySelector('.epics-chart-filtered');
+            if (fullChart) fullChart.style.display = hide ? 'none' : '';
+            if (filteredChart) filteredChart.style.display = hide ? '' : 'none';
         };
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
