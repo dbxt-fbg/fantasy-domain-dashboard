@@ -16,7 +16,7 @@
         
         <header>
             <h1>🔍 Ticket Hygiene Dashboard</h1>
-            <div class="subtitle">Generated June 11, 2026 at 18:45</div>
+            <div class="subtitle">Generated June 11, 2026 at 22:47</div>
         </header>
                 <nav class="top-nav">
             <ul class="nav-menu">
@@ -39,6 +39,30 @@
             </ul>
         </nav>
         <div class="content">
+            
+            <div class="metrics-grid" style="margin-bottom: 28px;">
+                <div class="metric-card">
+                    <div class="metric-label">Open Issues</div>
+                    <div class="metric-value">21</div>
+                    <div class="metric-subtext">currently flagged</div>
+                </div>
+                <div class="metric-card warning">
+                    <div class="metric-label">Oldest Open</div>
+                    <div class="metric-value">9d</div>
+                    <div class="metric-subtext">since first flagged</div>
+                </div>
+                <div class="metric-card warning">
+                    <div class="metric-label">Aged ≥ 7 Days</div>
+                    <div class="metric-value">10</div>
+                    <div class="metric-subtext">0 aged ≥ 14d</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Avg Age</div>
+                    <div class="metric-value">5d</div>
+                    <div class="metric-subtext">across open issues</div>
+                </div>
+            </div>
+            
             <h2 class="section-title" style="margin-top: 0;">🎯 Feature Hygiene Rules</h2>
             <div class="metrics-grid">
                 <button type="button" class="metric-card clean" onclick="showSection('features_missing_requirements')" aria-controls="features_missing_requirements">
@@ -503,7 +527,6 @@
                     </div>
                     </div></div>
         </div>
-    </div>
     
     </div>
 </body>
