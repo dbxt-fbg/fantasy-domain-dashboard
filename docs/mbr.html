@@ -175,12 +175,13 @@
         </nav>
         <nav class="sub-nav">
             <ul class="nav-menu">
-                <li class="nav-item"><a href="team_dashboard.html#team-metrics">Stories</a></li>
-                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="features.html">Features</a></li>
                 <li class="nav-item"><a href="epics_dashboard.html">Epics</a></li>
+                <li class="nav-item"><a href="team_dashboard.html">Stories</a></li>
+                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
                 <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
                 <li class="nav-item"><a href="hygiene_dashboard.html">Ticket Hygiene</a></li>
-                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
                 <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
                 <li class="nav-item"><a href="dependencies.html">Dependencies</a></li>
                 <li class="nav-item"><a href="mbr.html" class="active">MBR</a></li>
@@ -213,8 +214,8 @@
                 <h2 class="section-title mbr-section-title">📝 Executive Summary</h2>
                 <div class="intro-banner">
                     <p style="color: var(--text-secondary); line-height: 1.7; margin: 0;">
-                        May was an execution month. Across two sprints (M30.1 and M30.2) the team closed roughly 134 stories
-                        and 122.5 story points — with M30.2 alone landing 98.5 of 139.5 SP (71% completion). The contest
+                        May was an execution month. Across two sprints (M30.1 and M30.2) the team closed 82 stories,
+                        bugs and tasks (106 story points) — with M30.2 alone landing 58.5 of 102.5 SP (57% completion). The contest
                         settlement pipeline went end-to-end (settle jobs, payout tiers, pick scoring tiers, experience-level
                         calculation, ContestEntryResult enum), Geolocation Integration shipped to Done on the Fantasy API
                         side, the Playmaker admin app's gRPC layer was migrated to REST behind Spring Cloud Gateway, and
@@ -238,11 +239,11 @@
                 <h2 class="section-title mbr-section-title">📊 May at a Glance</h2>
                 <div class="metric-row">
                     <div class="metric-mini">
-                        <div class="val">134</div>
+                        <div class="val">82</div>
                         <div class="lbl">Stories/bugs/tasks closed</div>
                     </div>
                     <div class="metric-mini">
-                        <div class="val">122.5</div>
+                        <div class="val">106</div>
                         <div class="lbl">Story points completed</div>
                     </div>
                     <div class="metric-mini">
@@ -250,26 +251,25 @@
                         <div class="lbl">Sprints completed</div>
                     </div>
                     <div class="metric-mini">
-                        <div class="val">71%</div>
-                        <div class="lbl">M30.2 SP commitment hit</div>
+                        <div class="val">57%</div>
+                        <div class="lbl">M30.2 SP completion</div>
                     </div>
                     <div class="metric-mini">
-                        <div class="val">5</div>
+                        <div class="val">11</div>
                         <div class="lbl">Epics moved to Done</div>
                     </div>
                 </div>
 
                 <p style="font-size: 12px; color: var(--text-faint); margin-top: 0;">
-                    * Closed counts cover M30.1 (Apr 30 – May 12) and M30.2 (May 13 – May 26). Story points are now
-                    consistently set on M30.2 — the velocity series begins here. M30.1 completed 24 of 40 SP that were
-                    eventually pointed; final M30.2 ended at 98.5/139.5 SP closed.
+                    * Closed counts cover M30.1 (Apr 30 – May 12) and M30.2 (May 13 – May 26), measured by each ticket's
+                    status at sprint close. M30.1 ended at 47.5 of 77 SP closed; M30.2 ended at 58.5 of 102.5 SP closed.
                 </p>
 
                 <!-- Work by workstream -->
                 <div style="margin-top: 16px;">
                     <div class="workstream-row">
                         <span class="workstream-name">Wallet, Geo &amp; Settlement (BE)</span>
-                        <span class="workstream-count">21 stories</span>
+                        <span class="workstream-count">22 stories</span>
                         <span class="workstream-engineers">Tanya Phanich</span>
                     </div>
                     <div class="workstream-row">
@@ -319,7 +319,7 @@
                     </div>
                     <div class="workstream-row">
                         <span class="workstream-name">Player Cards CMS &amp; C4 Aggregation</span>
-                        <span class="workstream-count">4 stories</span>
+                        <span class="workstream-count">3 stories</span>
                         <span class="workstream-engineers">Anushri Patel</span>
                     </div>
                     <div class="workstream-row">
@@ -334,7 +334,7 @@
                     </div>
                     <div class="workstream-row">
                         <span class="workstream-name">iOS Datadog &amp; Document Verification</span>
-                        <span class="workstream-count">3 stories</span>
+                        <span class="workstream-count">4 stories</span>
                         <span class="workstream-engineers">Jasmine Dacones</span>
                     </div>
                     <div class="workstream-row">
@@ -520,11 +520,11 @@
                     <div class="challenge-item">
                         <div class="item-title">M30.1 Sprint: Mid-Sprint Carry-In</div>
                         <div class="item-body">
-                            M30.1 closed at 24/40 SP — but it's worth noting that the sprint started Apr 30 with
-                            70 tickets / 90 SP committed and only 36 tickets / 40 SP were ultimately scored at
-                            sprint close (the rest moved out or got rescoped mid-sprint). The first sprint of
-                            a milestone often has noisy commitment data; the M30.2 baseline (139.5 SP committed,
-                            98.5 closed) is a cleaner velocity reference going forward.
+                            M30.1 closed at 47.5/77 SP — and the sprint started Apr 30 with 70 tickets committed,
+                            of which 24 were closed by the live commitment snapshot (the rest moved out or got
+                            rescoped mid-sprint). The first sprint of a milestone often has noisy commitment data;
+                            the M30.2 baseline (102.5 SP committed, 58.5 closed = 57%) is a cleaner velocity
+                            reference going forward.
                         </div>
                     </div>
 
