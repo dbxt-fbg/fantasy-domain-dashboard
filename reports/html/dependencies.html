@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/dashboard.css?v=ff-logo-1">
-    <script src="assets/dashboard.js?v=2.0" defer></script>
+    <link rel="stylesheet" href="assets/dashboard.css?v=gantt-open-stories-1">
+    <script src="assets/dashboard.js?v=gantt-open-stories-1" defer></script>
     <style>
         /* Page-specific overrides only — shared styles live in assets/dashboard.css */
     </style>
@@ -19,7 +19,7 @@
         
         <header>
             <h1>🔗 Dependencies</h1>
-            <div class="subtitle">Project: Fantasy · 12 tracked · Source: config/dependencies.yaml · Last edited May 21, 2026 at 12:15</div>
+            <div class="subtitle">Project: Fantasy · 12 tracked · Source: config/dependencies.yaml · Last edited June 11, 2026 at 09:14</div>
         </header>
         <nav class="top-nav">
             <ul class="nav-menu">
@@ -29,12 +29,13 @@
         </nav>
         <nav class="sub-nav">
             <ul class="nav-menu">
-                <li class="nav-item"><a href="team_dashboard.html#team-metrics">Stories</a></li>
-                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="features.html">Features</a></li>
                 <li class="nav-item"><a href="epics_dashboard.html">Epics</a></li>
+                <li class="nav-item"><a href="team_dashboard.html">Stories</a></li>
+                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
                 <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
                 <li class="nav-item"><a href="hygiene_dashboard.html">Ticket Hygiene</a></li>
-                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
                 <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
                 <li class="nav-item"><a href="dependencies.html" class="active">Dependencies</a></li>
                 <li class="nav-item"><a href="mbr.html">MBR</a></li>
@@ -49,12 +50,14 @@
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-7243" target="_blank" rel="noopener">FEAT-7243</a>
                 <span class="dep-team">Shared Services</span>
+                
                 <span class="dep-status todo">Product Discovery</span>
             </div>
             <div class="dep-summary">[CAT] DFS: Eligibility Service Part 1 [to be defined]</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-empty">No weekly updates yet.</div></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-7243">Status notes</label>
             <textarea id="dep-notes-FEAT-7243" class="dep-notes" rows="4"
                 placeholder="What's the latest? (free-text — no history kept)">Slated for M31.  Needs an engineering breakdown if all requirements are final.</textarea>
@@ -68,17 +71,17 @@
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8216" target="_blank" rel="noopener">FEAT-8216</a>
                 <span class="dep-team">Shared Services</span>
+                <span class="dep-rag amber">AMBER</span>
                 <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">[CAT] DFS: Universal Balance (Unified Wallet)</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-date">2026-06-11</div><div class="dep-weekly-latest">We knew from the start of the milestone we won’t be able to test e2e due to app switcher. The only ticket that is not in m30 is  . Will inspect M30.4 ticket completion progress before making a decision on whether to change it or to move remaining workload to</div><details class="dep-weekly-history"><summary>6 earlier updates</summary><div class="dep-weekly-history-list"><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-06-02</div>DFS is now unblocked to place and settle bets (so we are good for internal alpha), for prod beta transaction history spike ongoing, payment funds resolver target end date sometime next week. trading-api migration will be tracked in a different feat.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-28</div>We are shooting for end of M30 completion for internal alpha (which only requires bet placement/settlement) M31.2 for public beta, M31.3 for prod readiness</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-26</div>This one may not make it by the end of M30. We are still spiking on the implementation and expect to have a better idea before the end of this sprint,</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-19</div>want to gather estimates from spike ticket tomorrow, and then provide timeline estimates, and create a followup feat ticket in M31 for testing/cerifications/data/app switcher testing.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-08</div>- Wallet Update</div><div class="dep-weekly-entry">Have begun unpacking and fact finding, but largely behind due to ongoing FMX fund separation commitment.</div></div></details></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8216">Status notes</label>
             <textarea id="dep-notes-FEAT-8216" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">DATA, PAY, and MAGU are all in progress.  
-
-***  This one may not make it by the end of M30. We are still spiking on the implementation and expect to have a better idea before the end of this sprint.</textarea>
+                placeholder="What's the latest? (free-text — no history kept)"></textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8216', this)">Save</button>
@@ -89,15 +92,17 @@
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8217" target="_blank" rel="noopener">FEAT-8217</a>
                 <span class="dep-team">Shared Services</span>
-                <span class="dep-status inprogress">Engineering Unpacking</span>
+                <span class="dep-rag green">GREEN</span>
+                <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">[CAT] DFS: Payments MVP - Payment Methods (Deposit+Withdrawals)</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-date">2026-06-02</div><div class="dep-weekly-latest">targeting end of milestone dev done but we won’t have anything to test end to end until end of 31.1, so will track testing this in a m31 feat.</div><details class="dep-weekly-history"><summary>2 earlier updates</summary><div class="dep-weekly-history-list"><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-19</div>like  we will aim for dev done/alpha ready but prod readiness needs to be in a separate feat in M31 due to lack of app switcher to test end to end</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-14</div>Still finishing up the spike here, but we should be able to finish by 30.4.  hoping to conclude spike work by end of sprint https://betfanatics.atlassian.net/browse/PAY-6193</div></div></details></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8217">Status notes</label>
             <textarea id="dep-notes-FEAT-8217" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Tanya to start M30.3.</textarea>
+                placeholder="What's the latest? (free-text — no history kept)"></textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8217', this)">Save</button>
@@ -108,12 +113,14 @@
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8495" target="_blank" rel="noopener">FEAT-8495</a>
                 <span class="dep-team">Shared Services</span>
-                <span class="dep-status todo">Product Discovery</span>
+                
+                <span class="dep-status todo">Ready for Prioritization Review</span>
             </div>
             <div class="dep-summary">[CAT] DFS: Payments Launch and Certification</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-empty">No weekly updates yet.</div></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8495">Status notes</label>
             <textarea id="dep-notes-FEAT-8495" class="dep-notes" rows="4"
                 placeholder="What's the latest? (free-text — no history kept)">Slated for M31.  Needs requirements.</textarea>
@@ -127,18 +134,18 @@
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8509" target="_blank" rel="noopener">FEAT-8509</a>
                 <span class="dep-team">Shared Services</span>
+                <span class="dep-rag amber">AMBER</span>
                 <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">[CAT] DFS: RG Limits &amp; Entry Limits</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-date">2026-06-15</div><div class="dep-weekly-latest">GATE is completing a SPIKE for the implementation here, to hand over to DFS. The spike will be done at the end of this sprint on , but this feature is looking unlikely to complete in M30 based on an initial review of the requirements and their complexity. This is required by public launch, which needs to be code complete 31.2 (). Goal for spikes is to have one completely done so the DFS team can help us with those requirements, then move to the other spike.  Flipping RED unless we find out it is possible during the spike, which again looks unlikely.</div><details class="dep-weekly-history"><summary>5 earlier updates</summary><div class="dep-weekly-history-list"><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-06-10</div>GATE work for in-app spending alert scoped and added to M30.4 and M31.1. Decision on FE/BE flow finalized, keeps latency impacts to wallet minimal. PAY to finalize API contracts with consumers of saveTransaction. GATE picking up NATS implementation work in M30.4.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-06-03</div>GATE work for Daily Entry Limits is under way. API contract with fantasy-api to retrieve progress towards limits defined, work planned for M30.4. Uncovered additional work in the NATS ui to allow fantasy limits to be displayed. Working through discussions for when/how to check in-app spending alert after bet placement, without creating significant load on wallet/account infrastructure.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-27</div>GATE spike for DFS Entry Limits complete, work planned for completion M30.4. GATE still in process of spike to define &#x27;Spend threshold alert&#x27; work. We have concerns around how frequently the endpoint is called - as a spend limit being checked per action would mean an additional check during bet placement. Exploring alternative solutions. Not expected to complete in M30. Pay in process of determining work for DFS entry limit enforcement in the wallet.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-13</div>GATE has asked the DFS team to handle the implementation of these two new limits.  GATE will consult, advise, and review as necessary.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-05</div>work has not begun due to RG Polly issues cropping up and P1 issues.  Hoping to pick up. in M30.2.  Will likely enlist the DFS team to implement at least one of the limits.</div></div></details></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8509">Status notes</label>
             <textarea id="dep-notes-FEAT-8509" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Fu Shen and Tanya are meeting 5/21 to sort out the requirements.  Nigel to start work M30.3
-
-The GATE team is prioritizing a spike this week to be ready for the supporting engineer. @sean.roy can you provide updates as this progresses? CC @Griffin Sandler for other coordination work happening with MAGU and SWAT (that I&#x27;ll help with)
-This needs to be ready for Beta, but the expectation is that the support from DFS in M30 will ensure, with full confidence, that the timeline can be met for all the RG work.</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">6/9
+NATS UI work will happen in M31.1</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8509', this)">Save</button>
@@ -149,15 +156,18 @@ This needs to be ready for Beta, but the expectation is that the support from DF
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8511" target="_blank" rel="noopener">FEAT-8511</a>
                 <span class="dep-team">Shared Services</span>
+                <span class="dep-rag green">GREEN</span>
                 <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">[CAT] DFS: Geolocation Support</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-date">2026-06-10</div><div class="dep-weekly-latest">Backend implementation complete and tested. PR for fantasy-api waiting to merge until geo services catch up in the pipeline</div><details class="dep-weekly-history"><summary>5 earlier updates</summary><div class="dep-weekly-history-list"><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-06-03</div>Backend implementation merged to DEV. PR to consume new fields in fantasy-api needs to be tested to verify canUseDFS is honored.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-27</div>Backend implementation to consume/propogate the new canUseDfs field is planned for this sprint, dependent on OpenBet to add the field to the payload.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-20</div>GATE team reviewed scope of back end work and confirmed that changes are minimal. Tickets created.  to provide update on status of OpenBet ticket</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-20</div>OpenBet has a date of for the new metadata.  After than, the mobile app and the geolocation services will need to parse the new metadata for DFS.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-05</div>The FBG - 108 ticket has been created with OpenBet to add metadata to USStatesAndTribal geofences to support DFS.  The GATE</div></div></details></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8511">Status notes</label>
             <textarea id="dep-notes-FEAT-8511" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Tanya is working on the Fantasy epic in M30.2.  </textarea>
+                placeholder="What's the latest? (free-text — no history kept)">6/4 
+Tanya&#x27;s work is done.  Onus on MAGU and GATE to wrap the feature. </textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8511', this)">Save</button>
@@ -168,12 +178,14 @@ This needs to be ready for Beta, but the expectation is that the support from DF
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8512" target="_blank" rel="noopener">FEAT-8512</a>
                 <span class="dep-team">Shared Services</span>
+                
                 <span class="dep-status todo">Product Discovery</span>
             </div>
             <div class="dep-summary">[CAT] DFS: Tax &amp; Regulatory Reports</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-empty">No weekly updates yet.</div></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8512">Status notes</label>
             <textarea id="dep-notes-FEAT-8512" class="dep-notes" rows="4"
                 placeholder="What's the latest? (free-text — no history kept)">Slated for M31.  Needs requirements.</textarea>
@@ -187,16 +199,18 @@ This needs to be ready for Beta, but the expectation is that the support from DF
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8600" target="_blank" rel="noopener">FEAT-8600</a>
                 <span class="dep-team">Shared Services</span>
-                <span class="dep-status inprogress">Engineering Unpacking</span>
+                <span class="dep-rag green">GREEN</span>
+                <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">[CAT] App Switcher for Super app Concept</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-date">2026-05-12</div><div class="dep-weekly-latest">Currently expecting to commit this to M31. During CAT/DFS meeting today, it was suggested that the Growth team take on App Switcher work. Working to confirm that and transition the effort.</div><details class="dep-weekly-history"><summary>1 earlier update</summary><div class="dep-weekly-history-list"><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-05</div>Vasukh will build a plan for the high level work outlined by Jim. This will be completed in M30.1 and the PROF work will start in M30.2</div></div></details></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8600">Status notes</label>
             <textarea id="dep-notes-FEAT-8600" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">FE Work: @Nate Clay to share by May 29, sizing and feasibility of getting this done by M31.2 for Beta. Will have dependencies on the DFS team porting the standalone app code and Atlas for supporting app switcher functionality
-AUTH work: @Griffin Sandler has confirmed that PROF has things ready for the supporting engineer to pick up work starting M30.3</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">6/4
+Commitment for M31.  PROF work complete, MAGU work in progress, GATE not yet started. </textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8600', this)">Save</button>
@@ -207,17 +221,18 @@ AUTH work: @Griffin Sandler has confirmed that PROF has things ready for the sup
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8554" target="_blank" rel="noopener">FEAT-8554</a>
                 <span class="dep-team">Odds Factory</span>
+                <span class="dep-rag green">GREEN</span>
                 <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">[OF] DFS: Trading Engineering/Product Requirements [Alpha]</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-date">2026-06-05</div><div class="dep-weekly-latest">Proposition updates regarding marginated odds (multipliers) and availability factors now live.</div><details class="dep-weekly-history"><summary>9 earlier updates</summary><div class="dep-weekly-history-list"><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-29</div>Publishing market and proposition creation for NFL and NBA, downstream Fantasy team now working on integration in M30.3. Chris He has been assigned to help support the role out of DFS for MVP, first tasked with some observality/performance tasks following up with integrating the remaining core sports.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-22</div>Technical ADRs for Beta were designed ahead of time regarding unified tracker and offering more lines for mainline player markets, presenting to the wider team in the coming weeks</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-15</div>Now publishing all Fantasy fixture events for NFL and NBA on production. Competition/Market/Margin configurations are near completion and building out the proposition domain is making good progress</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-05-08</div>With the help of Adam Brett, we split this feature into three components   ,   and  - this followed with some Jira hygiene on certain epics/stories</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-04-20</div>Confirmed only  and  is required downstream for Alpha launch. With the focus on OF.Fantasy,  will also be prioritised in order to add tooling, observability and performance for the new service. Catch up on the product asks of DFS, Michael Golden joins discussions and joining pricing platform, dedicated to DFS integration, starting M30. Re-review of project plan, epics &amp; stories + estimates, expecting early-mid August with 2 devs, potentially requiring a 3rd for a sprint or 2 for tracker work, depending on M30 NFL statstream integration work from Football Spirit team:</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-04-10</div>Initial DFS x OF sync - review the current project plan and capacity, as we don’t want to cannibalise pricing platform M30 work. Story points need refining and reviewed by Ciaran Foy.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-04-08</div>Fantasy product phased requirements discovery &amp; project planning - requires an additional trading engineer to assist.</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-03-25</div>Technical discussions begun with Fantasy team &amp; Sean C on the approach of powering DFS with OddsFactory data: Fantasy - Trading Eng requirements - John Groves - Confluence</div><div class="dep-weekly-entry"><div class="dep-weekly-date">2026-03-18</div>Discussion w/ Noel M &amp; John G on what data can be provided to DFS &amp; draw up some technical ADRs on how the approach may be implemented: Fantasy Integration Proposal - Fantasy - Confluence</div></div></details></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8554">Status notes</label>
             <textarea id="dep-notes-FEAT-8554" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Targeted M30.  All VAMO Epics in progress.
-Should be delivered M30.3
-A week late due to an engineer quitting</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">6/4
+Targeted M30.  All VAMO Epics in progress. Should be dev complete by M30.3</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8554', this)">Save</button>
@@ -228,15 +243,18 @@ A week late due to an engineer quitting</textarea>
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8902" target="_blank" rel="noopener">FEAT-8902</a>
                 <span class="dep-team">Odds Factory</span>
-                <span class="dep-status todo">Product Discovery</span>
+                <span class="dep-rag green">GREEN</span>
+                <span class="dep-status inprogress">Engineering Unpacking</span>
             </div>
             <div class="dep-summary">[OF] DFS: Trading Engineering/Product Requirements [Beta]</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-empty">No weekly updates yet.</div></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8902">Status notes</label>
             <textarea id="dep-notes-FEAT-8902" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Targeting M30.  Work to start M30.3.</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">6/4
+Spoke with Tommy, and this was moved along to M31 with Beta.</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8902', this)">Save</button>
@@ -247,15 +265,18 @@ A week late due to an engineer quitting</textarea>
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-7883" target="_blank" rel="noopener">FEAT-7883</a>
                 <span class="dep-team">Sportsbook</span>
-                <span class="dep-status todo">Product Discovery</span>
+                <span class="dep-rag green">GREEN</span>
+                <span class="dep-status inprogress">Engineering Unpacking</span>
             </div>
             <div class="dep-summary">[ENG] Migrate Bet placement flow to wallet-transaction-api</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-date">2026-06-07</div><div class="dep-weekly-latest">Unpacked the work and currently creating tickets to move into 30.4 to get ahead of the deadline within 31</div></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-7883">Status notes</label>
             <textarea id="dep-notes-FEAT-7883" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Per Tanya, we should be fine as we&#x27;re already connected to wallet-transaction-api.  Will reach out to Sean to determine if there are additional concerns.</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">6/4
+Tanya does not believe this to be a concern</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-7883', this)">Save</button>
@@ -266,15 +287,18 @@ A week late due to an engineer quitting</textarea>
             <div class="dep-head">
                 <a class="dep-key" href="https://betfanatics.atlassian.net/browse/FEAT-8991" target="_blank" rel="noopener">FEAT-8991</a>
                 <span class="dep-team">Sportsbook</span>
+                <span class="dep-rag green">GREEN</span>
                 <span class="dep-status inprogress">In Progress</span>
             </div>
             <div class="dep-summary">RAD Prod Phase 1</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>Unassigned</span>
             </div>
+            <div class="dep-weekly"><div class="dep-weekly-label">Weekly Status</div><div class="dep-weekly-date">2026-05-21</div><div class="dep-weekly-latest">Currently on track to deliver MVP goals by end of M30.</div></div>
             <label class="dep-notes-label" for="dep-notes-FEAT-8991">Status notes</label>
             <textarea id="dep-notes-FEAT-8991" class="dep-notes" rows="4"
-                placeholder="What's the latest? (free-text — no history kept)">Getting documentation on RAD 5/22</textarea>
+                placeholder="What's the latest? (free-text — no history kept)">6/11
+Playmaker alternative is being broken down here:  https://betfanatics.atlassian.net/browse/FNTSY-586</textarea>
             <div class="dep-actions">
                 <span class="dep-save-msg"></span>
                 <button type="button" class="dep-save-btn" onclick="saveDependencyNotes('FEAT-8991', this)">Save</button>
@@ -282,7 +306,7 @@ A week late due to an engineer quitting</textarea>
         </div>
     </div></div>
             <footer>
-                Generated by Engineering Management Dashboard · May 28, 2026 at 21:00
+                Generated by Engineering Management Dashboard · June 15, 2026 at 10:04
             </footer>
         </div>
     

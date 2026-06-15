@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/dashboard.css?v=gantt-chart-filter-1">
-    <script src="assets/dashboard.js?v=gantt-chart-filter-1" defer></script>
+    <link rel="stylesheet" href="assets/dashboard.css?v=gantt-open-stories-1">
+    <script src="assets/dashboard.js?v=gantt-open-stories-1" defer></script>
     <style>
         /* Page-specific overrides only — shared styles live in assets/dashboard.css */
     </style>
@@ -19,11 +19,11 @@
         
         <header>
             <h1>📋 Epics Dashboard</h1>
-            <div class="subtitle">Epic Timeline & Status • Generated June 11, 2026 at 23:00</div>
+            <div class="subtitle">Epic Timeline & Status • Generated June 12, 2026 at 13:13</div>
         </header>
         <nav class="top-nav">
             <ul class="nav-menu">
-                <li class="nav-item"><a href="index.html" class="active">Project: Fantasy</a></li>
+                <li class="nav-item"><a href="project_fantasy.html" class="active">Project: Fantasy</a></li>
                 <li class="nav-item"><a href="logs_dashboard.html">Agents and Logs</a></li>
             </ul>
         </nav>
@@ -98,11 +98,12 @@
                                 <div class="gantt-col-header" onclick="sortGanttRows(this, 'status')" style="width: 110px; padding: 0 8px 0 0;">Status</div>
                                 <div class="gantt-col-header" onclick="sortGanttRows(this, 'summary')" style="width: 190px; padding: 0 8px 0 0;">Summary</div>
                                 <div class="gantt-col-header" onclick="sortGanttRows(this, 'assignee')" style="width: 60px; padding: 0 8px 0 0;">Assignee</div>
+                                <div class="gantt-col-header" onclick="sortGanttRows(this, 'open')" style="width: 70px; padding: 0 8px 0 0; text-align: right;" title="Open child stories/bugs remaining (not closed)">Open</div>
                                 <div style="flex: 1;"></div>
                             </div>
                             <!-- Header with dates -->
                             <div style="display: flex; margin-bottom: 4px;">
-                                <div style="width: 440px; flex-shrink: 0;"></div>
+                                <div style="width: 510px; flex-shrink: 0;"></div>
                                 <div style="flex: 1; position: relative; height: 50px;">
     <div style="position:absolute; left:0.00%; width:18.84%; height:50px; border-left:1px solid #475569; box-sizing:border-box; padding:1px 2px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;" title="May 27, 2026 – Jun 09, 2026"><div style="display:flex; flex-direction:column; flex:1; min-height:0;"><div title="FNTSY M30.3 Sprint 2026.12 FE · 7 epics" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#38bdf8;  overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M30.3 FE</div><div title="FNTSY M30.3 Sprint 2026.12 BE · 10 epics" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#a78bfa;  overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M30.3 BE</div></div><div style="height:14px; min-width:0; font-size:10px; color:#94a3b8; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; border-top:1px solid #334155; margin-top:1px; padding-top:1px;">May 27 – Jun 09</div></div><div style="position:absolute; left:20.29%; width:18.84%; height:50px; border-left:1px solid #475569; box-sizing:border-box; padding:1px 2px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;" title="Jun 10, 2026 – Jun 23, 2026"><div style="display:flex; flex-direction:column; flex:1; min-height:0;"><div title="FNTSY M30.4 Sprint 2026.13 FE · 13 epics" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#38bdf8;  overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M30.4 FE</div><div title="FNTSY M30.4 Sprint 2026.13 BE · 19 epics" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#a78bfa;  overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M30.4 BE</div></div><div style="height:14px; min-width:0; font-size:10px; color:#94a3b8; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; border-top:1px solid #334155; margin-top:1px; padding-top:1px;">Jun 10 – Jun 23</div></div><div style="position:absolute; left:40.58%; width:18.84%; height:50px; border-left:1px solid #475569; box-sizing:border-box; padding:1px 2px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;" title="Jun 24, 2026 – Jul 07, 2026"><div style="display:flex; flex-direction:column; flex:1; min-height:0;"><div title="FNTSY M31.1 Sprint 2026.14 FE · 1 epic" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#38bdf8;  overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M31.1 FE</div><div title="FNTSY M31.1 Sprint 2026.14 BE · 6 epics" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#a78bfa;  overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M31.1 BE</div></div><div style="height:14px; min-width:0; font-size:10px; color:#94a3b8; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; border-top:1px solid #334155; margin-top:1px; padding-top:1px;">Jun 24 – Jul 07</div></div><div style="position:absolute; left:60.87%; width:18.84%; height:50px; border-left:1px solid #475569; box-sizing:border-box; padding:1px 2px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;" title="Jul 08, 2026 – Jul 21, 2026"><div style="display:flex; flex-direction:column; flex:1; min-height:0;"><div title="FNTSY M31.2 Sprint 2026.15 FE · no epics assigned yet" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#38bdf8; opacity:0.55; font-style:italic; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M31.2 FE</div><div title="FNTSY M31.2 Sprint 2026.15 BE · 2 epics" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#a78bfa;  overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M31.2 BE</div></div><div style="height:14px; min-width:0; font-size:10px; color:#94a3b8; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; border-top:1px solid #334155; margin-top:1px; padding-top:1px;">Jul 08 – Jul 21</div></div><div style="position:absolute; left:81.16%; width:18.84%; height:50px; border-left:1px solid #475569; box-sizing:border-box; padding:1px 2px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;" title="Jul 22, 2026 – Aug 04, 2026"><div style="display:flex; flex-direction:column; flex:1; min-height:0;"><div title="FNTSY M31.3 Sprint 2026.16 FE · no epics assigned yet" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#38bdf8; opacity:0.55; font-style:italic; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M31.3 FE</div><div title="FNTSY M31.3 Sprint 2026.16 BE · no epics assigned yet" style="height:20px; min-width:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#a78bfa; opacity:0.55; font-style:italic; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding:0 4px;">M31.3 BE</div></div><div style="height:14px; min-width:0; font-size:10px; color:#94a3b8; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; border-top:1px solid #334155; margin-top:1px; padding-top:1px;">Jul 22 – Aug 04</div></div>
                                 </div>
@@ -110,9 +111,9 @@
     
                             <!-- Vertical sprint dividers spanning the full chart height.
                                  The overlay sits on top of the timeline area only;
-                                 the 440px epic-label column stays untouched.
+                                 the 510px epic-label column stays untouched.
                                  top:83px = 29px col-header + 50px date row + 4px margin. -->
-                            <div style="position:absolute; left:440px; right:0;
+                            <div style="position:absolute; left:510px; right:0;
                                  top:83px; bottom:0; pointer-events:none; z-index:1;">
                                 <div style="position:absolute; left:0.00%; top:0; bottom:0; width:1px; background:#334155; pointer-events:none;"></div><div style="position:absolute; left:20.29%; top:0; bottom:0; width:1px; background:#334155; pointer-events:none;"></div><div style="position:absolute; left:40.58%; top:0; bottom:0; width:1px; background:#334155; pointer-events:none;"></div><div style="position:absolute; left:60.87%; top:0; bottom:0; width:1px; background:#334155; pointer-events:none;"></div><div style="position:absolute; left:81.16%; top:0; bottom:0; width:1px; background:#334155; pointer-events:none;"></div><div style="position:absolute; left:100%; top:0; bottom:0; width:1px; background:#334155; pointer-events:none;"></div>
                             </div>
@@ -120,9 +121,9 @@
                             <!-- Epic rows -->
                             <div class="gantt-rows">
     
-                            <div class="gantt-row" data-sort-key="FNTSY-11" data-sort-status="In Progress" data-sort-summary="[FE] Onboarding: ATT, Location, and Notification Permissions, KYC" data-sort-assignee="Jasmine Dacones" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-11" data-sort-status="In Progress" data-sort-summary="[FE] Onboarding: ATT, Location, and Notification Permissions, KYC" data-sort-assignee="Jasmine Dacones" data-sort-open="2" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-11" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-11</a>
                                 </div>
@@ -136,6 +137,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Jasmine Dacones'>JD</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>2</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -145,9 +149,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-17" data-sort-status="In Progress" data-sort-summary="[FE] Pick Selection: Event page" data-sort-assignee="Jasmine Dacones" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-17" data-sort-status="In Progress" data-sort-summary="[FE] Pick Selection: Event page" data-sort-assignee="Jasmine Dacones" data-sort-open="11" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-17" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-17</a>
                                 </div>
@@ -161,6 +165,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Jasmine Dacones'>JD</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>11</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -170,9 +177,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-28" data-sort-status="In Progress" data-sort-summary="[FE] Checkout: Submitting entry" data-sort-assignee="Paul Kang" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-28" data-sort-status="In Progress" data-sort-summary="[FE] Checkout: Submitting entry" data-sort-assignee="Paul Kang" data-sort-open="5" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-28" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-28</a>
                                 </div>
@@ -186,6 +193,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Paul Kang'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>5</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -195,14 +205,14 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-29" data-sort-status="In Progress" data-sort-summary="[FE] Checkout: Post submission" data-sort-assignee="Paul Kang" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-29" data-sort-status="In code review" data-sort-summary="[FE] Checkout: Post submission" data-sort-assignee="Paul Kang" data-sort-open="1" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-29" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-29</a>
                                 </div>
                                 <div style="width: 110px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap;">
-                                    <span style="display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; background: #1e3a8a; color: #93c5fd;;">In Progress</span>
+                                    <span style="display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; background: #1e3a8a; color: #93c5fd;;">In code review</span>
                                     
                                 </div>
                                 <div style="width: 190px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; color: #cbd5e1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="[FE] Checkout: Post submission">
@@ -211,6 +221,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Paul Kang'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>1</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -220,9 +233,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-30" data-sort-status="In Progress" data-sort-summary="[FE] BFF: Entry Tracking: View picks" data-sort-assignee="Scott Schmitz" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-30" data-sort-status="In Progress" data-sort-summary="[FE] BFF: Entry Tracking: View picks" data-sort-assignee="Scott Schmitz" data-sort-open="12" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-30" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-30</a>
                                 </div>
@@ -236,6 +249,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Scott Schmitz'>SS</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>12</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -245,9 +261,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-360" data-sort-status="To Do" data-sort-summary="[FE] Entry Validation" data-sort-assignee="Paul Kang" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-360" data-sort-status="To Do" data-sort-summary="[FE] Entry Validation" data-sort-assignee="Paul Kang" data-sort-open="0" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-360" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-360</a>
                                 </div>
@@ -261,6 +277,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Paul Kang'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#64748b;'>0</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -270,9 +289,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-515" data-sort-status="In Progress" data-sort-summary="[FE] Pick Selection: Single Market Player Card" data-sort-assignee="Anushri Patel" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-515" data-sort-status="In Progress" data-sort-summary="[FE] Pick Selection: Single Market Player Card" data-sort-assignee="Anushri Patel" data-sort-open="7" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-515" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-515</a>
                                 </div>
@@ -286,6 +305,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Anushri Patel'>AP</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>7</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -295,9 +317,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-160" data-sort-status="In Progress" data-sort-summary="[FE] DFS C4 Setup" data-sort-assignee="Jacob Tabak" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-160" data-sort-status="In Progress" data-sort-summary="[FE] DFS C4 Setup" data-sort-assignee="Jacob Tabak" data-sort-open="6" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-160" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-160</a>
                                 </div>
@@ -311,6 +333,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Jacob Tabak'>JT</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>6</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -320,9 +345,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-161" data-sort-status="In Progress" data-sort-summary="[BE] Wallet Integration" data-sort-assignee="Tanya Phanich" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-161" data-sort-status="In Progress" data-sort-summary="[BE] Wallet Integration" data-sort-assignee="Tanya Phanich" data-sort-open="1" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-161" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-161</a>
                                 </div>
@@ -336,6 +361,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Tanya Phanich'>TP</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>1</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -345,9 +373,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-168" data-sort-status="In Progress" data-sort-summary="[BE] Contests: rules and entry" data-sort-assignee="Josh Schaefer" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-168" data-sort-status="In Progress" data-sort-summary="[BE] Contests: rules and entry" data-sort-assignee="Josh Schaefer" data-sort-open="1" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-168" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-168</a>
                                 </div>
@@ -361,6 +389,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Josh Schaefer'>JS</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>1</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -370,9 +401,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-169" data-sort-status="Done" data-sort-summary="[BE] Contest Leaderboards" data-sort-assignee="Tanya Phanich" data-completed="1" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-169" data-sort-status="Done" data-sort-summary="[BE] Contest Leaderboards" data-sort-assignee="Tanya Phanich" data-sort-open="0" data-completed="1" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-169" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-169</a>
                                 </div>
@@ -386,6 +417,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Tanya Phanich'>TP</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#64748b;'>0</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -395,9 +429,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-18" data-sort-status="In Progress" data-sort-summary="[BE] UMB Pickslip" data-sort-assignee="Brooks Taylor" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-18" data-sort-status="In Progress" data-sort-summary="[BE] UMB Pickslip" data-sort-assignee="Brooks Taylor" data-sort-open="3" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-18" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-18</a>
                                 </div>
@@ -411,6 +445,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Brooks Taylor'>BT</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>3</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -420,9 +457,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-205" data-sort-status="In Progress" data-sort-summary="[BE] PBT Campaign Configuration For DFS" data-sort-assignee="Liam Butler" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-205" data-sort-status="In Progress" data-sort-summary="[BE] PBT Campaign Configuration For DFS" data-sort-assignee="Liam Butler" data-sort-open="1" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-205" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-205</a>
                                 </div>
@@ -436,6 +473,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Liam Butler'>LB</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>1</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -445,9 +485,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-305" data-sort-status="Testing in progress" data-sort-summary="[BE] Max Stake Calculation and Validation" data-sort-assignee="Josh Schaefer" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-305" data-sort-status="Testing in progress" data-sort-summary="[BE] Max Stake Calculation and Validation" data-sort-assignee="Josh Schaefer" data-sort-open="0" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-305" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-305</a>
                                 </div>
@@ -461,6 +501,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Josh Schaefer'>JS</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#64748b;'>0</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -470,9 +513,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-47" data-sort-status="In Progress" data-sort-summary="[FE] Spin Up Fantasy KMP Application With FUEL Foundations" data-sort-assignee="Jacob Tabak" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-47" data-sort-status="In Progress" data-sort-summary="[FE] Spin Up Fantasy KMP Application With FUEL Foundations" data-sort-assignee="Jacob Tabak" data-sort-open="2" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-47" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-47</a>
                                 </div>
@@ -486,6 +529,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Jacob Tabak'>JT</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>2</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -495,9 +541,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-508" data-sort-status="Ready for Testing" data-sort-summary="[BE] Oddsfactory Ingestion Updates" data-sort-assignee="Nigel Young" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-508" data-sort-status="Ready for Testing" data-sort-summary="[BE] Oddsfactory Ingestion Updates" data-sort-assignee="Nigel Young" data-sort-open="0" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-508" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-508</a>
                                 </div>
@@ -511,6 +557,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Nigel Young'>NY</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#64748b;'>0</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -520,9 +569,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-623" data-sort-status="In Progress" data-sort-summary="[BE] Endpoints for FE integration" data-sort-assignee="Salmaan Khan" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-623" data-sort-status="In Progress" data-sort-summary="[BE] Endpoints for FE integration" data-sort-assignee="Salmaan Khan" data-sort-open="2" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-623" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-623</a>
                                 </div>
@@ -536,6 +585,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Salmaan Khan'>SK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>2</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -545,9 +597,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-307" data-sort-status="In Progress" data-sort-summary="[BE] Playmaker Editing Contest Entries" data-sort-assignee="Ryan Taylor" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-307" data-sort-status="In Progress" data-sort-summary="[BE] Playmaker Editing Contest Entries" data-sort-assignee="Ryan Taylor" data-sort-open="6" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-307" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-307</a>
                                 </div>
@@ -561,6 +613,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Ryan Taylor'>RT</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>6</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -570,9 +625,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-409" data-sort-status="To Do" data-sort-summary="[BE] End-to-End User Scenario Validation" data-sort-assignee="Patrick Kilburn" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-409" data-sort-status="To Do" data-sort-summary="[BE] End-to-End User Scenario Validation" data-sort-assignee="Patrick Kilburn" data-sort-open="3" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-409" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-409</a>
                                 </div>
@@ -586,6 +641,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Patrick Kilburn'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>3</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -595,9 +653,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-413" data-sort-status="In Progress" data-sort-summary="[BE] Pick Selection: Single Market Player Card" data-sort-assignee="Liam Butler" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-413" data-sort-status="In Progress" data-sort-summary="[BE] Pick Selection: Single Market Player Card" data-sort-assignee="Liam Butler" data-sort-open="3" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-413" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-413</a>
                                 </div>
@@ -611,6 +669,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Liam Butler'>LB</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>3</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -620,9 +681,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-475" data-sort-status="To Do" data-sort-summary="[BE] Contest Unsettlement" data-sort-assignee="Salmaan Khan" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-475" data-sort-status="To Do" data-sort-summary="[BE] Contest Unsettlement" data-sort-assignee="Salmaan Khan" data-sort-open="3" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-475" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-475</a>
                                 </div>
@@ -636,6 +697,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Salmaan Khan'>SK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>3</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -645,9 +709,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-502" data-sort-status="To Do" data-sort-summary="[BE] Fast Lane M30.4" data-sort-assignee="Patrick Kilburn" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-502" data-sort-status="To Do" data-sort-summary="[BE] Fast Lane M30.4" data-sort-assignee="Patrick Kilburn" data-sort-open="1" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-502" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-502</a>
                                 </div>
@@ -661,6 +725,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Patrick Kilburn'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>1</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -670,9 +737,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-537" data-sort-status="To Do" data-sort-summary="[BE] League Pages - Events Endpoint" data-sort-assignee="Josh Schaefer" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-537" data-sort-status="To Do" data-sort-summary="[BE] League Pages - Events Endpoint" data-sort-assignee="Josh Schaefer" data-sort-open="2" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-537" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-537</a>
                                 </div>
@@ -686,6 +753,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Josh Schaefer'>JS</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>2</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -695,9 +765,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-667" data-sort-status="To Do" data-sort-summary="[BE] [UMB] Prod readiness for Events, Markets, and Propositions" data-sort-assignee="Brooks Taylor" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-667" data-sort-status="To Do" data-sort-summary="[BE] [UMB] Prod readiness for Events, Markets, and Propositions" data-sort-assignee="Brooks Taylor" data-sort-open="6" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-667" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-667</a>
                                 </div>
@@ -711,6 +781,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Brooks Taylor'>BT</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>6</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -720,9 +793,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-677" data-sort-status="To Do" data-sort-summary="[BE] Playmaker - Hydrate account pages with FBG account data" data-sort-assignee="￿" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-677" data-sort-status="To Do" data-sort-summary="[BE] Playmaker - Hydrate account pages with FBG account data" data-sort-assignee="￿" data-sort-open="1" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-677" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-677</a>
                                 </div>
@@ -736,6 +809,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#64748b; font-style:italic;' title='Unassigned'>—</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>1</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -745,9 +821,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-15" data-sort-status="In Progress" data-sort-summary="[FE] BFF: Pick Selection: Single Market Player Card" data-sort-assignee="Anushri Patel" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-15" data-sort-status="In Progress" data-sort-summary="[FE] BFF: Pick Selection: Single Market Player Card" data-sort-assignee="Anushri Patel" data-sort-open="5" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-15" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-15</a>
                                 </div>
@@ -761,6 +837,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Anushri Patel'>AP</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>5</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -770,9 +849,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-22" data-sort-status="To Do" data-sort-summary="[FE] User-facing Account Management" data-sort-assignee="￿" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-22" data-sort-status="To Do" data-sort-summary="[FE] User-facing Account Management" data-sort-assignee="￿" data-sort-open="12" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-22" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-22</a>
                                 </div>
@@ -786,6 +865,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#64748b; font-style:italic;' title='Unassigned'>—</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>12</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -795,9 +877,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-31" data-sort-status="To Do" data-sort-summary="[FE] Entry Tracking: Track picks" data-sort-assignee="￿" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-31" data-sort-status="To Do" data-sort-summary="[FE] Entry Tracking: Track picks" data-sort-assignee="￿" data-sort-open="0" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-31" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-31</a>
                                 </div>
@@ -811,6 +893,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#64748b; font-style:italic;' title='Unassigned'>—</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#64748b;'>0</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -820,9 +905,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-32" data-sort-status="In Progress" data-sort-summary="[FE BFF] Entry Tracking: Leaderboard" data-sort-assignee="Kevin Jacob" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-32" data-sort-status="In Progress" data-sort-summary="[FE BFF] Entry Tracking: Leaderboard" data-sort-assignee="Kevin Jacob" data-sort-open="2" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-32" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-32</a>
                                 </div>
@@ -836,6 +921,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Kevin Jacob'>KJ</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>2</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -845,9 +933,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-416" data-sort-status="In Progress" data-sort-summary="[FE] League Pages" data-sort-assignee="Anthony Porter" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-416" data-sort-status="In Progress" data-sort-summary="[FE] League Pages" data-sort-assignee="Anthony Porter" data-sort-open="1" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-416" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-416</a>
                                 </div>
@@ -861,6 +949,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Anthony Porter'>AP</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>1</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -870,9 +961,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-532" data-sort-status="In Progress" data-sort-summary="[FE] [UMB] Realtime Updates for Events, Markets, and Propositions" data-sort-assignee="Jacob Tabak" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-532" data-sort-status="In Progress" data-sort-summary="[FE] [UMB] Realtime Updates for Events, Markets, and Propositions" data-sort-assignee="Jacob Tabak" data-sort-open="6" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-532" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-532</a>
                                 </div>
@@ -886,6 +977,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Jacob Tabak'>JT</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>6</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -895,9 +989,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-597" data-sort-status="To Do" data-sort-summary="[FE] BFF: Checkout: Submitting entry" data-sort-assignee="Paul Kang" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-597" data-sort-status="To Do" data-sort-summary="[FE] BFF: Checkout: Submitting entry" data-sort-assignee="Paul Kang" data-sort-open="2" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-597" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-597</a>
                                 </div>
@@ -911,6 +1005,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Paul Kang'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>2</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -920,9 +1017,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-638" data-sort-status="In Progress" data-sort-summary="[FE] BFF: UMB Pickslip" data-sort-assignee="Paul Kang" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-638" data-sort-status="In Progress" data-sort-summary="[FE] BFF: UMB Pickslip" data-sort-assignee="Paul Kang" data-sort-open="1" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-638" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-638</a>
                                 </div>
@@ -936,6 +1033,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Paul Kang'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>1</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -945,9 +1045,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-7" data-sort-status="To Do" data-sort-summary="[FE] Onboarding:  Acquisition Offer Display - loyalty? " data-sort-assignee="Jacob Tabak" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-7" data-sort-status="To Do" data-sort-summary="[FE] Onboarding:  Acquisition Offer Display - loyalty? " data-sort-assignee="Jacob Tabak" data-sort-open="0" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-7" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-7</a>
                                 </div>
@@ -961,6 +1061,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Jacob Tabak'>JT</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#64748b;'>0</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -970,9 +1073,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-16" data-sort-status="To Do" data-sort-summary="[FE] Pick Selection: Player Page" data-sort-assignee="￿" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-16" data-sort-status="To Do" data-sort-summary="[FE] Pick Selection: Player Page" data-sort-assignee="￿" data-sort-open="0" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-16" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-16</a>
                                 </div>
@@ -986,6 +1089,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#64748b; font-style:italic;' title='Unassigned'>—</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#64748b;'>0</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -995,9 +1101,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-531" data-sort-status="In Progress" data-sort-summary="[FE] UMB Pickslip" data-sort-assignee="Paul Kang" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-531" data-sort-status="In Progress" data-sort-summary="[FE] UMB Pickslip" data-sort-assignee="Paul Kang" data-sort-open="13" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-531" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-531</a>
                                 </div>
@@ -1011,6 +1117,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Paul Kang'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>13</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -1020,9 +1129,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-586" data-sort-status="To Do" data-sort-summary="[BE] Playmaker - Risk Requirements (Liability Management/Alerting) - MVP - Alternative to RAD" data-sort-assignee="￿" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-586" data-sort-status="To Do" data-sort-summary="[BE] Playmaker - Risk Requirements (Liability Management/Alerting) - MVP - Alternative to RAD" data-sort-assignee="￿" data-sort-open="6" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-586" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-586</a>
                                 </div>
@@ -1036,6 +1145,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#64748b; font-style:italic;' title='Unassigned'>—</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>6</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -1045,9 +1157,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-637" data-sort-status="To Do" data-sort-summary="[BE] Backend Load &amp; Performance Testing - Test Execution" data-sort-assignee="Patrick Kilburn" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-637" data-sort-status="To Do" data-sort-summary="[BE] Backend Load &amp; Performance Testing - Test Execution" data-sort-assignee="Patrick Kilburn" data-sort-open="2" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-637" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-637</a>
                                 </div>
@@ -1061,6 +1173,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Patrick Kilburn'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>2</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -1070,9 +1185,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-676" data-sort-status="In Progress" data-sort-summary="[BE] Playmaker Audit logs" data-sort-assignee="￿" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-676" data-sort-status="In Progress" data-sort-summary="[BE] Playmaker Audit logs" data-sort-assignee="Patrick Kilburn" data-sort-open="2" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-676" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-676</a>
                                 </div>
@@ -1084,7 +1199,10 @@
                                     <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">[BE] Playmaker Audit logs</span>
                                 </div>
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
-                                    <span style='color:#64748b; font-style:italic;' title='Unassigned'>—</span>
+                                    <span style='color:#cbd5e1;' title='Patrick Kilburn'>PK</span>
+                                </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>2</span>
                                 </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
@@ -1095,9 +1213,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-732" data-sort-status="To Do" data-sort-summary="[BE] Market Permissibility - Playmaker" data-sort-assignee="￿" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-732" data-sort-status="To Do" data-sort-summary="[BE] Market Permissibility - Playmaker" data-sort-assignee="￿" data-sort-open="5" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-732" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-732</a>
                                 </div>
@@ -1111,6 +1229,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#64748b; font-style:italic;' title='Unassigned'>—</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>5</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -1120,9 +1241,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-781" data-sort-status="To Do" data-sort-summary="[BE] Fast Lane M31.1" data-sort-assignee="Patrick Kilburn" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-781" data-sort-status="To Do" data-sort-summary="[BE] Fast Lane M31.1" data-sort-assignee="Patrick Kilburn" data-sort-open="6" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-781" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-781</a>
                                 </div>
@@ -1136,6 +1257,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Patrick Kilburn'>PK</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>6</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -1145,9 +1269,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-280" data-sort-status="To Do" data-sort-summary="[BE] Risk/Ops - Ability To Block Combos for DFS Specifically" data-sort-assignee="Michael Goodwin" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-280" data-sort-status="To Do" data-sort-summary="[BE] Risk/Ops - Ability To Block Combos for DFS Specifically" data-sort-assignee="Michael Goodwin" data-sort-open="0" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-280" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-280</a>
                                 </div>
@@ -1161,6 +1285,9 @@
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Michael Goodwin'>MG</span>
                                 </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#64748b;'>0</span>
+                                </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
                                      No background tint, no bottom gap; the colored
@@ -1170,9 +1297,9 @@
                                 </div>
                             </div>
         
-                            <div class="gantt-row" data-sort-key="FNTSY-783" data-sort-status="To Do" data-sort-summary="[BE] Fast Lane M31.2" data-sort-assignee="Patrick Kilburn" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" data-sort-key="FNTSY-783" data-sort-status="To Do" data-sort-summary="[BE] Fast Lane M31.2" data-sort-assignee="Patrick Kilburn" data-sort-open="4" data-completed="0" style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <a href="https://betfanatics.atlassian.net/browse/FNTSY-783" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">FNTSY-783</a>
                                 </div>
@@ -1185,6 +1312,9 @@
                                 </div>
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     <span style='color:#cbd5e1;' title='Patrick Kilburn'>PK</span>
+                                </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    <span style='color:#e2e8f0; font-weight:600; font-variant-numeric:tabular-nums;'>4</span>
                                 </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
@@ -1923,7 +2053,7 @@
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 
                                 <span style="color: #94a3b8; font-size: 12px;">Paul Kang</span>
-                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #475569; color: #e2e8f0;">In Progress</span>
+                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #475569; color: #e2e8f0;">In code review</span>
                             </div>
                         </div>
         
@@ -2070,7 +2200,7 @@
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 
-                                <span style="color: #94a3b8; font-size: 12px;">Unassigned</span>
+                                <span style="color: #94a3b8; font-size: 12px;">Patrick Kilburn</span>
                                 <span style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #475569; color: #e2e8f0;">In Progress</span>
                             </div>
                         </div>

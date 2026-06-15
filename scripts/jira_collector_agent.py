@@ -62,6 +62,43 @@ def collect_and_process_jira_data():
         from refresh_jira_data import refresh_jira_data
         refresh_jira_data('/tmp/jira_unified.json')
 
+        # Open child-issue counts per epic. Must be a dedicated parent-scoped
+        # query: an epic's open children are often backlog items with no sprint,
+        # so they never appear in the sprint-scoped pull above and can't be
+        # counted from the tickets table. Source the epic list from the DB so
+        # we cover every epic the Gantt renders (active/future AND closed
+        # window), then persist counts into epic_open_children.
+        try:
+            from database.schema import get_connection
+            db_path = config['database']['path']
+            _conn = get_connection(db_path)
+            _cur = _conn.cursor()
+            _cur.execute("SELECT DISTINCT ticket_key FROM tickets WHERE issue_type = 'Epic'")
+            epic_keys = [r['ticket_key'] for r in _cur.fetchall()]
+            _conn.close()
+
+            counts = jira.count_open_children(epic_keys)
+
+            now_iso = datetime.now().isoformat()
+            _conn = get_connection(db_path)
+            _cur = _conn.cursor()
+            for epic_key, open_count in counts.items():
+                _cur.execute(
+                    """
+                    INSERT INTO epic_open_children (epic_key, open_count, updated_at)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(epic_key) DO UPDATE SET
+                        open_count = excluded.open_count,
+                        updated_at = excluded.updated_at
+                    """,
+                    (epic_key, open_count, now_iso),
+                )
+            _conn.commit()
+            _conn.close()
+            logger.info(f"Persisted open-children counts for {len(counts)} epic(s)")
+        except Exception as e:
+            logger.warning(f"Open-children count step failed (non-fatal): {e}")
+
         # Backfill any sprint whose end_date has passed but is still labeled
         # active/future locally — otherwise refresh_jira_data wipes its tickets
         # on the next run. Non-fatal: log + continue if any one fails.
@@ -90,6 +127,19 @@ def collect_and_process_jira_data():
                     )
         except Exception as e:
             logger.warning(f"Auto-backfill scan failed (non-fatal): {e}")
+
+        # Re-pull live Jira state (status / assignee / summary) for tickets
+        # in CLOSED sprints inside the dashboard's recent-sprint window.
+        # refresh_jira_data only touches active/future sprints, so an epic
+        # that moved to Done after its sprint closed otherwise sits stale
+        # forever. This keeps the rendered status of closed-sprint tickets
+        # aligned with Jira without reopening the historical metrics
+        # (story_points, status_at_sprint_end stay frozen).
+        try:
+            from refresh_closed_sprint_tickets import refresh_closed_sprint_tickets
+            refresh_closed_sprint_tickets()
+        except Exception as e:
+            logger.warning(f"Closed-sprint refresh failed (non-fatal): {e}")
 
         # Run discover_team_members and sync_project_fantasy on cooldowns —
         # these don't need to fire every 15 minutes. The collector itself runs

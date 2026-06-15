@@ -607,6 +607,13 @@ window.sortGanttRows = function (headerEl, field) {
             if (an !== bn) return (an - bn) * dir;
             return av.localeCompare(bv) * dir;
         }
+        if (field === 'open') {
+            // Numeric column — compare counts, not their string forms, so
+            // 9 sorts below 10. Falls back to 0 for missing/blank values.
+            const an = parseInt(av, 10) || 0;
+            const bn = parseInt(bv, 10) || 0;
+            return (an - bn) * dir;
+        }
         return av.localeCompare(bv) * dir;
     });
     rows.forEach(row => rowsContainer.appendChild(row));
