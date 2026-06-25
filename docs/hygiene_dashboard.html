@@ -6,8 +6,8 @@
     <title>Ticket Hygiene Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/dashboard.css?v=ff-logo-1">
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/dashboard.css?v=scoreboard-1">
     <script src="assets/dashboard.js?v=2.0" defer></script>
     <!-- showSection lives in assets/dashboard.js -->
 </head>
@@ -16,7 +16,7 @@
         
         <header>
             <h1>🔍 Ticket Hygiene Dashboard</h1>
-            <div class="subtitle">Generated June 24, 2026 at 14:30</div>
+            <div class="subtitle">Generated June 24, 2026 at 21:42</div>
         </header>
                 <nav class="top-nav">
             <ul class="nav-menu">
@@ -43,7 +43,7 @@
             <div class="metrics-grid" style="margin-bottom: 28px;">
                 <div class="metric-card">
                     <div class="metric-label">Open Issues</div>
-                    <div class="metric-value">236</div>
+                    <div class="metric-value">182</div>
                     <div class="metric-subtext">currently flagged</div>
                 </div>
                 <div class="metric-card danger">
@@ -53,8 +53,8 @@
                 </div>
                 <div class="metric-card warning">
                     <div class="metric-label">Aged ≥ 7 Days</div>
-                    <div class="metric-value">215</div>
-                    <div class="metric-subtext">87 aged ≥ 14d</div>
+                    <div class="metric-value">160</div>
+                    <div class="metric-subtext">73 aged ≥ 14d</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Avg Age</div>
@@ -87,11 +87,11 @@
             <div class="metrics-grid">
                 <button type="button" class="metric-card" onclick="showSection('epics_no_parent')" aria-controls="epics_no_parent">
                     <div class="metric-label">Epics Without Parent</div>
-                    <div class="metric-value">3</div>
+                    <div class="metric-value">1</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_no_description')" aria-controls="epics_no_description">
                     <div class="metric-label">Epics Missing Description</div>
-                    <div class="metric-value">11</div>
+                    <div class="metric-value">6</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_no_prefix')" aria-controls="epics_no_prefix">
                     <div class="metric-label">Epics Without [BE]/[FE] Prefix</div>
@@ -99,15 +99,15 @@
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_no_designs')" aria-controls="epics_no_designs">
                     <div class="metric-label">[FE] Epics Without Figma</div>
-                    <div class="metric-value">26</div>
+                    <div class="metric-value">22</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_no_work_items')" aria-controls="epics_no_work_items">
                     <div class="metric-label">Epics Without Child Stories</div>
-                    <div class="metric-value">25</div>
+                    <div class="metric-value">19</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_missing_acceptance_criteria')" aria-controls="epics_missing_acceptance_criteria">
                     <div class="metric-label">Epics Missing AC</div>
-                    <div class="metric-value">85</div>
+                    <div class="metric-value">47</div>
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('epics_no_sprint')" aria-controls="epics_no_sprint">
                     <div class="metric-label">Epics Without Sprint</div>
@@ -135,7 +135,7 @@
                 </button>
                 <button type="button" class="metric-card" onclick="showSection('code_review_24h')" aria-controls="code_review_24h">
                     <div class="metric-label">Code Review > 24 Hours</div>
-                    <div class="metric-value">2</div>
+                    <div class="metric-value">3</div>
                 </button>
             </div>
         
@@ -577,8 +577,8 @@
                         </div>
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
-                            <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-06-15T18:15:08">open 8d</span>
+                            <span class="badge status">Ready for Promotion</span>
+                            <span class="badge age-warning" title="First seen 2026-06-15T18:15:08">open 9d</span>
                             
                     
                         </div>
@@ -692,8 +692,8 @@
                         </div>
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
-                            <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-06-15T18:15:08">open 8d</span>
+                            <span class="badge status">Ready for Promotion</span>
+                            <span class="badge age-warning" title="First seen 2026-06-15T18:15:08">open 9d</span>
                             
                     
                         </div>
@@ -899,7 +899,7 @@
                     </div>
                     </div></div>
             <div class="section" id="epics_no_parent">
-                <h2 class="section-title">Epics Without Parent Feature (3)</h2>
+                <h2 class="section-title">Epics Without Parent Feature (1)</h2>
             <div class="issue-list">
                     <div class="issue-item">
                         <div>
@@ -914,37 +914,9 @@
                     
                         </div>
                     </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-296" target="_blank" class="issue-key">FNTSY-296</a>
-                            <span class="issue-summary">Fantasy Client Onboarding</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Scott Schmitz</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-361" target="_blank" class="issue-key">FNTSY-361</a>
-                            <span class="issue-summary">Jasmine - Fantasy Client Engineer Onboarding (Clone this)</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jasmine Dacones</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
                     </div></div>
             <div class="section" id="epics_no_description">
-                <h2 class="section-title">Epics Without Description (11)</h2>
+                <h2 class="section-title">Epics Without Description (6)</h2>
             <div class="issue-list">
                     <div class="issue-item">
                         <div>
@@ -962,34 +934,6 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-677" target="_blank" class="issue-key">FNTSY-677</a>
-                            <span class="issue-summary">[BE] Playmaker - Give admins more account info</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Ryan Taylor</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-27T11:46:09">open 28d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-175" target="_blank" class="issue-key">FNTSY-175</a>
-                            <span class="issue-summary">[FE] Playbook C4 Integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jacob Tabak</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-265" target="_blank" class="issue-key">FNTSY-265</a>
                             <span class="issue-summary">Fantasy Client Engineer Onboarding: Anthony Porter Jr.</span>
                         </div>
@@ -1004,54 +948,12 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-296" target="_blank" class="issue-key">FNTSY-296</a>
-                            <span class="issue-summary">Fantasy Client Onboarding</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Scott Schmitz</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-304" target="_blank" class="issue-key">FNTSY-304</a>
-                            <span class="issue-summary">[BE] Geolocation Integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Tanya Phanich</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-308" target="_blank" class="issue-key">FNTSY-308</a>
                             <span class="issue-summary">[BE] Player Page RPCs</span>
                         </div>
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-361" target="_blank" class="issue-key">FNTSY-361</a>
-                            <span class="issue-summary">Jasmine - Fantasy Client Engineer Onboarding (Clone this)</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jasmine Dacones</span>
-                            <span class="badge status">Done</span>
                             <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
                             
                     
@@ -1132,7 +1034,7 @@
                     </div>
                     </div></div>
             <div class="section" id="epics_no_designs">
-                <h2 class="section-title">[FE] Epics Without Figma Link (26)</h2>
+                <h2 class="section-title">[FE] Epics Without Figma Link (22)</h2>
             <div class="issue-list">
                     <div class="issue-item">
                         <div>
@@ -1171,20 +1073,6 @@
                             <span class="badge assignee">Jasmine Dacones</span>
                             <span class="badge status">To Do</span>
                             <span class="badge age-danger" title="First seen 2026-05-21T13:45:55">open 34d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-609" target="_blank" class="issue-key">FNTSY-609</a>
-                            <span class="issue-summary">[FE] Entry Tracking: Leaderboard UI</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Kevin Jacob</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-22T12:30:55">open 33d</span>
                             <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
                     
                         </div>
@@ -1290,54 +1178,12 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-175" target="_blank" class="issue-key">FNTSY-175</a>
-                            <span class="issue-summary">[FE] Playbook C4 Integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jacob Tabak</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-253" target="_blank" class="issue-key">FNTSY-253</a>
-                            <span class="issue-summary">[FE] Wire up end to end communication with Fantasy API</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Anushri Patel</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-28" target="_blank" class="issue-key">FNTSY-28</a>
                             <span class="issue-summary">[FE] Checkout: Submitting entry</span>
                         </div>
                         <div class="issue-meta">
                             <span class="badge assignee">Paul Kang</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-29" target="_blank" class="issue-key">FNTSY-29</a>
-                            <span class="issue-summary">[FE] Checkout: Post submission</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Paul Kang</span>
-                            <span class="badge status">Done</span>
                             <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
                             
                     
@@ -1499,7 +1345,7 @@
                     </div>
                     </div></div>
             <div class="section" id="epics_no_work_items">
-                <h2 class="section-title">Epics Without Child Stories (25)</h2>
+                <h2 class="section-title">Epics Without Child Stories (19)</h2>
             <div class="issue-list">
                     <div class="issue-item">
                         <div>
@@ -1531,68 +1377,12 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-669" target="_blank" class="issue-key">FNTSY-669</a>
-                            <span class="issue-summary">[BE] Playmaker - Contest Entries Page</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Ryan Taylor</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-27T07:00:48">open 28d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-121" target="_blank" class="issue-key">FNTSY-121</a>
-                            <span class="issue-summary">[COP] Anushri Patel - Client Onboarding Beta Guide</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Anushri Patel</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-16" target="_blank" class="issue-key">FNTSY-16</a>
                             <span class="issue-summary">[FE] Pick Selection: Player Page</span>
                         </div>
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-175" target="_blank" class="issue-key">FNTSY-175</a>
-                            <span class="issue-summary">[FE] Playbook C4 Integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jacob Tabak</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-183" target="_blank" class="issue-key">FNTSY-183</a>
-                            <span class="issue-summary">[COP] Scott Schmitz - Client Onboarding Beta Guide</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Scott Schmitz</span>
-                            <span class="badge status">Done</span>
                             <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
                             
                     
@@ -1741,20 +1531,6 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-296" target="_blank" class="issue-key">FNTSY-296</a>
-                            <span class="issue-summary">Fantasy Client Onboarding</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Scott Schmitz</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-308" target="_blank" class="issue-key">FNTSY-308</a>
                             <span class="issue-summary">[BE] Player Page RPCs</span>
                         </div>
@@ -1775,20 +1551,6 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-361" target="_blank" class="issue-key">FNTSY-361</a>
-                            <span class="issue-summary">Jasmine - Fantasy Client Engineer Onboarding (Clone this)</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jasmine Dacones</span>
-                            <span class="badge status">Done</span>
                             <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
                             
                     
@@ -1852,7 +1614,7 @@
                     </div>
                     </div></div>
             <div class="section" id="epics_missing_acceptance_criteria">
-                <h2 class="section-title">Epics Missing Acceptance Criteria (85)</h2>
+                <h2 class="section-title">Epics Missing Acceptance Criteria (47)</h2>
             <div class="issue-list">
                     <div class="issue-item">
                         <div>
@@ -1884,76 +1646,6 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-486" target="_blank" class="issue-key">FNTSY-486</a>
-                            <span class="issue-summary">[BE] Playmaker App Settings Page</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Josh Schaefer</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-11T08:15:51">open 44d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-500" target="_blank" class="issue-key">FNTSY-500</a>
-                            <span class="issue-summary">[BE] Fast Lane M30.2</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Patrick Kilburn</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-11T15:30:47">open 43d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-501" target="_blank" class="issue-key">FNTSY-501</a>
-                            <span class="issue-summary">[BE] Fast Lane M30.3</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Patrick Kilburn</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-11T15:30:47">open 43d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-502" target="_blank" class="issue-key">FNTSY-502</a>
-                            <span class="issue-summary">[BE] Fast Lane M30.4</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Patrick Kilburn</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-11T15:30:47">open 43d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-508" target="_blank" class="issue-key">FNTSY-508</a>
-                            <span class="issue-summary">[BE] Oddsfactory Ingestion Updates</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Nigel Young</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-12T09:30:47">open 43d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-531" target="_blank" class="issue-key">FNTSY-531</a>
                             <span class="issue-summary">[FE] UMB Pickslip</span>
                         </div>
@@ -1975,34 +1667,6 @@
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
                             <span class="badge age-danger" title="First seen 2026-05-13T14:15:54">open 42d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-538" target="_blank" class="issue-key">FNTSY-538</a>
-                            <span class="issue-summary">[BE] Playmaker Pick Scoring Tiers Page</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Kevin Paquette</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-14T06:45:59">open 41d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-539" target="_blank" class="issue-key">FNTSY-539</a>
-                            <span class="issue-summary">[BE] Playmaker Leaderboard Payout Tiers Page</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Kevin Paquette</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-14T06:45:59">open 41d</span>
                             <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
                     
                         </div>
@@ -2100,21 +1764,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Brooks Taylor</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-danger" title="First seen 2026-05-26T16:00:54">open 28d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-669" target="_blank" class="issue-key">FNTSY-669</a>
-                            <span class="issue-summary">[BE] Playmaker - Contest Entries Page</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Ryan Taylor</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-27T07:00:48">open 28d</span>
+                            <span class="badge age-danger" title="First seen 2026-05-26T16:00:54">open 29d</span>
                             <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
                     
                         </div>
@@ -2130,34 +1780,6 @@
                             <span class="badge status">In Progress</span>
                             <span class="badge age-danger" title="First seen 2026-05-27T11:46:09">open 28d</span>
                             <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-677" target="_blank" class="issue-key">FNTSY-677</a>
-                            <span class="issue-summary">[BE] Playmaker - Give admins more account info</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Ryan Taylor</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-05-27T11:46:09">open 28d</span>
-                            <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-707" target="_blank" class="issue-key">FNTSY-707</a>
-                            <span class="issue-summary">[BE] Playmaker Leagues, Events & Markets Cleanup</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Ryan Taylor</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-06-02T12:30:52">open 22d</span>
-                            
                     
                         </div>
                     </div>
@@ -2185,20 +1807,6 @@
                             <span class="badge assignee">Patrick Kilburn</span>
                             <span class="badge status">To Do</span>
                             <span class="badge age-danger" title="First seen 2026-06-02T13:30:51">open 22d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-718" target="_blank" class="issue-key">FNTSY-718</a>
-                            <span class="issue-summary">[BE] Playmaker - Add smoke tests/UX tests</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Ryan Taylor</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-danger" title="First seen 2026-06-04T12:15:53">open 20d</span>
                             
                     
                         </div>
@@ -2262,68 +1870,12 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-106" target="_blank" class="issue-key">FNTSY-106</a>
-                            <span class="issue-summary">[BE] Create Playmaker Backend For Frontend and Micro Frontend</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Unassigned</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-111" target="_blank" class="issue-key">FNTSY-111</a>
                             <span class="issue-summary">[COP] Brooks Taylor - Client Onboarding Beta Guide</span>
                         </div>
                         <div class="issue-meta">
                             <span class="badge assignee">Brooks Taylor</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-121" target="_blank" class="issue-key">FNTSY-121</a>
-                            <span class="issue-summary">[COP] Anushri Patel - Client Onboarding Beta Guide</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Anushri Patel</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-145" target="_blank" class="issue-key">FNTSY-145</a>
-                            <span class="issue-summary">[BE] Fantasy API gRPC Server Configuration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Michael Goodwin</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-156" target="_blank" class="issue-key">FNTSY-156</a>
-                            <span class="issue-summary">[BE] Loyalty Tokens Design</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Unassigned</span>
-                            <span class="badge status">Done</span>
                             <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
                             
                     
@@ -2360,54 +1912,12 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-161" target="_blank" class="issue-key">FNTSY-161</a>
-                            <span class="issue-summary">[BE] Wallet Integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Tanya Phanich</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-17" target="_blank" class="issue-key">FNTSY-17</a>
                             <span class="issue-summary">[FE] Pick Selection: Event page</span>
                         </div>
                         <div class="issue-meta">
                             <span class="badge assignee">Jasmine Dacones</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-175" target="_blank" class="issue-key">FNTSY-175</a>
-                            <span class="issue-summary">[FE] Playbook C4 Integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jacob Tabak</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-183" target="_blank" class="issue-key">FNTSY-183</a>
-                            <span class="issue-summary">[COP] Scott Schmitz - Client Onboarding Beta Guide</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Scott Schmitz</span>
-                            <span class="badge status">Done</span>
                             <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
                             
                     
@@ -2436,118 +1946,6 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Liam Butler</span>
                             <span class="badge status">Ready for Testing</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-208" target="_blank" class="issue-key">FNTSY-208</a>
-                            <span class="issue-summary">[BE] Fantasy PBT Bonus API work</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Liam Butler</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-217" target="_blank" class="issue-key">FNTSY-217</a>
-                            <span class="issue-summary">[BE] Contest Templating</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Michael Goodwin</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-219" target="_blank" class="issue-key">FNTSY-219</a>
-                            <span class="issue-summary">[BE] Implement PBT integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Liam Butler</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-223" target="_blank" class="issue-key">FNTSY-223</a>
-                            <span class="issue-summary">[BE] PBT Integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Unassigned</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-236" target="_blank" class="issue-key">FNTSY-236</a>
-                            <span class="issue-summary">[BE] Results Ingestion and Settlement Jobs</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Unassigned</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-242" target="_blank" class="issue-key">FNTSY-242</a>
-                            <span class="issue-summary">[BE] Publish Contest Entries to Kafka</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Tanya Phanich</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-247" target="_blank" class="issue-key">FNTSY-247</a>
-                            <span class="issue-summary">[BE] Proposition Groups Validation</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Michael Goodwin</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-253" target="_blank" class="issue-key">FNTSY-253</a>
-                            <span class="issue-summary">[FE] Wire up end to end communication with Fantasy API</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Anushri Patel</span>
-                            <span class="badge status">Done</span>
                             <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
                             
                     
@@ -2682,62 +2080,6 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-296" target="_blank" class="issue-key">FNTSY-296</a>
-                            <span class="issue-summary">Fantasy Client Onboarding</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Scott Schmitz</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-303" target="_blank" class="issue-key">FNTSY-303</a>
-                            <span class="issue-summary">[BE] FanCash Earn Support</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Liam Butler</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-304" target="_blank" class="issue-key">FNTSY-304</a>
-                            <span class="issue-summary">[BE] Geolocation Integration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Tanya Phanich</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-306" target="_blank" class="issue-key">FNTSY-306</a>
-                            <span class="issue-summary">[BE] Playmaker Account, Entries, and Leaderboard Pages</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Ryan Taylor</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-307" target="_blank" class="issue-key">FNTSY-307</a>
                             <span class="issue-summary">[BE] Playmaker Editing Contest Entries</span>
                         </div>
@@ -2780,104 +2122,6 @@
                     
                     <div class="issue-item">
                         <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-310" target="_blank" class="issue-key">FNTSY-310</a>
-                            <span class="issue-summary">[BE] Market Permissibility Configuration</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Josh Schaefer</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-329" target="_blank" class="issue-key">FNTSY-329</a>
-                            <span class="issue-summary">[BE] Backend Load & Performance Testing - Setup & Implementation</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Patrick Kilburn</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-339" target="_blank" class="issue-key">FNTSY-339</a>
-                            <span class="issue-summary">[BE] InfoSec Work</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Patrick Kilburn</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-348" target="_blank" class="issue-key">FNTSY-348</a>
-                            <span class="issue-summary">[BE] Migrate Playmaker Integration to Spring Cloud Gateway</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Kevin Paquette</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-361" target="_blank" class="issue-key">FNTSY-361</a>
-                            <span class="issue-summary">Jasmine - Fantasy Client Engineer Onboarding (Clone this)</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Jasmine Dacones</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-40" target="_blank" class="issue-key">FNTSY-40</a>
-                            <span class="issue-summary">[BE] FASTLANE</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Patrick Kilburn</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-46" target="_blank" class="issue-key">FNTSY-46</a>
-                            <span class="issue-summary">[BE] OF/SDP Ingestion</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Tanya Phanich</span>
-                            <span class="badge status">Done</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
                             <a href="https://betfanatics.atlassian.net/browse/FNTSY-57" target="_blank" class="issue-key">FNTSY-57</a>
                             <span class="issue-summary">[BE] Service: Orchestrator</span>
                         </div>
@@ -2898,20 +2142,6 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Unassigned</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
-                            
-                    
-                        </div>
-                    </div>
-                    
-                    <div class="issue-item">
-                        <div>
-                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-99" target="_blank" class="issue-key">FNTSY-99</a>
-                            <span class="issue-summary">[BE] Create fantasy-public-api and Enter Contest Endpoint</span>
-                        </div>
-                        <div class="issue-meta">
-                            <span class="badge assignee">Michael Goodwin</span>
-                            <span class="badge status">Done</span>
                             <span class="badge age-warning" title="First seen 2026-06-12T12:30:09">open 12d</span>
                             
                     
@@ -3097,7 +2327,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Brooks Taylor</span>
                             <span class="badge status">To Do</span>
-                            <span class="badge age-danger" title="First seen 2026-05-26T16:00:54">open 28d</span>
+                            <span class="badge age-danger" title="First seen 2026-05-26T16:00:54">open 29d</span>
                             <span class="badge regression" title="Has resolved and reappeared 1x">↻ regressed 1x</span>
                     
                         </div>
@@ -3460,7 +2690,7 @@
                         <div class="issue-meta">
                             <span class="badge assignee">Scott Schmitz</span>
                             <span class="badge status">In Progress</span>
-                            <span class="badge age-muted" title="First seen 2026-06-22T18:30:07">open 1d</span>
+                            <span class="badge age-muted" title="First seen 2026-06-22T18:30:07">open 2d</span>
                             
                     
                         </div>
@@ -3481,7 +2711,7 @@
                     </div>
                     </div></div>
             <div class="section" id="code_review_24h">
-                <h2 class="section-title">Tickets In Code Review > 24 Hours (2)</h2>
+                <h2 class="section-title">Tickets In Code Review > 24 Hours (3)</h2>
             <div class="issue-list">
                     <div class="issue-item">
                         <div>
@@ -3493,7 +2723,7 @@
                             <span class="badge status">In code review</span>
                             <span class="badge age-muted" title="First seen 2026-06-23T07:30:09">open 1d</span>
                             
-                    <span class="badge hours">55.2h in review</span>
+                    <span class="badge hours">59.5h in review</span>
                         </div>
                     </div>
                     
@@ -3507,7 +2737,21 @@
                             <span class="badge status">In code review</span>
                             <span class="badge age-muted" title="First seen 2026-06-24T14:15:10">open 0d</span>
                             
-                    <span class="badge hours">24.3h in review</span>
+                    <span class="badge hours">28.5h in review</span>
+                        </div>
+                    </div>
+                    
+                    <div class="issue-item">
+                        <div>
+                            <a href="https://betfanatics.atlassian.net/browse/FNTSY-779" target="_blank" class="issue-key">FNTSY-779</a>
+                            <span class="issue-summary">Pull in event switcher from OSB</span>
+                        </div>
+                        <div class="issue-meta">
+                            <span class="badge assignee">Jasmine Dacones</span>
+                            <span class="badge status">In code review</span>
+                            <span class="badge age-muted" title="First seen 2026-06-24T16:45:08">open 0d</span>
+                            
+                    <span class="badge hours">26.0h in review</span>
                         </div>
                     </div>
                     </div></div>

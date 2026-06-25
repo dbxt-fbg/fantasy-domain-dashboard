@@ -4,41 +4,57 @@
 
 /* ----- Design tokens --------------------------------------------------- */
 :root {
-    /* Background & surface */
-    --bg-app: #0f172a;
-    --bg-container: #1e293b;
-    --bg-surface: #334155;
-    --bg-surface-2: #1e293b;
-    --bg-hover: #475569;
-    --bg-hover-strong: #64748b;
+    /* ---------------------------------------------------------------
+       Identity: "the night game under the floodlights."
+       Project Fantasy is a fantasy-SPORTS product, so the visual
+       language is the broadcast scoreboard / box score — cool field-
+       at-night charcoals, one luminous broadcast-cyan accent for the
+       chrome and the numbers that matter, and tabular figures. Gold
+       (--trophy) is reserved for the header nameplate only, so it
+       reads as a signature rather than a system color.
+       --------------------------------------------------------------- */
+
+    /* Background & surface — cooler & deeper than the old blue-slate */
+    --bg-app: #0a0e14;
+    --bg-container: #0f1620;
+    --bg-surface: #1a2430;
+    --bg-surface-2: #131c27;
+    --bg-hover: #25323f;
+    --bg-hover-strong: #34465a;
 
     /* Text */
-    --text-primary: #f1f5f9;
-    --text-secondary: #e2e8f0;
-    --text-muted: #94a3b8;
-    --text-faint: #64748b;
+    --text-primary: #f4f8fb;
+    --text-secondary: #cdd9e5;
+    --text-muted: #8194a6;
+    --text-faint: #566375;
 
-    /* Brand & state */
-    --brand: #6366f1;
-    --brand-hover: #818cf8;
-    --success: #10b981;
-    --success-strong: #059669;
-    --success-bg: #064e3b;
-    --success-text: #6ee7b7;
-    --warning: #f59e0b;
-    --warning-bg: #78350f;
+    /* Brand & state. Brand is broadcast cyan; semantic state colors
+       keep their meaning (they encode data, not decoration) but are
+       retuned for the deeper ground. */
+    --brand: #38bdf8;
+    --brand-hover: #7dd3fc;
+    --success: #2dd4a7;
+    --success-strong: #14b88a;
+    --success-bg: #07372c;
+    --success-text: #6ee7c3;
+    --warning: #fbbf24;
+    --warning-bg: #5a3a09;
     --warning-text: #fcd34d;
-    --danger: #ef4444;
-    --danger-bg: #7f1d1d;
-    --danger-text: #fca5a5;
-    --info: #3b82f6;
-    --info-bg: #1e3a8a;
-    --info-text: #93c5fd;
-    --accent-text: #60a5fa;
-    --border: #475569;
+    --danger: #fb6a5f;
+    --danger-bg: #5e1a17;
+    --danger-text: #fda4a0;
+    --info: #38bdf8;
+    --info-bg: #0c3a52;
+    --info-text: #9bdcfb;
+    --accent-text: #56cdf9;
+    --border: #243340;
+    --border-strong: #34465a;
+
+    /* Signature accent — used ONLY on the header nameplate. */
+    --trophy: #f4c860;
 
     /* Header gradient — pages override on <body> */
-    --header-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --header-gradient: linear-gradient(135deg, #0c3a52 0%, #0f1620 70%);
 
     /* Spacing scale */
     --space-1: 4px;
@@ -66,13 +82,33 @@
     --fs-3xl: 24px;
     --fs-4xl: 28px;
 
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-sans: 'Saira', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* Condensed athletic face for scoreboard-style display type. */
+    --font-display: 'Saira Condensed', 'Saira', 'Arial Narrow', sans-serif;
     --font-mono: 'Monaco', 'Menlo', 'Courier New', monospace;
+}
+
+/* Numbers are the point of a box score: line up every digit. */
+.metric-value, .perf-metric-value, .epic-sprint-stat, .epic-role-stat,
+th, td, .badge, .ticket-key, .stat-num, [class*="-sp"], [class*="-count"] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
 }
 
 /* ----- Reset / base ---------------------------------------------------- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
+/* Respect reduced-motion: drop smooth scroll, transitions, and the
+   floodlight wash for anyone who's asked the OS to keep things still. */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}
 body {
     font-family: var(--font-sans);
     background: var(--bg-app);
@@ -90,38 +126,67 @@ body {
 header {
     background: var(--header-gradient);
     color: white;
-    padding: calc(var(--space-8) * 1.25) var(--space-8) var(--space-8);
+    padding: calc(var(--space-8) * 1.25) var(--space-8) var(--space-6);
     position: relative;
     text-align: center;
+    overflow: hidden;
 }
+/* Floodlight wash — an off-center glow keyed to the page's brand hue,
+   like a stadium light spilling across the scoreboard. */
+header::before {
+    content: "";
+    position: absolute;
+    top: -60%;
+    left: 50%;
+    width: 80%;
+    height: 200%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at 50% 0%,
+        color-mix(in srgb, var(--brand) 22%, transparent) 0%,
+        transparent 60%);
+    pointer-events: none;
+}
+/* The scoreboard nameplate — the one element this page is remembered by.
+   Condensed athletic caps over a luminous cyan rule, flanked by a single
+   gold championship tick at each end. */
 header h1 {
-    font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', serif;
-    font-size: 4.25rem;
-    margin: 0 auto var(--space-4);
-    font-weight: 900;
-    letter-spacing: 0.08em;
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5.5vw, 4rem);
+    margin: 0 auto var(--space-3);
+    font-weight: 800;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    line-height: 1;
-    color: #f8fafc;
-    text-shadow:
-        0 2px 0 rgba(0, 0, 0, 0.25),
-        0 4px 12px rgba(0, 0, 0, 0.5),
-        0 0 28px rgba(255, 255, 255, 0.08);
+    line-height: 0.95;
+    color: #ffffff;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
     display: inline-block;
-    padding: 0 var(--space-6) var(--space-3);
-    border-bottom: 3px solid rgba(248, 250, 252, 0.95);
+    padding: 0 calc(var(--space-6) + 14px) var(--space-3);
+    border-bottom: 2px solid var(--brand);
     position: relative;
+    z-index: 1;
 }
-header h1::first-letter {
-    font-size: 1.18em;
-    font-weight: 900;
+/* Gold end-ticks on the underline rule — the championship marker, the
+   only place gold appears in the whole system. */
+header h1::before,
+header h1::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    width: 10px;
+    height: 2px;
+    background: var(--trophy);
+    box-shadow: 0 0 8px var(--trophy);
 }
+header h1::before { left: 0; }
+header h1::after { right: 0; }
 header .subtitle {
-    opacity: 0.85;
-    font-size: var(--fs-md);
-    font-style: italic;
-    letter-spacing: 0.08em;
+    opacity: 0.92;
+    font-family: var(--font-display);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
+    color: var(--brand-hover);
     margin-top: var(--space-3);
     text-align: center;
 }
@@ -138,10 +203,10 @@ footer {
     border-top: 1px solid var(--border);
 }
 
-/* ----- Top navigation -------------------------------------------------- */
+/* ----- Top navigation — the scoreboard channel selector --------------- */
 .top-nav {
     background: var(--bg-surface);
-    border-bottom: 2px solid var(--border);
+    border-bottom: 1px solid var(--border-strong);
 }
 .nav-menu {
     list-style: none;
@@ -151,10 +216,13 @@ footer {
     display: block;
     color: var(--text-muted);
     text-decoration: none;
-    padding: 15px 25px;
-    font-weight: 500;
+    padding: 14px 24px;
+    font-family: var(--font-display);
+    font-weight: 600;
     font-size: var(--fs-md);
-    transition: background 0.2s, color 0.2s;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
     border-bottom: 3px solid transparent;
 }
 .nav-item a:hover {
@@ -163,7 +231,8 @@ footer {
 }
 .nav-item a.active {
     color: var(--text-primary);
-    background: var(--bg-hover);
+    background: var(--bg-hover);  /* fallback if color-mix unsupported */
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--brand) 12%, transparent));
     border-bottom-color: var(--brand);
 }
 
@@ -279,13 +348,28 @@ footer {
     margin-bottom: var(--space-10);
 }
 .section-title {
-    font-size: var(--fs-2xl);
-    font-weight: 600;
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: 700;
     margin-bottom: var(--space-5);
     color: var(--text-primary);
-    border-bottom: 2px solid var(--border);
+    border-bottom: 1px solid var(--border-strong);
     padding-bottom: var(--space-3);
-    letter-spacing: -0.01em;
+    padding-left: var(--space-3);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    position: relative;
+}
+/* Cyan eyebrow tick — the scoreboard label marker. */
+.section-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--brand);
 }
 .section-title.is-collapsible {
     cursor: pointer;
@@ -321,13 +405,14 @@ footer {
     margin-bottom: var(--space-8);
 }
 .metric-card {
-    background: var(--bg-surface);
+    background: var(--bg-surface);  /* fallback if color-mix unsupported */
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--brand) 7%, transparent), transparent 40%),
+        var(--bg-surface);
     border-radius: var(--radius-lg);
     padding: var(--space-5);
+    border: 1px solid var(--border);
     border-left: 4px solid var(--brand);
-    border-top: none;
-    border-right: none;
-    border-bottom: none;
     text-align: left;
     color: inherit;
     font: inherit;
@@ -350,17 +435,21 @@ button.metric-card:focus-visible {
 .metric-card.info    { border-left-color: var(--info); }
 .metric-card.danger  { border-left-color: var(--danger); }
 .metric-label {
+    font-family: var(--font-display);
     font-size: var(--fs-sm);
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.1em;
+    font-weight: 600;
     margin-bottom: var(--space-2);
 }
 .metric-value {
-    font-size: var(--fs-3xl);
+    font-family: var(--font-display);
+    font-size: var(--fs-4xl);
     font-weight: 700;
     color: var(--text-primary);
-    line-height: 1.1;
+    line-height: 1;
+    letter-spacing: -0.01em;
 }
 .metric-subtext {
     font-size: var(--fs-md);
@@ -1710,33 +1799,37 @@ button.perf-metric-value.info    { color: var(--info); }
    bars, and metric-card borders all reference `var(--brand)` etc., the
    whole surface re-tints automatically. */
 
-/* Project: Fantasy + its secondary tabs (Stories, Story Points, Epics,
-   Repositories) — indigo/violet. This is the original palette. */
+/* Each tab keeps its own accent (useful wayfinding), but they now read
+   as channels on one scoreboard rather than four different products:
+   every header sits on the same field-charcoal ground, lit by a
+   floodlight wash in the tab's hue (see header::before). */
+
+/* Project: Fantasy + its secondary tabs — broadcast cyan (the marquee). */
 body.page-project {
-    --brand: #6366f1;
-    --brand-hover: #818cf8;
-    --header-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --brand: #38bdf8;
+    --brand-hover: #7dd3fc;
+    --header-gradient: linear-gradient(150deg, #0c3a52 0%, #0f1620 68%);
 }
 
-/* Team Members — teal/emerald. Warmer, more people-focused. */
+/* Team Members — emerald. The roster channel. */
 body.page-team {
-    --brand: #0d9488;
-    --brand-hover: #14b8a6;
-    --header-gradient: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+    --brand: #2dd4a7;
+    --brand-hover: #5eead4;
+    --header-gradient: linear-gradient(150deg, #07372c 0%, #0f1620 68%);
 }
 
-/* Agents and Logs — amber/orange. Ops-console feel. */
+/* Agents and Logs — amber. The ops / play-by-play channel. */
 body.page-logs {
-    --brand: #ea580c;
-    --brand-hover: #fb923c;
-    --header-gradient: linear-gradient(135deg, #c2410c 0%, #f59e0b 100%);
+    --brand: #fbbf24;
+    --brand-hover: #fcd34d;
+    --header-gradient: linear-gradient(150deg, #4a3008 0%, #0f1620 68%);
 }
 
-/* ----- Hygiene page --------------------------------------------------- */
+/* ----- Hygiene page — the penalty / red-flag channel. ----------------- */
 body.page-hygiene {
     --brand: var(--danger);
-    --brand-hover: #f87171;
-    --header-gradient: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+    --brand-hover: #fda4a0;
+    --header-gradient: linear-gradient(150deg, #5e1a17 0%, #0f1620 68%);
 }
 .page-hygiene .metric-card {
     border-left-color: var(--danger);
@@ -1875,7 +1968,7 @@ body.page-hygiene {
 .log-line.success { color: var(--success-text); }
 .log-line.warning { color: #fbbf24; }
 .log-line.error   { color: #f87171; }
-.log-line.timestamp { color: #818cf8; }
+.log-line.timestamp { color: #7dd3fc; }
 .log-timestamp {
     color: var(--text-faint);
     margin-right: var(--space-3);
@@ -2557,10 +2650,12 @@ body.page-project .stakeholders-page .section { padding: 0; }
 }
 /* Phase-specific accents — keeps adjacent groups visually distinct without
    overriding the brand for the default state. */
-.launch-badge.alpha          { background: #6366f1; }
-.launch-badge.beta           { background: #3b82f6; }
-.launch-badge.public-launch  { background: #10b981; }
-.launch-badge.post-launch    { background: #8b5cf6; }
+/* Launch phases as a progression: deep cyan → bright cyan → emerald
+   (shipped) → trophy gold (post-launch / in market). */
+.launch-badge.alpha          { background: #0e7490; }
+.launch-badge.beta           { background: #38bdf8; color: #07212e; }
+.launch-badge.public-launch  { background: #2dd4a7; color: #07212e; }
+.launch-badge.post-launch    { background: var(--trophy); color: #2a1d02; }
 .launch-badge.unassigned     { background: var(--bg-hover-strong); color: var(--text-secondary); }
 .launch-group-counts { color: var(--text-muted); font-size: var(--fs-sm); flex: 1; }
 .launch-group-pct    { color: var(--text-primary); font-weight: 700; font-size: var(--fs-md); }
