@@ -5,11 +5,13 @@ Generate HTML dashboard reports with better formatting.
 
 import html
 import json
+import re
 import sys
 import os
 from collections import Counter
 from pathlib import Path
 from datetime import datetime
+from typing import Optional
 
 
 def _is_working_day(d) -> bool:
@@ -76,8 +78,19 @@ from database.queries import (
     get_pr_approvals_by_developer,
     get_sprint_commitment_accuracy,
     get_pr_size_distribution,
+    get_time_to_first_review,
+    get_review_load_by_reviewer,
+    get_time_in_status,
+    get_status_churn,
+    get_blocked_time,
+    get_sprint_scope_change,
+    get_pr_size_vs_merge_time,
+    get_hygiene_aging_summary,
     get_one_on_one_meeting,
     get_one_on_one_meetings_bulk,
+    get_flow_efficiency,
+    get_rework_rate,
+    get_predictability,
 )
 
 
@@ -89,6 +102,9 @@ def render_html(*, title: str, content: str, body_class: str = "page-project") -
 # Which body class to use per active_page key — mirrors nav.PRIMARY_NAV.
 _PAGE_THEME = {
     "project-fantasy": "page-project",
+    "features":        "page-project",
+    "readiness":       "page-project",
+    "delivery-excellence": "page-project",
     "stories":         "page-project",
     "story-points":    "page-project",
     "epics":           "page-project",
@@ -111,9 +127,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/dashboard.css?v=ff-logo-1">
-    <script src="assets/dashboard.js?v=2.0" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/dashboard.css?v=scoreboard-1">
+    <script src="assets/dashboard.js?v=gantt-open-stories-1" defer></script>
     <style>
         /* Page-specific overrides only — shared styles live in assets/dashboard.css */
     </style>
@@ -239,11 +255,11 @@ def _render_burndown_chart(
         for y, _ in y_ticks
     )
     y_label_svg = ''.join(
-        f'<text x="{pad_l - 8}" y="{y + 4:.1f}" text-anchor="end" fill="#94a3b8" font-size="11">{lbl}</text>'
+        f'<text x="{pad_l - 8}" y="{y + 4:.1f}" text-anchor="end" fill="#8194a6" font-size="11">{lbl}</text>'
         for y, lbl in y_ticks
     )
     x_label_svg = ''.join(
-        f'<text x="{x:.1f}" y="{svg_h - pad_b + 18}" text-anchor="middle" fill="#94a3b8" font-size="11">{lbl}</text>'
+        f'<text x="{x:.1f}" y="{svg_h - pad_b + 18}" text-anchor="middle" fill="#8194a6" font-size="11">{lbl}</text>'
         for x, lbl in x_ticks
     )
 
@@ -252,21 +268,21 @@ def _render_burndown_chart(
         tx = x_at(wd_elapsed)
         today_marker_svg = (
             f'<line x1="{tx:.1f}" y1="{pad_t}" x2="{tx:.1f}" y2="{svg_h - pad_b}" '
-            f'stroke="#60a5fa" stroke-width="1" stroke-dasharray="3,3" opacity="0.6" />'
-            f'<text x="{tx:.1f}" y="{pad_t - 4}" text-anchor="middle" fill="#60a5fa" font-size="10">Today</text>'
+            f'stroke="#56cdf9" stroke-width="1" stroke-dasharray="3,3" opacity="0.6" />'
+            f'<text x="{tx:.1f}" y="{pad_t - 4}" text-anchor="middle" fill="#56cdf9" font-size="10">Today</text>'
         )
 
     projection_svg = ''
     if projection_points:
         projection_svg = (
-            f'<polyline fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,3" '
+            f'<polyline fill="none" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4,3" '
             f'points="{" ".join(projection_points)}" />'
         )
 
     series_svg_parts = []
     for s in series:
         pts = s.get('points', [])
-        color = s.get('color', '#10b981')
+        color = s.get('color', '#2dd4a7')
         if pts:
             stroke_w = s.get('stroke_width', 2.5)
             dasharray = s.get('dasharray')
@@ -278,7 +294,7 @@ def _render_burndown_chart(
             )
         for cx, cy in s.get('dots', []):
             series_svg_parts.append(
-                f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="{color}" stroke="#1e293b" stroke-width="1.5" />'
+                f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="3" fill="{color}" stroke="#0f1620" stroke-width="1.5" />'
             )
     series_svg = ''.join(series_svg_parts)
 
@@ -312,9 +328,9 @@ def _render_burndown_chart(
                         {grid_svg}
                         {y_label_svg}
                         {x_label_svg}
-                        <line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{svg_h - pad_b}" stroke="#475569" stroke-width="1" />
-                        <line x1="{pad_l}" y1="{svg_h - pad_b}" x2="{svg_w - pad_r}" y2="{svg_h - pad_b}" stroke="#475569" stroke-width="1" />
-                        <polyline fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4" points="{" ".join(ideal_points)}" />
+                        <line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{svg_h - pad_b}" stroke="#243340" stroke-width="1" />
+                        <line x1="{pad_l}" y1="{svg_h - pad_b}" x2="{svg_w - pad_r}" y2="{svg_h - pad_b}" stroke="#243340" stroke-width="1" />
+                        <polyline fill="none" stroke="#566375" stroke-width="2" stroke-dasharray="4,4" points="{" ".join(ideal_points)}" />
                         {projection_svg}
                         {series_svg}
                         {today_marker_svg}
@@ -364,14 +380,23 @@ def _partition_tickets_by_role(
     return buckets
 
 
+# Role buckets reported on the Stories / Story Points pages. 'other' holds
+# tickets whose assignee isn't mapped to a BE/FE role (unassigned, PMs, QA,
+# not-yet-rostered hires). It MUST be carried through so per-sprint banner
+# totals equal the sum of the rendered role blocks AND reconcile with the
+# Sprint Reports page, which counts every assignee. See _partition_tickets_by_role.
+_REPORTED_ROLES = ('BE', 'FE', 'other')
+
+
 def _role_metrics(tickets_by_role: dict[str, list[dict]]) -> dict[str, dict]:
     """Return per-role counts for closed/in_progress/open ticket lists.
 
     tickets_by_role maps 'closed' | 'in_progress' | 'open' → role partition dict.
-    Returns {'BE': {total, closed, in_progress, open, completion}, 'FE': ...}
+    Returns {'BE': {...}, 'FE': {...}, 'other': {...}} so callers can sum across
+    all reported roles without dropping unassigned/non-BE-FE work.
     """
     result = {}
-    for role in ('BE', 'FE'):
+    for role in _REPORTED_ROLES:
         closed = len(tickets_by_role['closed'].get(role, []))
         in_prog = len(tickets_by_role['in_progress'].get(role, []))
         open_ = len(tickets_by_role['open'].get(role, []))
@@ -386,13 +411,57 @@ def _role_metrics(tickets_by_role: dict[str, list[dict]]) -> dict[str, dict]:
     return result
 
 
+def _fmt_sp(v: float) -> str:
+    """Format a story-point value: whole numbers lose the '.0', halves keep
+    one decimal (e.g. 3.0 -> '3', 3.5 -> '3.5').
+
+    Rounding SP to whole numbers for display caused per-role headers to sum to
+    a different number than their sprint banner (each rounded independently),
+    so SP figures are shown at their true 0.5 granularity instead.
+    """
+    return f"{v:.0f}" if float(v).is_integer() else f"{v:.1f}"
+
+
+def _scope_change_chip(db_path: str, sprint_id: int) -> str:
+    """A subtle banner chip showing mid-sprint scope change, or '' if N/A.
+
+    Only renders when the sprint has ≥2 snapshots AND the delta is material
+    (|Δ| ≥ 2 SP) — small wobble from rounding/rescoping isn't worth the noise.
+    Added scope reads amber (it's the usual reason commitment % looks low);
+    removed scope reads muted. Snapshot-based (committed total over time), so
+    it's labeled distinctly from the ticket-bucket totals beside it.
+    """
+    sc = get_sprint_scope_change(db_path, sprint_id)
+    if not sc or abs(sc['delta_sp']) < 2:
+        return ''
+    if sc['delta_sp'] > 0:
+        color = '#fbbf24'
+        label = f"+{_fmt_sp(sc['delta_sp'])} <small>scope added</small>"
+    else:
+        color = '#8194a6'
+        label = f"{_fmt_sp(sc['delta_sp'])} <small>scope removed</small>"
+    start_sp = _fmt_sp(sc['start_sp'])
+    end_sp = _fmt_sp(sc['end_sp'])
+    pct = sc['pct']
+    title = (f"Committed {start_sp} SP at sprint start, {end_sp} SP now "
+             f"({pct:+g}%). Snapshot-based.")
+    return (
+        f'<span class="epic-sprint-stat" style="color: {color};" '
+        f'title="{title}">{label}</span>'
+    )
+
+
 def _role_sp_metrics(closed, in_prog, open_) -> dict:
-    """Sum story_points per role partition, return per-role SP dict."""
+    """Sum story_points per role partition, return per-role SP dict.
+
+    Includes the 'other' bucket (see _REPORTED_ROLES) so banner totals
+    reconcile with the rendered role blocks and with the Sprint Reports page.
+    """
     def _sum(lst):
         return sum((t.get('story_points') or 0) for t in lst)
 
     result = {}
-    for role in ('BE', 'FE'):
+    for role in _REPORTED_ROLES:
         c = _sum(closed.get(role, []))
         ip = _sum(in_prog.get(role, []))
         o = _sum(open_.get(role, []))
@@ -405,364 +474,712 @@ def _role_sp_metrics(closed, in_prog, open_) -> dict:
     return result
 
 
+def _render_sprint_story_bar_chart(db_path: str, sprint_prefix: str, config: dict, *, current_sprint_id: int | None) -> str:
+    """Render a sprint-over-sprint story-completion bar chart (Stories only).
+
+    Mirrors `_render_sprint_completion_bar_chart` on the SP page but counts
+    Story tickets instead of summing story points. Closed sprints use
+    `status_at_sprint_end`; the active sprint falls back to live status via
+    COALESCE so the in-flight bar reads "now." Counts every assignee (BE, FE,
+    and unassigned/other) so the bar matches the per-sprint banners below and
+    the Sprint Reports page.
+    """
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT sprint_id, sprint_name, start_date, end_date, state
+              FROM sprints
+             WHERE sprint_name LIKE ? || '%'
+               AND COALESCE(is_placeholder, 0) = 0
+               AND (state = 'closed'
+                    OR sprint_id = ?
+                    OR (state = 'active' AND date(end_date) >= date('now')))
+             ORDER BY end_date DESC
+             LIMIT 12
+            """,
+            (sprint_prefix, current_sprint_id or -1),
+        )
+        sprint_rows = [dict(r) for r in cursor.fetchall()]
+        if not sprint_rows:
+            return ''
+        sprint_rows.reverse()
+
+        bars = []
+        # Restrict to the same {closed | in-progress | open} buckets the
+        # per-sprint banners use, so a ticket with an unrecognized status
+        # doesn't inflate the "committed" bar relative to its banner total.
+        bar_known = list(set(CLOSED_STATUSES) | set(IN_PROGRESS_STATUSES) | set(OPEN_STATUSES))
+        bar_ph = sql_placeholders(bar_known)
+        for s in sprint_rows:
+            cursor.execute(
+                f"""
+                SELECT COALESCE(status_at_sprint_end, status) AS sprint_end_status
+                  FROM tickets
+                 WHERE sprint_id = ?
+                   AND issue_type = 'Story'
+                   AND COALESCE(status_at_sprint_end, status) IN ({bar_ph})
+                """,
+                (s['sprint_id'], *bar_known),
+            )
+            rows = cursor.fetchall()
+            committed = len(rows)
+            completed = sum(1 for r in rows if r['sprint_end_status'] in CLOSED_STATUSES)
+            bars.append({
+                'label': fmt_sprint_short(s['sprint_name']),
+                'committed': committed,
+                'completed': completed,
+                'is_active': s['sprint_id'] == current_sprint_id,
+            })
+    finally:
+        conn.close()
+
+    if not bars or all(b['committed'] == 0 for b in bars):
+        return ''
+
+    svg_w, svg_h = 900, 280
+    pad_l, pad_r, pad_t, pad_b = 52, 20, 32, 50
+    inner_w = svg_w - pad_l - pad_r
+    inner_h = svg_h - pad_t - pad_b
+    n = len(bars)
+    slot_w = inner_w / n
+    bar_w = min(slot_w * 0.78, 64)
+
+    max_y = max((max(b['committed'], b['completed']) for b in bars), default=1) or 1
+
+    def _nice(v):
+        import math
+        if v <= 0:
+            return 1
+        magnitude = 10 ** math.floor(math.log10(v))
+        for m in (1, 2, 2.5, 5, 10):
+            cand = m * magnitude
+            if cand >= v:
+                return cand
+        return 10 * magnitude
+    axis_max = _nice(max_y)
+
+    def y_at(v):
+        return pad_t + (1 - v / axis_max) * inner_h
+
+    def x_center(i):
+        return pad_l + slot_w * (i + 0.5)
+
+    grid_svg, y_label_svg = '', ''
+    for i in range(5):
+        v = axis_max * (4 - i) / 4
+        y = y_at(v)
+        grid_svg += f'<line class="chart-grid-line" x1="{pad_l}" y1="{y:.1f}" x2="{svg_w - pad_r}" y2="{y:.1f}" />'
+        y_label_svg += f'<text x="{pad_l - 8}" y="{y + 4:.1f}" text-anchor="end" fill="#8194a6" font-size="11">{v:.0f}</text>'
+
+    bar_svg_parts = []
+    for i, b in enumerate(bars):
+        cx = x_center(i)
+        x_left = cx - bar_w / 2
+        committed_top = y_at(b['committed']) if b['committed'] > 0 else y_at(0)
+        completed_top = y_at(b['completed']) if b['completed'] > 0 else y_at(0)
+        baseline = y_at(0)
+        committed_h = baseline - committed_top
+        completed_h = baseline - completed_top
+        active_stroke = ' stroke="#7dd3fc" stroke-width="1.5"' if b['is_active'] else ''
+        if committed_h > 0.5:
+            bar_svg_parts.append(
+                f'<rect x="{x_left:.1f}" y="{committed_top:.1f}" width="{bar_w:.1f}" '
+                f'height="{committed_h:.1f}" fill="#243340" opacity="0.45" rx="3"{active_stroke} />'
+            )
+        if completed_h > 0.5:
+            bar_svg_parts.append(
+                f'<rect x="{x_left:.1f}" y="{completed_top:.1f}" width="{bar_w:.1f}" '
+                f'height="{completed_h:.1f}" fill="#2dd4a7" rx="3" />'
+            )
+        top_y = min(committed_top, completed_top)
+        pct = (b['completed'] / b['committed'] * 100) if b['committed'] > 0 else 0
+        bar_svg_parts.append(
+            f'<text x="{cx:.1f}" y="{top_y - 6:.1f}" text-anchor="middle" '
+            f'fill="#cdd9e5" font-size="11" font-weight="600">'
+            f'{b["completed"]}/{b["committed"]} '
+            f'<tspan fill="#8194a6" font-weight="500">({pct:.0f}%)</tspan>'
+            f'</text>'
+        )
+        suffix = ' (active)' if b['is_active'] else ''
+        label = (b['label'] + suffix).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        bar_svg_parts.append(
+            f'<text x="{cx:.1f}" y="{svg_h - pad_b + 16:.1f}" text-anchor="middle" '
+            f'fill="#cdd9e5" font-size="11">{label}</text>'
+        )
+
+    bar_svg = ''.join(bar_svg_parts)
+
+    legend_html = (
+        '<div class="burndown-legend">'
+        '<div><span class="swatch swatch-solid" style="background:#2dd4a7;"></span>Completed Stories</div>'
+        '<div><span class="swatch swatch-solid" style="background:#243340; opacity:0.45;"></span>Committed Stories</div>'
+        '<div><span class="swatch swatch-solid" style="background:transparent; border:1.5px solid #7dd3fc;"></span>Active sprint</div>'
+        '</div>'
+    )
+
+    return f"""
+        <div class="section" id="stories-completion-bars">
+            <div class="chart-container">
+                <div class="chart-title">📊 Stories Completed — Sprint over Sprint</div>
+                <div class="burndown-svg-wrap">
+                    <svg viewBox="0 0 {svg_w} {svg_h}" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 320px; display: block;">
+                        {grid_svg}
+                        {y_label_svg}
+                        <line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{svg_h - pad_b}" stroke="#243340" stroke-width="1" />
+                        <line x1="{pad_l}" y1="{svg_h - pad_b}" x2="{svg_w - pad_r}" y2="{svg_h - pad_b}" stroke="#243340" stroke-width="1" />
+                        {bar_svg}
+                    </svg>
+                </div>
+                {legend_html}
+            </div>
+        </div>
+    """
+
+
+def _render_stories_burndown_html(sprint: dict, db_path: str) -> str:
+    """Build the SVG burndown chart for one sprint's Stories.
+
+    Returns '' if no daily snapshots exist for the sprint. Forecast/projection
+    line is only drawn when we have at least one working day of data and a
+    positive burn rate — otherwise that line collapses to a single point.
+    """
+    burndown = get_sprint_burndown(db_path, sprint['sprint_id'])
+    if not burndown:
+        return ''
+
+    from datetime import timedelta
+
+    start_date = parse_iso_tz(sprint['start_date']).date()
+    end_date = parse_iso_tz(sprint['end_date']).date()
+    today = datetime.now().date()
+
+    axes = _build_burndown_axes(start_date, end_date, today)
+    wd_total = axes['wd_total']
+    wd_elapsed = axes['wd_elapsed']
+    days_remaining = axes['days_remaining']
+    wd_index_for = axes['wd_index_for']
+    working_days = axes['working_days']
+
+    burndown_in_sprint = [
+        d for d in burndown
+        if datetime.fromisoformat(d['snapshot_date']).date() >= start_date
+    ]
+    if not burndown_in_sprint:
+        burndown_in_sprint = burndown
+
+    burndown_by_date = {
+        datetime.fromisoformat(d['snapshot_date']).date(): d
+        for d in burndown_in_sprint
+    }
+
+    start_remaining = burndown_in_sprint[0].get('open_tickets', burndown_in_sprint[0].get('total_tickets', 0))
+    current_remaining = burndown_in_sprint[-1].get('open_tickets', 0)
+    ideal_remaining_today = start_remaining - (start_remaining / wd_total) * wd_elapsed if wd_total > 0 else 0
+    ahead_behind = ideal_remaining_today - current_remaining
+
+    tickets_burned = max(start_remaining - current_remaining, 0)
+    tickets_per_wd = (tickets_burned / wd_elapsed) if wd_elapsed > 0 else 0
+    projected_extra_wd = (current_remaining / tickets_per_wd) if tickets_per_wd > 0 else None
+    projected_finish_date = None
+    if projected_extra_wd is not None:
+        remaining_wd = int(round(projected_extra_wd))
+        cur = today
+        while remaining_wd > 0:
+            cur += timedelta(days=1)
+            if _is_working_day(cur):
+                remaining_wd -= 1
+        projected_finish_date = cur
+
+    svg_w, svg_h = 900, 280
+    pad_l, pad_r, pad_t, pad_b = 46, 20, 18, 34
+    inner_w = svg_w - pad_l - pad_r
+    inner_h = svg_h - pad_t - pad_b
+    max_remaining = max(
+        start_remaining,
+        max((d.get('open_tickets', 0) for d in burndown_in_sprint), default=start_remaining),
+    )
+    if max_remaining <= 0:
+        max_remaining = 1
+
+    def x_at(off):
+        return pad_l + (off / wd_total) * inner_w if wd_total > 0 else pad_l
+
+    def y_at(v):
+        return pad_t + (1 - v / max_remaining) * inner_h
+
+    axes['y_ticks'] = [
+        (y_at(round(max_remaining * (4 - i) / 4)), round(max_remaining * (4 - i) / 4))
+        for i in range(5)
+    ]
+    if wd_total <= 10:
+        x_ticks_idx = list(range(wd_total + 1))
+    else:
+        step = max(1, wd_total // 7)
+        x_ticks_idx = list(range(0, wd_total + 1, step))
+        if wd_total not in x_ticks_idx:
+            x_ticks_idx.append(wd_total)
+    axes['x_ticks'] = [
+        (x_at(idx), f"{working_days[min(idx, len(working_days)-1)].month}/{working_days[min(idx, len(working_days)-1)].day}")
+        for idx in x_ticks_idx
+    ]
+
+    actual_points, actual_dots, seen = [], [], set()
+    for d in sorted(burndown_by_date):
+        xidx = wd_index_for(d)
+        if xidx in seen:
+            continue
+        seen.add(xidx)
+        y_val = burndown_by_date[d].get('open_tickets', 0)
+        actual_points.append(f"{x_at(xidx):.1f},{y_at(y_val):.1f}")
+        actual_dots.append((x_at(xidx), y_at(y_val)))
+
+    ideal_points = [
+        f"{x_at(0):.1f},{y_at(start_remaining):.1f}",
+        f"{x_at(wd_total):.1f},{y_at(0):.1f}",
+    ]
+    projection_points = None
+    if projected_extra_wd is not None and wd_elapsed > 0:
+        projection_points = [
+            f"{x_at(wd_elapsed):.1f},{y_at(current_remaining):.1f}",
+            f"{x_at(wd_elapsed + projected_extra_wd):.1f},{y_at(0):.1f}",
+        ]
+
+    if ahead_behind > 0.5:
+        pace_label = f"<span style='color: #6ee7c3;'>↑ {ahead_behind:.0f} ahead of ideal</span>"
+    elif ahead_behind < -0.5:
+        pace_label = f"<span style='color: #fda4a0;'>↓ {abs(ahead_behind):.0f} behind ideal</span>"
+    else:
+        pace_label = "<span style='color: #cdd9e5;'>on pace</span>"
+
+    forecast_text = projected_finish_date.strftime('%b %d') if projected_finish_date else '—'
+    forecast_delta = ''
+    if projected_finish_date:
+        delta_days = (projected_finish_date - end_date).days
+        forecast_delta = (
+            f" ({abs(delta_days)}d early)" if delta_days < 0
+            else f" ({delta_days}d late)" if delta_days > 0
+            else ' (on time)'
+        )
+
+    return _render_burndown_chart(
+        title='📈 Sprint Burndown Chart',
+        section_id=f'burndown-chart-{sprint["sprint_id"]}',
+        axes=axes,
+        series=[{'name': 'Actual', 'points': actual_points, 'dots': actual_dots, 'color': '#2dd4a7'}],
+        summary_cards=[
+            {'label': 'Remaining',  'value': str(current_remaining), 'sub': f'of {start_remaining} tickets'},
+            {'label': 'Pace',       'value': pace_label, 'sub': f'ideal: {ideal_remaining_today:.0f} remaining'},
+            {'label': 'Time Left',  'value': f'{days_remaining}d', 'sub': f'working day {wd_elapsed + 1} of {wd_total + 1}'},
+            {'label': 'Forecast Finish', 'value': forecast_text, 'sub': f'at current pace{forecast_delta}'},
+        ],
+        legend=[
+            {'kind': 'solid', 'color': '#2dd4a7', 'label': 'Actual'},
+            {'kind': 'dashed', 'color': '#566375', 'label': 'Ideal'},
+            {'kind': 'dashed', 'color': '#fbbf24', 'label': 'Projected'},
+            {'kind': 'dashed', 'color': '#56cdf9', 'label': 'Today'},
+        ],
+        ideal_points=ideal_points,
+        projection_points=projection_points,
+        today_in_sprint=(start_date <= today <= end_date),
+    )
+
+
+def _render_flow_breakdown(db_path: str) -> str:
+    """Render the flow section: time-in-status horizontal bars + churn callout.
+
+    Team-wide, last 30 days (the status-history window). Returns '' when there
+    isn't enough closed-interval data to draw bars. Time-in-status comes from
+    the deduped `status_changes` table; churn from a DISTINCT'd read of
+    `ticket_status_history` (see get_status_churn for the dedup rationale).
+    """
+    stages = get_time_in_status(db_path, days=30)
+    churn = get_status_churn(db_path, days=30)
+    if not stages:
+        return ''
+
+    max_h = max(s['avg_hours'] for s in stages) or 1
+    # Stages that are queues/waits read amber; active-work stages read blue.
+    wait_stages = {'To Do', 'Product Discovery', 'Engineering Unpacking',
+                   'Committed', 'Blocked', 'Ready for Testing'}
+
+    bars = ''
+    for s in stages:
+        pct = s['avg_hours'] / max_h * 100
+        days = s['avg_hours'] / 24
+        val_label = f"{s['avg_hours']:.0f}h" if s['avg_hours'] < 48 else f"{days:.1f}d"
+        color = '#fbbf24' if s['status'] in wait_stages else '#38bdf8'
+        bars += f"""
+            <div class="flow-stage-row">
+                <div class="flow-stage-name">{s['status']}</div>
+                <div class="flow-stage-track">
+                    <div class="flow-stage-fill" style="width: {pct:.0f}%; background: {color};"></div>
+                </div>
+                <div class="flow-stage-val">{val_label} <span style="color: var(--text-faint); font-weight: 400;">· n={s['sample']}</span></div>
+            </div>
+        """
+
+    # Churn callout — only meaningful when there's at least one bounce.
+    if churn['total'] > 0:
+        parts = []
+        if churn['review_bounces']:
+            parts.append(f"{churn['review_bounces']} review bounce{'es' if churn['review_bounces'] != 1 else ''}")
+        if churn['reopens']:
+            parts.append(f"{churn['reopens']} reopen{'s' if churn['reopens'] != 1 else ''}")
+        churn_detail = ' · '.join(parts)
+        churn_html = f"""
+            <div class="flow-churn">
+                <span class="flow-churn-val">{churn['total']}</span>
+                <span class="flow-churn-label">backward transitions (last 30d) — {churn_detail}.
+                Work bouncing back from review/done signals rework or unclear scope.</span>
+            </div>
+        """
+    else:
+        churn_html = """
+            <div class="flow-churn flow-churn-clean">
+                <span class="flow-churn-val">0</span>
+                <span class="flow-churn-label">backward transitions in the last 30 days — work is flowing forward cleanly.</span>
+            </div>
+        """
+
+    return f"""
+        <div class="flow-breakdown" style="margin-bottom: 16px;">
+            <div class="flow-breakdown-title">⏳ Time in Status <span style="color: var(--text-faint); font-weight: 400; font-size: 12px;">— team-wide, avg working hours, last 30 days</span></div>
+            <div class="flow-stages">{bars}</div>
+            {churn_html}
+        </div>
+    """
+
+
+def _render_stories_sprint_block(sprint: dict, db_path: str, config: dict, *, is_active: bool) -> str:
+    """Render one collapsible Stories block for a single sprint.
+
+    Active sprint also gets a team-metrics row (cycle time, throughput, PR
+    review time, sprint commitment). Closed sprints stick to burndown +
+    BE/FE breakdown so the page stays readable as history grows. Closed
+    sprints place tickets by `status_at_sprint_end` so the bucket counts
+    match the Sprint Reports page.
+    """
+    sprint_id = sprint['sprint_id']
+    id_suffix = f"-{sprint_id}"
+
+    closed_set = set(CLOSED_STATUSES)
+    inprog_set = set(IN_PROGRESS_STATUSES)
+    open_set = set(OPEN_STATUSES)
+    all_statuses = list(closed_set | inprog_set | open_set)
+
+    placeholders = ",".join("?" for _ in all_statuses)
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            f"""
+            SELECT ticket_key, summary, status,
+                   COALESCE(status_at_sprint_end, status) AS sprint_end_status,
+                   assignee_account_id, assignee_display_name, story_points,
+                   issue_type, ticket_url
+              FROM tickets
+             WHERE sprint_id = ?
+               AND issue_type = 'Story'
+               AND COALESCE(status_at_sprint_end, status) IN ({placeholders})
+             ORDER BY ticket_key
+            """,
+            [sprint_id] + all_statuses,
+        )
+        all_tickets = [dict(r) for r in cursor.fetchall()]
+    finally:
+        conn.close()
+
+    closed_tickets_list = [t for t in all_tickets if t['sprint_end_status'] in closed_set]
+    in_progress_tickets_list = [t for t in all_tickets if t['sprint_end_status'] in inprog_set]
+    open_tickets_list = [t for t in all_tickets if t['sprint_end_status'] in open_set]
+
+    name_to_role, _ = _build_role_maps(config)
+    closed_by_role = _partition_tickets_by_role(closed_tickets_list, name_to_role)
+    inprog_by_role = _partition_tickets_by_role(in_progress_tickets_list, name_to_role)
+    open_by_role = _partition_tickets_by_role(open_tickets_list, name_to_role)
+    role_m = _role_metrics({'closed': closed_by_role, 'in_progress': inprog_by_role, 'open': open_by_role})
+
+    # Sum across ALL reported roles (BE+FE+other) so the banner total equals
+    # the sum of the role blocks below and reconciles with Sprint Reports.
+    banner_closed = sum(role_m[r]['closed'] for r in _REPORTED_ROLES)
+    banner_in_progress = sum(role_m[r]['in_progress'] for r in _REPORTED_ROLES)
+    banner_open = sum(role_m[r]['open'] for r in _REPORTED_ROLES)
+    banner_total = banner_closed + banner_in_progress + banner_open
+    banner_completion = (banner_closed / banner_total * 100) if banner_total > 0 else 0
+    banner_html = (
+        f'<span class="epic-sprint-stat" style="color: #2dd4a7;">{banner_closed} <small>closed</small></span>'
+        f'<span class="epic-sprint-stat" style="color: #fbbf24;">{banner_in_progress + banner_open} <small>remaining</small></span>'
+        f'<span class="epic-sprint-stat" style="color: #38bdf8;">{banner_total} <small>total</small></span>'
+        f'<span class="epic-sprint-stat" style="color: #7dd3fc;">{banner_completion:.0f}% <small>complete</small></span>'
+        f'{_scope_change_chip(db_path, sprint_id)}'
+    )
+
+    is_empty = banner_total == 0
+    empty_class = ' epic-sprint-empty' if is_empty else ''
+    open_attr = ' open' if is_active else ''
+
+    burndown_html = _render_stories_burndown_html(sprint, db_path)
+
+    # Team-metrics row only shown for the active sprint. Cycle/throughput are
+    # in-flight indicators; PR-review-time is a 30-day team-wide rolling
+    # window that doesn't make sense to repeat per closed sprint.
+    team_metrics_html = ''
+    if is_active:
+        team_cycle_time = get_team_cycle_time(db_path, sprint_id)
+        team_throughput = get_team_throughput(db_path, sprint_id, days=7)
+        team_pr_review_time = get_team_pr_review_time(db_path, days=30)
+        commitment_accuracy = get_sprint_commitment_accuracy(db_path, sprint_id)
+        # Flow metrics (team-wide, 30-day window — status history only spans
+        # ~early May, so a per-sprint slice would be too thin to average).
+        blocked = get_blocked_time(db_path, days=30)
+        commit_card_class = (
+            'success' if commitment_accuracy['accuracy'] >= 80
+            else 'warning' if commitment_accuracy['accuracy'] >= 60
+            else 'info'
+        )
+        # Blocked card turns amber only when something is blocked right now.
+        blocked_card_class = 'warning' if blocked['currently_blocked'] > 0 else ''
+        blocked_value = (
+            f"{blocked['currently_blocked']}"
+            if blocked['currently_blocked'] > 0
+            else f"{blocked['ticket_count']}"
+        )
+        blocked_sub = (
+            f"blocked now · {blocked['total_hours']/24:.1f}d total (30d)"
+            if blocked['currently_blocked'] > 0
+            else f"blocked in last 30d · {blocked['total_hours']/24:.1f}d total"
+        )
+        team_metrics_html = f"""
+            <div class="metrics-grid" style="margin-bottom: 16px;">
+                <div class="metric-card info">
+                    <div class="metric-label">Avg Cycle Time</div>
+                    <div class="metric-value">{f"{team_cycle_time:.1f}" if team_cycle_time else "N/A"}</div>
+                    <div class="metric-subtext">days to complete</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Throughput</div>
+                    <div class="metric-value">{team_throughput}</div>
+                    <div class="metric-subtext">tickets per week</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">PR Review Time</div>
+                    <div class="metric-value">{f"{team_pr_review_time:.0f}h" if team_pr_review_time else "N/A"}</div>
+                    <div class="metric-subtext">avg to merge</div>
+                </div>
+                <div class="metric-card {commit_card_class}">
+                    <div class="metric-label">Sprint Commitment</div>
+                    <div class="metric-value">{commitment_accuracy['accuracy']}%</div>
+                    <div class="metric-subtext">{commitment_accuracy['completed']}/{commitment_accuracy['planned']} tickets</div>
+                </div>
+                <div class="metric-card {blocked_card_class}">
+                    <div class="metric-label">Blocked</div>
+                    <div class="metric-value">{blocked_value}</div>
+                    <div class="metric-subtext">{blocked_sub}</div>
+                </div>
+            </div>
+            {_render_flow_breakdown(db_path)}
+        """
+
+    out = f"""
+        <details class="epic-sprint-block{empty_class}"{open_attr}>
+            <summary class="epic-sprint-summary">
+                <span class="epic-sprint-caret">▸</span>
+                <span class="epic-sprint-name">{fmt_sprint_long(sprint['sprint_name'])}</span>
+                <span class="epic-sprint-counts">{banner_html}</span>
+            </summary>
+            <div class="epic-sprint-body">
+                {burndown_html}
+                {team_metrics_html}
+    """
+
+    if is_empty:
+        out += (
+            '<div style="color:var(--text-muted); font-size:13px; '
+            'font-style:italic; padding:8px 4px;">No Story tickets recorded for this sprint.</div>'
+        )
+
+    role_config = [
+        ('BE', 'be', '⚙️ Backend'),
+        ('FE', 'fe', '🎨 Frontend'),
+        ('other', 'other', '👥 Other / Unassigned'),
+    ]
+    role_color = {'BE': '#2dd4a7', 'FE': '#c4b5fd', 'other': '#8194a6'}
+    for role, rid_base, role_label in role_config:
+        rm = role_m[role]
+        # Only surface the catch-all block when it holds work, so a
+        # well-rostered sprint isn't cluttered with an empty "Other" row.
+        if role == 'other' and rm['total'] == 0:
+            continue
+        rid = f"{rid_base}{id_suffix}"
+        r_closed = closed_by_role[role]
+        r_inprog = inprog_by_role[role]
+        r_open = open_by_role[role]
+        role_key = role.lower()
+        accent = role_color.get(role, '#38bdf8')
+
+        out += f"""
+            <details class="epic-role-block role-{role_key}">
+                <summary class="epic-role-summary">
+                    <span class="epic-role-caret">▸</span>
+                    <span class="epic-role-name">{role_label}</span>
+                    <span class="epic-role-counts">
+                        <span class="epic-role-stat" style="color: #2dd4a7;">{rm['closed']} <small>closed</small></span>
+                        <span class="epic-role-stat" style="color: #fbbf24;">{rm['in_progress']} <small>in progress</small></span>
+                        <span class="epic-role-stat" style="color: #38bdf8;">{rm['open']} <small>open</small></span>
+                        <span class="epic-role-stat" style="color: {accent};">{rm['total']} <small>total</small></span>
+                        <span class="epic-role-stat" style="color: #7dd3fc;">{rm['completion']:.0f}% <small>complete</small></span>
+                    </span>
+                </summary>
+                <div class="epic-role-body">
+                    <div class="metrics-grid">
+                        <button type="button" class="metric-card success" onclick="toggleAccordion('{rid}-closed-panel')" aria-controls="{rid}-closed-panel" aria-expanded="false">
+                            <div class="metric-label">Closed</div>
+                            <div class="metric-value clickable">{rm['closed']}</div>
+                            <div class="metric-subtext">{rm['completion']:.1f}% complete · Click to view</div>
+                        </button>
+                        <button type="button" class="metric-card warning" onclick="toggleAccordion('{rid}-inprogress-panel')" aria-controls="{rid}-inprogress-panel" aria-expanded="false">
+                            <div class="metric-label">In Progress</div>
+                            <div class="metric-value clickable">{rm['in_progress']}</div>
+                            <div class="metric-subtext">Click to view</div>
+                        </button>
+                        <button type="button" class="metric-card info" onclick="toggleAccordion('{rid}-open-panel')" aria-controls="{rid}-open-panel" aria-expanded="false">
+                            <div class="metric-label">Open / To Do</div>
+                            <div class="metric-value clickable">{rm['open']}</div>
+                            <div class="metric-subtext">Click to view</div>
+                        </button>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {rm['completion']}%"></div>
+                    </div>
+
+                    <div id="{rid}-closed-panel" class="accordion-panel">
+                        <div class="accordion-content">
+                            <div class="accordion-header">✅ Closed Tickets ({len(r_closed)})</div>
+                            <div class="ticket-grid">
+        """
+
+        for ticket in r_closed:
+            out += f"""
+                                <div class="ticket-item">
+                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
+                                    {ticket['summary']}
+                                    <span style="color: #566375; font-size: 12px;"> • {ticket['assignee_display_name'] or 'Unassigned'}</span>
+                                </div>
+            """
+
+        out += f"""
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="{rid}-inprogress-panel" class="accordion-panel">
+                        <div class="accordion-content">
+                            <div class="accordion-header">🔄 In Progress Tickets ({len(r_inprog)})</div>
+                            <div class="ticket-grid">
+        """
+
+        for ticket in r_inprog:
+            out += f"""
+                                <div class="ticket-item">
+                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
+                                    {ticket['summary']}
+                                    <span style="color: #566375; font-size: 12px;"> • {ticket['assignee_display_name'] or 'Unassigned'} • {ticket['status']}</span>
+                                </div>
+            """
+
+        out += f"""
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="{rid}-open-panel" class="accordion-panel">
+                        <div class="accordion-content">
+                            <div class="accordion-header">📋 Open / To Do Tickets ({len(r_open)})</div>
+                            <div class="ticket-grid">
+        """
+
+        for ticket in r_open:
+            out += f"""
+                                <div class="ticket-item">
+                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
+                                    {ticket['summary']}
+                                    <span style="color: #566375; font-size: 12px;"> • {ticket['assignee_display_name'] or 'Unassigned'} • {ticket['status']}</span>
+                                </div>
+            """
+
+        out += """
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        """
+
+    out += """
+            </div>
+        </details>
+    """
+    return out
+
+
 def generate_team_html(config: dict, output_path: Path):
     """Generate HTML team dashboard."""
     db_path = config['database']['path']
     sprint_prefix = config['jira']['sprint_prefix']
 
-    sprint = get_current_sprint(db_path, sprint_prefix)
-    if not sprint:
-        print("No active sprint found")
+    active_sprint = get_current_sprint(db_path, sprint_prefix)
+
+    # Pull every FNTSY sprint (active + closed) so each gets its own
+    # collapsible block. Newest-first: the active sprint sits at the top
+    # of the list and the rest read backwards through history.
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT sprint_id, jira_sprint_id, sprint_name, state, start_date, end_date, goal
+              FROM sprints
+             WHERE sprint_name LIKE ? || '%'
+               AND COALESCE(is_placeholder, 0) = 0
+               AND state IN ('active', 'closed')
+             ORDER BY start_date DESC
+            """,
+            (sprint_prefix,),
+        )
+        all_sprints = [dict(r) for r in cursor.fetchall()]
+    finally:
+        conn.close()
+
+    if not all_sprints:
+        print("No sprints found")
         return
 
-    metrics = get_sprint_metrics(db_path, sprint['sprint_id'])
-    burndown = get_sprint_burndown(db_path, sprint['sprint_id'])
-    developers = get_all_developers_metrics(db_path, sprint['sprint_id'])
+    header_sprint = active_sprint or all_sprints[0]
+    active_sprint_id = active_sprint['sprint_id'] if active_sprint else None
 
-    # Velocity on the Stories page is counted in stories completed, not story points.
-    # Story points live on the Story Points page.
-    velocity = metrics['closed_tickets'] if metrics else 0
-    velocity_label = "Sprint Velocity (Stories Completed)"
+    completion_bar_chart_html = _render_sprint_story_bar_chart(
+        db_path, sprint_prefix, config, current_sprint_id=active_sprint_id,
+    )
 
-    # Get new metrics
-    team_cycle_time = get_team_cycle_time(db_path, sprint['sprint_id'])
-    team_throughput = get_team_throughput(db_path, sprint['sprint_id'], days=7)
-    team_pr_review_time = get_team_pr_review_time(db_path, days=30)
-    pr_approvals = get_pr_approvals_by_developer(db_path, days=30)
-    commitment_accuracy = get_sprint_commitment_accuracy(db_path, sprint['sprint_id'])
-    pr_size_dist = get_pr_size_distribution(db_path, days=30)
-
-    # Calculate completion percentage
-    completion = 0
-    if metrics and metrics['total_tickets'] > 0:
-        completion = (metrics['closed_tickets'] / metrics['total_tickets']) * 100
-
-    # Header + nav go first; the main `content` block gets the metrics and
-    # accordions, and `burndown_html` is built separately so we can splice it
-    # in at the very top of <div class="content"> at render time.
-    content = ""
-    burndown_html = ""
-
-    if metrics:
-        # Get tickets by status for accordion panels — single batched query
-        # rather than one round-trip per status.
-        from database.queries import get_tickets_for_sprint
-
-        closed_set = set(CLOSED_STATUSES)
-        inprog_set = set(IN_PROGRESS_STATUSES)
-        open_set = set(OPEN_STATUSES)
-        all_statuses = list(closed_set | inprog_set | open_set)
-
-        all_tickets = get_tickets_for_sprint(
-            db_path, sprint['sprint_id'], statuses=all_statuses, issue_type='Story'
+    sprint_blocks_html = ''.join(
+        _render_stories_sprint_block(
+            s, db_path, config,
+            is_active=(s['sprint_id'] == active_sprint_id),
         )
+        for s in all_sprints
+    )
 
-        closed_tickets_list = [t for t in all_tickets if t['status'] in closed_set]
-        in_progress_tickets_list = [t for t in all_tickets if t['status'] in inprog_set]
-        open_tickets_list = [t for t in all_tickets if t['status'] in open_set]
-
-        # Build role maps for BE/FE split
-        name_to_role, _ = _build_role_maps(config)
-        closed_by_role = _partition_tickets_by_role(closed_tickets_list, name_to_role)
-        inprog_by_role = _partition_tickets_by_role(in_progress_tickets_list, name_to_role)
-        open_by_role = _partition_tickets_by_role(open_tickets_list, name_to_role)
-        role_m = _role_metrics({'closed': closed_by_role, 'in_progress': inprog_by_role, 'open': open_by_role})
-
-        # Combined team-level metrics row at the top
-        content += f"""
-            <div class="section" id="team-metrics">
-
-                <!-- Additional Team Metrics -->
-                <div class="metrics-grid">
-                    <div class="metric-card info">
-                        <div class="metric-label">Avg Cycle Time</div>
-                        <div class="metric-value">{f"{team_cycle_time:.1f}" if team_cycle_time else "N/A"}</div>
-                        <div class="metric-subtext">days to complete</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Throughput</div>
-                        <div class="metric-value">{team_throughput}</div>
-                        <div class="metric-subtext">tickets per week</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">PR Review Time</div>
-                        <div class="metric-value">{f"{team_pr_review_time:.0f}h" if team_pr_review_time else "N/A"}</div>
-                        <div class="metric-subtext">avg to merge</div>
-                    </div>
-                    <div class="metric-card {'success' if commitment_accuracy['accuracy'] >= 80 else 'warning' if commitment_accuracy['accuracy'] >= 60 else 'info'}">
-                        <div class="metric-label">Sprint Commitment</div>
-                        <div class="metric-value">{commitment_accuracy['accuracy']}%</div>
-                        <div class="metric-subtext">{commitment_accuracy['completed']}/{commitment_accuracy['planned']} tickets</div>
-                    </div>
-                </div>
-        """
-
-        # Render one section per role
-        role_config = [
-            ('BE', 'be', '⚙️ Backend'),
-            ('FE', 'fe', '🎨 Frontend'),
-        ]
-        for role, rid, role_label in role_config:
-            rm = role_m[role]
-            r_closed = closed_by_role[role]
-            r_inprog = inprog_by_role[role]
-            r_open = open_by_role[role]
-            r_velocity = rm['closed']
-
-            content += f"""
-                <div class="section-title" style="margin-top: 32px;">{role_label}</div>
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-label">Total Tickets</div>
-                        <div class="metric-value">{rm['total']}</div>
-                    </div>
-                    <button type="button" class="metric-card success" onclick="toggleAccordion('{rid}-closed-panel')" aria-controls="{rid}-closed-panel" aria-expanded="false">
-                        <div class="metric-label">Closed</div>
-                        <div class="metric-value clickable">{rm['closed']}</div>
-                        <div class="metric-subtext">{rm['completion']:.1f}% complete · Click to view</div>
-                    </button>
-                    <button type="button" class="metric-card warning" onclick="toggleAccordion('{rid}-inprogress-panel')" aria-controls="{rid}-inprogress-panel" aria-expanded="false">
-                        <div class="metric-label">In Progress</div>
-                        <div class="metric-value clickable">{rm['in_progress']}</div>
-                        <div class="metric-subtext">Click to view</div>
-                    </button>
-                    <button type="button" class="metric-card info" onclick="toggleAccordion('{rid}-open-panel')" aria-controls="{rid}-open-panel" aria-expanded="false">
-                        <div class="metric-label">Open / To Do</div>
-                        <div class="metric-value clickable">{rm['open']}</div>
-                        <div class="metric-subtext">Click to view</div>
-                    </button>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: {rm['completion']}%"></div>
-                </div>
-                <div style="margin-top: 16px;">
-                    <div class="velocity-card">
-                        <div class="velocity-value">{r_velocity}</div>
-                        <div class="velocity-label">{velocity_label}</div>
-                    </div>
-                </div>
-
-                <div id="{rid}-closed-panel" class="accordion-panel">
-                    <div class="accordion-content">
-                        <div class="accordion-header">✅ Closed Tickets ({len(r_closed)})</div>
-                        <div class="ticket-grid">
-            """
-
-            for ticket in r_closed:
-                content += f"""
-                                <div class="ticket-item">
-                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
-                                    {ticket['summary']}
-                                    <span style="color: #6b7280; font-size: 12px;"> • {ticket['assignee_display_name'] or 'Unassigned'}</span>
-                                </div>
-                """
-
-            content += f"""
-                        </div>
-                    </div>
-                </div>
-
-                <div id="{rid}-inprogress-panel" class="accordion-panel">
-                    <div class="accordion-content">
-                        <div class="accordion-header">🔄 In Progress Tickets ({len(r_inprog)})</div>
-                        <div class="ticket-grid">
-            """
-
-            for ticket in r_inprog:
-                content += f"""
-                                <div class="ticket-item">
-                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
-                                    {ticket['summary']}
-                                    <span style="color: #6b7280; font-size: 12px;"> • {ticket['assignee_display_name'] or 'Unassigned'} • {ticket['status']}</span>
-                                </div>
-                """
-
-            content += f"""
-                        </div>
-                    </div>
-                </div>
-
-                <div id="{rid}-open-panel" class="accordion-panel">
-                    <div class="accordion-content">
-                        <div class="accordion-header">📋 Open / To Do Tickets ({len(r_open)})</div>
-                        <div class="ticket-grid">
-            """
-
-            for ticket in r_open:
-                content += f"""
-                                <div class="ticket-item">
-                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
-                                    {ticket['summary']}
-                                    <span style="color: #6b7280; font-size: 12px;"> • {ticket['assignee_display_name'] or 'Unassigned'} • {ticket['status']}</span>
-                                </div>
-                """
-
-            content += """
-                        </div>
-                    </div>
-                </div>
-            """
-
-        content += """
-            </div>
-        """
-
-    # Burndown Chart — working-days only (weekends excluded from axis + math).
-    if burndown and len(burndown) > 0:
-        from datetime import timedelta
-
-        start_date = parse_iso_tz(sprint['start_date']).date()
-        end_date = parse_iso_tz(sprint['end_date']).date()
-        today = datetime.now().date()
-
-        axes = _build_burndown_axes(start_date, end_date, today)
-        wd_total = axes['wd_total']
-        wd_elapsed = axes['wd_elapsed']
-        days_remaining = axes['days_remaining']
-        wd_index_for = axes['wd_index_for']
-        working_days = axes['working_days']
-
-        # Filter pre-sprint snapshot rows so the ideal line anchors at sprint start.
-        burndown_in_sprint = [
-            d for d in burndown
-            if datetime.fromisoformat(d['snapshot_date']).date() >= start_date
-        ]
-        if not burndown_in_sprint:
-            burndown_in_sprint = burndown
-
-        burndown_by_date = {
-            datetime.fromisoformat(d['snapshot_date']).date(): d
-            for d in burndown_in_sprint
-        }
-
-        start_remaining = burndown_in_sprint[0].get('open_tickets', burndown_in_sprint[0].get('total_tickets', 0))
-        current_remaining = burndown_in_sprint[-1].get('open_tickets', 0)
-        ideal_remaining_today = start_remaining - (start_remaining / wd_total) * wd_elapsed
-        ahead_behind = ideal_remaining_today - current_remaining
-
-        tickets_burned = max(start_remaining - current_remaining, 0)
-        tickets_per_wd = (tickets_burned / wd_elapsed) if wd_elapsed > 0 else 0
-        projected_extra_wd = (current_remaining / tickets_per_wd) if tickets_per_wd > 0 else None
-        projected_finish_date = None
-        if projected_extra_wd is not None:
-            remaining_wd = int(round(projected_extra_wd))
-            cur = today
-            while remaining_wd > 0:
-                cur += timedelta(days=1)
-                if _is_working_day(cur):
-                    remaining_wd -= 1
-            projected_finish_date = cur
-
-        # Coordinate transforms — pre-pixel, used by the renderer for axis ticks.
-        svg_w, svg_h = 900, 280
-        pad_l, pad_r, pad_t, pad_b = 46, 20, 18, 34
-        inner_w = svg_w - pad_l - pad_r
-        inner_h = svg_h - pad_t - pad_b
-        max_remaining = max(
-            start_remaining,
-            max((d.get('open_tickets', 0) for d in burndown_in_sprint), default=start_remaining),
-        )
-        if max_remaining <= 0:
-            max_remaining = 1
-
-        def x_at(off):
-            return pad_l + (off / wd_total) * inner_w
-
-        def y_at(v):
-            return pad_t + (1 - v / max_remaining) * inner_h
-
-        # Y-axis ticks
-        axes['y_ticks'] = [
-            (y_at(round(max_remaining * (4 - i) / 4)), round(max_remaining * (4 - i) / 4))
-            for i in range(5)
-        ]
-        # X-axis ticks
-        if wd_total <= 10:
-            x_ticks_idx = list(range(wd_total + 1))
-        else:
-            step = max(1, wd_total // 7)
-            x_ticks_idx = list(range(0, wd_total + 1, step))
-            if wd_total not in x_ticks_idx:
-                x_ticks_idx.append(wd_total)
-        axes['x_ticks'] = [
-            (x_at(idx), f"{working_days[min(idx, len(working_days)-1)].month}/{working_days[min(idx, len(working_days)-1)].day}")
-            for idx in x_ticks_idx
-        ]
-
-        # Build single 'actual' series with weekend dedupe.
-        actual_points = []
-        actual_dots = []
-        seen = set()
-        for d in sorted(burndown_by_date):
-            xidx = wd_index_for(d)
-            if xidx in seen:
-                continue
-            seen.add(xidx)
-            y_val = burndown_by_date[d].get('open_tickets', 0)
-            actual_points.append(f"{x_at(xidx):.1f},{y_at(y_val):.1f}")
-            actual_dots.append((x_at(xidx), y_at(y_val)))
-
-        ideal_points = [
-            f"{x_at(0):.1f},{y_at(start_remaining):.1f}",
-            f"{x_at(wd_total):.1f},{y_at(0):.1f}",
-        ]
-        projection_points = None
-        if projected_extra_wd is not None and wd_elapsed > 0:
-            projection_points = [
-                f"{x_at(wd_elapsed):.1f},{y_at(current_remaining):.1f}",
-                f"{x_at(wd_elapsed + projected_extra_wd):.1f},{y_at(0):.1f}",
-            ]
-
-        if ahead_behind > 0.5:
-            pace_label = f"<span style='color: #6ee7b7;'>↑ {ahead_behind:.0f} ahead of ideal</span>"
-        elif ahead_behind < -0.5:
-            pace_label = f"<span style='color: #fca5a5;'>↓ {abs(ahead_behind):.0f} behind ideal</span>"
-        else:
-            pace_label = "<span style='color: #cbd5e1;'>on pace</span>"
-
-        forecast_text = projected_finish_date.strftime('%b %d') if projected_finish_date else '—'
-        forecast_delta = ''
-        if projected_finish_date:
-            delta_days = (projected_finish_date - end_date).days
-            forecast_delta = (
-                f" ({abs(delta_days)}d early)" if delta_days < 0
-                else f" ({delta_days}d late)" if delta_days > 0
-                else ' (on time)'
-            )
-
-        burndown_html += _render_burndown_chart(
-            title='📈 Sprint Burndown Chart',
-            section_id='burndown-chart',
-            axes=axes,
-            series=[{'name': 'Actual', 'points': actual_points, 'dots': actual_dots, 'color': '#10b981'}],
-            summary_cards=[
-                {'label': 'Remaining',  'value': str(current_remaining), 'sub': f'of {start_remaining} tickets'},
-                {'label': 'Pace',       'value': pace_label, 'sub': f'ideal: {ideal_remaining_today:.0f} remaining'},
-                {'label': 'Time Left',  'value': f'{days_remaining}d', 'sub': f'working day {wd_elapsed + 1} of {wd_total + 1}'},
-                {'label': 'Forecast Finish', 'value': forecast_text, 'sub': f'at current pace{forecast_delta}'},
-            ],
-            legend=[
-                {'kind': 'solid', 'color': '#10b981', 'label': 'Actual'},
-                {'kind': 'dashed', 'color': '#64748b', 'label': 'Ideal'},
-                {'kind': 'dashed', 'color': '#f59e0b', 'label': 'Projected'},
-                {'kind': 'dashed', 'color': '#60a5fa', 'label': 'Today'},
-            ],
-            ideal_points=ideal_points,
-            projection_points=projection_points,
-            today_in_sprint=(start_date <= today <= end_date),
-        )
-
-
-    # Final page layout: header → nav → burndown (top of page) → metrics/accordions → footer
     page = f"""
         <header>
             <h1>📊 Team Dashboard</h1>
-            <div class="subtitle">{fmt_sprint_long(sprint['sprint_name'])} • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
+            <div class="subtitle">{fmt_sprint_long(header_sprint['sprint_name'])} • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
         </header>
 {generate_nav_menu('stories')}
         <div class="content">
-{burndown_html}
-{content}
+{completion_bar_chart_html}
+{sprint_blocks_html}
             <footer>
                 Generated by Engineering Management Dashboard
             </footer>
@@ -770,7 +1187,7 @@ def generate_team_html(config: dict, output_path: Path):
     """
 
     html = render_html(
-        title=f"Team Dashboard - {fmt_sprint_long(sprint['sprint_name'])}",
+        title=f"Team Dashboard - {fmt_sprint_long(header_sprint['sprint_name'])}",
         content=page,
         body_class=_PAGE_THEME["stories"],
     )
@@ -1151,15 +1568,15 @@ def _build_member_card_html(dev, config, db_path, sprint,
                             </div>
                             <div class="perf-metric">
                                 <div class="perf-metric-label">Completed SP</div>
-                                <div class="perf-metric-value" style="color: #10b981;">{completed_sp:g}</div>
+                                <div class="perf-metric-value" style="color: #2dd4a7;">{completed_sp:g}</div>
                             </div>
                             <div class="perf-metric">
                                 <div class="perf-metric-label">In Progress SP</div>
-                                <div class="perf-metric-value" style="color: #f59e0b;">{in_progress_sp:g}</div>
+                                <div class="perf-metric-value" style="color: #fbbf24;">{in_progress_sp:g}</div>
                             </div>
                             <div class="perf-metric">
                                 <div class="perf-metric-label">To Do SP</div>
-                                <div class="perf-metric-value" style="color: #3b82f6;">{todo_sp:g}</div>
+                                <div class="perf-metric-value" style="color: #38bdf8;">{todo_sp:g}</div>
                             </div>
                             <div class="perf-metric" title="{'Estimate: (cycle_time / avg_SP_per_ticket). No per-ticket history yet; real value once status history accumulates.' if cycle_per_point_is_proxy else 'Real avg days-per-point from ticket status history'}">
                                 <div class="perf-metric-label">Cycle Time / Point</div>
@@ -1549,6 +1966,7 @@ def _build_member_past_sprints_html(
             SELECT sprint_id, jira_sprint_id, sprint_name, start_date, end_date
               FROM sprints
              WHERE sprint_name LIKE ? || '%' AND date(end_date) < date('now')
+               AND COALESCE(is_placeholder, 0) = 0
              ORDER BY end_date DESC
              LIMIT 8
             """,
@@ -1575,6 +1993,10 @@ def _build_member_past_sprints_html(
                 (s['sprint_id'], dev_id, *EXCLUDED_STATUSES),
             )
             tickets = [dict(r) for r in cursor.fetchall()]
+            # Strip the cross-sprint "_s<jira_sprint_id>" suffix on rolled-over
+            # Story/Bug rows so the link text shows the bare Jira key.
+            for t in tickets:
+                t['ticket_key'] = t['ticket_key'].split('_s', 1)[0]
             if not tickets:
                 continue
 
@@ -1624,16 +2046,16 @@ def _build_member_past_sprints_html(
             rows = []
             for t in tickets:
                 sp = _format_sp(t['story_points'] or 0.0)
-                type_color = '#fbbf24' if t['issue_type'] == 'Bug' else '#94a3b8'
+                type_color = '#fbbf24' if t['issue_type'] == 'Bug' else '#8194a6'
                 rows.append(f"""
-                                <div style="background: #1e293b; border-left: 3px solid #475569; border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                                <div style="background: #131c27; border-left: 3px solid #243340; border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
                                     <div style="flex: 1; min-width: 0;">
-                                        <a href="{html.escape(t['ticket_url'] or '')}" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600; font-size: 13px;">{html.escape(t['ticket_key'])}</a>
+                                        <a href="{html.escape(t['ticket_url'] or '')}" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600; font-size: 13px;">{html.escape(t['ticket_key'])}</a>
                                         <span style="color: {type_color}; font-size: 10px; font-weight: 600; margin-left: 6px;">{html.escape(t['issue_type'] or '')}</span>
-                                        <span style="color: #e2e8f0; margin-left: 8px;">{html.escape(t['summary'] or '')}</span>
+                                        <span style="color: #cdd9e5; margin-left: 8px;">{html.escape(t['summary'] or '')}</span>
                                     </div>
                                     <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0;">
-                                        <span style="color: #cbd5e1; font-size: 12px; font-variant-numeric: tabular-nums;">{sp} SP</span>
+                                        <span style="color: #cdd9e5; font-size: 12px; font-variant-numeric: tabular-nums;">{sp} SP</span>
                                         {_status_badge(t['sprint_end_status'])}
                                     </div>
                                 </div>
@@ -1693,15 +2115,15 @@ def _build_member_past_sprints_html(
                                 </div>
                                 <div class="perf-metric">
                                     <div class="perf-metric-label">Completed SP</div>
-                                    <div class="perf-metric-value" style="color: #10b981;">{_format_sp(completed_sp)}</div>
+                                    <div class="perf-metric-value" style="color: #2dd4a7;">{_format_sp(completed_sp)}</div>
                                 </div>
                                 <div class="perf-metric">
                                     <div class="perf-metric-label">In Progress SP</div>
-                                    <div class="perf-metric-value" style="color: #f59e0b;">{_format_sp(in_progress_sp)}</div>
+                                    <div class="perf-metric-value" style="color: #fbbf24;">{_format_sp(in_progress_sp)}</div>
                                 </div>
                                 <div class="perf-metric">
                                     <div class="perf-metric-label">To Do SP</div>
-                                    <div class="perf-metric-value" style="color: #3b82f6;">{_format_sp(todo_sp)}</div>
+                                    <div class="perf-metric-value" style="color: #38bdf8;">{_format_sp(todo_sp)}</div>
                                 </div>
                                 <div class="perf-metric" title="Story points completed per week during this sprint">
                                     <div class="perf-metric-label">SP Throughput</div>
@@ -1819,14 +2241,14 @@ def generate_team_members_html(config: dict, output_path: Path):
     def _render_page(active_dev_name, card_html, page_title):
         header = f"""
         <style>
-            details.member-current-sprint {{ background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px 16px; margin: 14px 0; }}
+            details.member-current-sprint {{ background: #131c27; border: 1px solid #1a2430; border-radius: 8px; padding: 12px 16px; margin: 14px 0; }}
             details.member-current-sprint > summary {{ list-style: none; cursor: pointer; outline: none; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }}
             details.member-current-sprint > summary::-webkit-details-marker {{ display: none; }}
-            details.member-current-sprint .member-current-sprint-chevron {{ display: inline-block; width: 10px; color: #94a3b8; transition: transform 0.15s; }}
+            details.member-current-sprint .member-current-sprint-chevron {{ display: inline-block; width: 10px; color: #8194a6; transition: transform 0.15s; }}
             details.member-current-sprint[open] .member-current-sprint-chevron {{ transform: rotate(90deg); }}
-            details.member-current-sprint > summary:hover .member-current-sprint-chevron {{ color: #cbd5e1; }}
-            details.member-current-sprint .member-current-sprint-title {{ font-size: 15px; font-weight: 600; color: #f1f5f9; }}
-            details.member-current-sprint .member-current-sprint-meta {{ color: #94a3b8; font-size: 12px; margin-left: auto; }}
+            details.member-current-sprint > summary:hover .member-current-sprint-chevron {{ color: #cdd9e5; }}
+            details.member-current-sprint .member-current-sprint-title {{ font-size: 15px; font-weight: 600; color: #f4f8fb; }}
+            details.member-current-sprint .member-current-sprint-meta {{ color: #8194a6; font-size: 12px; margin-left: auto; }}
             details.member-current-sprint .member-current-sprint-body {{ margin-top: 14px; }}
         </style>
         <header>
@@ -1865,6 +2287,7 @@ def generate_team_members_html(config: dict, output_path: Path):
               JOIN sprints s ON s.sprint_id = t.sprint_id
              WHERE s.sprint_name LIKE ? || '%'
                AND date(s.end_date) < date('now')
+               AND COALESCE(s.is_placeholder, 0) = 0
                AND t.assignee_account_id IS NOT NULL
                AND t.issue_type IN ('Story', 'Bug')
                AND t.status NOT IN ({excl_ph})
@@ -1942,441 +2365,740 @@ def generate_team_members_html(config: dict, output_path: Path):
 
 
 
+def _render_sprint_completion_bar_chart(db_path: str, sprint_prefix: str, config: dict, *, current_sprint_id: int | None) -> str:
+    """Render a sprint-over-sprint story-point completion bar chart.
+
+    Each bar is a sprint: solid green for SP completed (status_at_sprint_end
+    in CLOSED_STATUSES), faded grey for the remainder of committed SP. Active
+    sprints use live status (no snapshot yet), closed sprints use the sprint-end
+    snapshot — same source-of-truth as the Sprint Reports page so a sprint's
+    bar reads the same here as it does there. Counts every assignee (BE, FE,
+    and unassigned/other) so the bar matches the per-sprint banners below and
+    the Sprint Reports page.
+    """
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT sprint_id, sprint_name, start_date, end_date, state
+              FROM sprints
+             WHERE sprint_name LIKE ? || '%'
+               AND COALESCE(is_placeholder, 0) = 0
+               AND (state = 'closed'
+                    OR sprint_id = ?
+                    OR (state = 'active' AND date(end_date) >= date('now')))
+             ORDER BY end_date DESC
+             LIMIT 12
+            """,
+            (sprint_prefix, current_sprint_id or -1),
+        )
+        sprint_rows = [dict(r) for r in cursor.fetchall()]
+        if not sprint_rows:
+            return ''
+        sprint_rows.reverse()  # chronological L→R
+
+        bars = []
+        # Restrict to the buckets the per-sprint banners use so the SP totals
+        # reconcile exactly between the bar and each sprint's <details> banner.
+        # Counts ALL assignees (no BE/FE filter) so the bar also matches the
+        # Sprint Reports page.
+        bar_known = list(set(CLOSED_STATUSES) | set(IN_PROGRESS_STATUSES) | set(OPEN_STATUSES))
+        bar_ph = sql_placeholders(bar_known)
+        for s in sprint_rows:
+            cursor.execute(
+                f"""
+                SELECT COALESCE(status_at_sprint_end, status) AS sprint_end_status,
+                       status, story_points
+                  FROM tickets
+                 WHERE sprint_id = ?
+                   AND issue_type IN ('Story', 'Bug')
+                   AND COALESCE(status_at_sprint_end, status) IN ({bar_ph})
+                """,
+                (s['sprint_id'], *bar_known),
+            )
+            rows = cursor.fetchall()
+            committed = 0.0
+            completed = 0.0
+            for r in rows:
+                sp = r['story_points'] or 0.0
+                committed += sp
+                # Active sprint hasn't been snapshotted, so sprint_end_status
+                # falls back to live status via the COALESCE above — that's
+                # exactly what we want for the in-flight bar.
+                if r['sprint_end_status'] in CLOSED_STATUSES:
+                    completed += sp
+            bars.append({
+                'label': fmt_sprint_short(s['sprint_name']),
+                'committed': committed,
+                'completed': completed,
+                'is_active': s['sprint_id'] == current_sprint_id,
+            })
+    finally:
+        conn.close()
+
+    if not bars or all(b['committed'] == 0 for b in bars):
+        return ''
+
+    svg_w, svg_h = 900, 280
+    pad_l, pad_r, pad_t, pad_b = 52, 20, 32, 50
+    inner_w = svg_w - pad_l - pad_r
+    inner_h = svg_h - pad_t - pad_b
+    n = len(bars)
+    # Reserve 22% of the slot for inter-bar gutters; clamp to a sensible width.
+    slot_w = inner_w / n
+    bar_w = min(slot_w * 0.78, 64)
+
+    max_y = max((max(b['committed'], b['completed']) for b in bars), default=1) or 1
+    # Round up to a tidy multiple so tick labels don't read like 47.3 SP.
+    # The pad_t reservation above carries the headroom for the value label
+    # that sits over the tallest bar.
+    def _nice(v):
+        import math
+        if v <= 0:
+            return 1
+        magnitude = 10 ** math.floor(math.log10(v))
+        for m in (1, 2, 2.5, 5, 10):
+            cand = m * magnitude
+            if cand >= v:
+                return cand
+        return 10 * magnitude
+    axis_max = _nice(max_y)
+
+    def y_at(v):
+        return pad_t + (1 - v / axis_max) * inner_h
+
+    def x_center(i):
+        return pad_l + slot_w * (i + 0.5)
+
+    grid_svg, y_label_svg = '', ''
+    for i in range(5):
+        v = axis_max * (4 - i) / 4
+        y = y_at(v)
+        grid_svg += f'<line class="chart-grid-line" x1="{pad_l}" y1="{y:.1f}" x2="{svg_w - pad_r}" y2="{y:.1f}" />'
+        y_label_svg += f'<text x="{pad_l - 8}" y="{y + 4:.1f}" text-anchor="end" fill="#8194a6" font-size="11">{v:.0f} SP</text>'
+
+    bar_svg_parts = []
+    for i, b in enumerate(bars):
+        cx = x_center(i)
+        x_left = cx - bar_w / 2
+        committed_top = y_at(b['committed']) if b['committed'] > 0 else y_at(0)
+        completed_top = y_at(b['completed']) if b['completed'] > 0 else y_at(0)
+        baseline = y_at(0)
+        # Background bar = committed (faded). Foreground bar = completed (solid).
+        committed_h = baseline - committed_top
+        completed_h = baseline - completed_top
+        active_stroke = ' stroke="#7dd3fc" stroke-width="1.5"' if b['is_active'] else ''
+        if committed_h > 0.5:
+            bar_svg_parts.append(
+                f'<rect x="{x_left:.1f}" y="{committed_top:.1f}" width="{bar_w:.1f}" '
+                f'height="{committed_h:.1f}" fill="#243340" opacity="0.45" rx="3"{active_stroke} />'
+            )
+        if completed_h > 0.5:
+            bar_svg_parts.append(
+                f'<rect x="{x_left:.1f}" y="{completed_top:.1f}" width="{bar_w:.1f}" '
+                f'height="{completed_h:.1f}" fill="#2dd4a7" rx="3" />'
+            )
+        # Single label line above the taller of the two bars: "completed/committed (pct%)".
+        top_y = min(committed_top, completed_top)
+        pct = (b['completed'] / b['committed'] * 100) if b['committed'] > 0 else 0
+        bar_svg_parts.append(
+            f'<text x="{cx:.1f}" y="{top_y - 6:.1f}" text-anchor="middle" '
+            f'fill="#cdd9e5" font-size="11" font-weight="600">'
+            f'{_fmt_sp(b["completed"])}/{_fmt_sp(b["committed"])} '
+            f'<tspan fill="#8194a6" font-weight="500">({pct:.0f}%)</tspan>'
+            f'</text>'
+        )
+        # X-axis label (sprint short name); add an "(active)" suffix in muted text.
+        suffix = ' (active)' if b['is_active'] else ''
+        label = (b['label'] + suffix).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        bar_svg_parts.append(
+            f'<text x="{cx:.1f}" y="{svg_h - pad_b + 16:.1f}" text-anchor="middle" '
+            f'fill="#cdd9e5" font-size="11">{label}</text>'
+        )
+
+    bar_svg = ''.join(bar_svg_parts)
+
+    # 3-sprint trailing average of completed SP — a velocity trend line that
+    # smooths single-sprint noise into a capacity signal. We average over
+    # SETTLED sprints only: not the active sprint, and not its concurrent
+    # partner / any other sprint still showing 0 completed (e.g. the BE half
+    # of the current milestone, which is state='closed' in Jira but hasn't
+    # actually delivered yet). Including those would drag the line toward 0
+    # and misrepresent sustained capacity.
+    settled_idx = [
+        i for i, b in enumerate(bars)
+        if not b['is_active'] and b['completed'] > 0
+    ]
+    trend_svg = ''
+    avg_now = None
+    if len(settled_idx) >= 3:
+        pts = []
+        for pos, i in enumerate(settled_idx):
+            window = [bars[j]['completed'] for j in settled_idx[max(0, pos - 2):pos + 1]]
+            avg = sum(window) / len(window)
+            avg_now = avg
+            pts.append(f"{x_center(i):.1f},{y_at(avg):.1f}")
+        dots = ''.join(
+            f'<circle cx="{p.split(",")[0]}" cy="{p.split(",")[1]}" r="3" '
+            f'fill="#7dd3fc" stroke="#0f1620" stroke-width="1.5" />'
+            for p in pts
+        )
+        trend_svg = (
+            f'<polyline fill="none" stroke="#7dd3fc" stroke-width="2" '
+            f'stroke-dasharray="5,3" points="{" ".join(pts)}" />{dots}'
+        )
+
+    trend_legend = (
+        '<div><span class="swatch swatch-dashed" style="border-color:#7dd3fc;"></span>3-sprint avg (completed)</div>'
+        if trend_svg else ''
+    )
+    legend_html = (
+        '<div class="burndown-legend">'
+        '<div><span class="swatch swatch-solid" style="background:#2dd4a7;"></span>Completed SP</div>'
+        '<div><span class="swatch swatch-solid" style="background:#243340; opacity:0.45;"></span>Committed SP</div>'
+        '<div><span class="swatch swatch-solid" style="background:transparent; border:1.5px solid #7dd3fc;"></span>Active sprint</div>'
+        f'{trend_legend}'
+        '</div>'
+    )
+    avg_note = (
+        f'<div class="chart-subtitle">Sustained velocity (3-sprint avg): '
+        f'<strong>{_fmt_sp(avg_now)} SP/sprint</strong></div>'
+        if avg_now is not None else ''
+    )
+
+    return f"""
+        <div class="section" id="sp-completion-bars">
+            <div class="chart-container">
+                <div class="chart-title">📊 Story Points Completed — Sprint over Sprint</div>
+                {avg_note}
+                <div class="burndown-svg-wrap">
+                    <svg viewBox="0 0 {svg_w} {svg_h}" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 320px; display: block;">
+                        {grid_svg}
+                        {y_label_svg}
+                        <line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{svg_h - pad_b}" stroke="#243340" stroke-width="1" />
+                        <line x1="{pad_l}" y1="{svg_h - pad_b}" x2="{svg_w - pad_r}" y2="{svg_h - pad_b}" stroke="#243340" stroke-width="1" />
+                        {bar_svg}
+                        {trend_svg}
+                    </svg>
+                </div>
+                {legend_html}
+            </div>
+        </div>
+    """
+
+
+def _render_sp_sprint_block(sprint: dict, db_path: str, config: dict, *, is_active: bool) -> str:
+    """Render one collapsible story-points block for a single sprint.
+
+    Includes the BE/FE burndown chart (when daily snapshots exist) and the
+    BE/FE collapsed sub-sections with completed/in-progress/open ticket
+    accordions. The active sprint opens by default; closed sprints stay
+    collapsed so the page doesn't paint as one long scroll wall.
+    """
+    sprint_id = sprint['sprint_id']
+    burndown = get_sprint_burndown(db_path, sprint_id)
+
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    try:
+        # ID suffix scopes accordion-panel ids per sprint so toggling one
+        # sprint's "Completed" panel doesn't fight with another's.
+        id_suffix = f"-{sprint_id}"
+        burndown_html = ""
+
+        # Story-points burndown chart — working-days only, with BE/FE series.
+        # Only renders when developer_snapshots have daily rows for the sprint.
+        if burndown and len(burndown) > 0:
+            from collections import defaultdict
+
+            start_date = parse_iso_tz(sprint['start_date']).date()
+            end_date = parse_iso_tz(sprint['end_date']).date()
+            today = datetime.now().date()
+
+            axes = _build_burndown_axes(start_date, end_date, today)
+            wd_total = axes['wd_total']
+            wd_elapsed = axes['wd_elapsed']
+            days_remaining = axes['days_remaining']
+            wd_index_for = axes['wd_index_for']
+            working_days = axes['working_days']
+
+            def _remaining(day):
+                return day.get('remaining_story_points', day.get('total_story_points', 0)) or 0
+
+            burndown_in_sprint = [
+                d for d in burndown
+                if datetime.fromisoformat(d['snapshot_date']).date() >= start_date
+            ]
+            if not burndown_in_sprint:
+                burndown_in_sprint = burndown
+
+            burndown_by_date_sp = {
+                datetime.fromisoformat(d['snapshot_date']).date(): d
+                for d in burndown_in_sprint
+            }
+
+            cursor.execute(
+                "SELECT COALESCE(SUM(story_points), 0) FROM tickets "
+                "WHERE sprint_id = ? AND issue_type = 'Story'",
+                (sprint_id,),
+            )
+            sprint_story_total = cursor.fetchone()[0] or 0
+            start_remaining_sp = _remaining(burndown_in_sprint[0]) if _remaining(burndown_in_sprint[0]) > 0 else sprint_story_total
+            current_remaining_sp = _remaining(burndown_in_sprint[-1])
+            ideal_remaining_today = start_remaining_sp - (start_remaining_sp / wd_total) * wd_elapsed if wd_total > 0 else 0
+            ahead_behind = ideal_remaining_today - current_remaining_sp
+
+            _, id_to_role = _build_role_maps(config)
+            conn_dev = get_connection(db_path)
+            c_dev = conn_dev.cursor()
+            c_dev.execute(
+                "SELECT developer_id, snapshot_date, assigned_story_points, remaining_story_points "
+                "FROM developer_snapshots WHERE sprint_id = ? AND snapshot_date >= ? ORDER BY snapshot_date",
+                (sprint_id, start_date.isoformat()),
+            )
+            role_sp_by_date: dict[str, dict[str, float]] = defaultdict(lambda: {'BE': 0.0, 'FE': 0.0})
+            role_assigned_by_date: dict[str, dict[str, float]] = defaultdict(lambda: {'BE': 0.0, 'FE': 0.0})
+            for row in c_dev.fetchall():
+                role = id_to_role.get(row['developer_id'])
+                if role in ('BE', 'FE'):
+                    role_sp_by_date[row['snapshot_date']][role] += row['remaining_story_points'] or 0
+                    role_assigned_by_date[row['snapshot_date']][role] += row['assigned_story_points'] or 0
+            conn_dev.close()
+
+            be_by_date = {datetime.fromisoformat(ds).date(): v['BE'] for ds, v in role_sp_by_date.items()}
+            fe_by_date = {datetime.fromisoformat(ds).date(): v['FE'] for ds, v in role_sp_by_date.items()}
+            be_assigned_by_date = {datetime.fromisoformat(ds).date(): v['BE'] for ds, v in role_assigned_by_date.items()}
+            fe_assigned_by_date = {datetime.fromisoformat(ds).date(): v['FE'] for ds, v in role_assigned_by_date.items()}
+
+            start_be = be_by_date.get(min(be_by_date, default=start_date), 0) if be_by_date else 0
+            start_fe = fe_by_date.get(min(fe_by_date, default=start_date), 0) if fe_by_date else 0
+            current_be = be_by_date.get(max(be_by_date, default=start_date), 0) if be_by_date else 0
+            current_fe = fe_by_date.get(max(fe_by_date, default=start_date), 0) if fe_by_date else 0
+            total_be = be_assigned_by_date.get(max(be_assigned_by_date, default=start_date), 0) if be_assigned_by_date else 0
+            total_fe = fe_assigned_by_date.get(max(fe_assigned_by_date, default=start_date), 0) if fe_assigned_by_date else 0
+            start_total_be = be_assigned_by_date.get(min(be_assigned_by_date, default=start_date), 0) if be_assigned_by_date else 0
+            start_total_fe = fe_assigned_by_date.get(min(fe_assigned_by_date, default=start_date), 0) if fe_assigned_by_date else 0
+
+            svg_w, svg_h = 900, 280
+            pad_l, pad_r, pad_t, pad_b = 52, 20, 18, 34
+            inner_w = svg_w - pad_l - pad_r
+            inner_h = svg_h - pad_t - pad_b
+            max_sp_axis = max(
+                start_remaining_sp,
+                max((_remaining(d) for d in burndown_in_sprint), default=start_remaining_sp),
+                start_be, start_fe,
+            )
+            if max_sp_axis <= 0:
+                max_sp_axis = 1
+
+            def x_at(off):
+                return pad_l + (off / wd_total) * inner_w if wd_total > 0 else pad_l
+
+            def y_at(v):
+                return pad_t + (1 - v / max_sp_axis) * inner_h
+
+            axes['y_ticks'] = [
+                (y_at(max_sp_axis * (4 - i) / 4), f"{max_sp_axis * (4 - i) / 4:.0f} SP")
+                for i in range(5)
+            ]
+            if wd_total <= 10:
+                x_ticks_idx = list(range(wd_total + 1))
+            else:
+                step = max(1, wd_total // 7)
+                x_ticks_idx = list(range(0, wd_total + 1, step))
+                if wd_total not in x_ticks_idx:
+                    x_ticks_idx.append(wd_total)
+            axes['x_ticks'] = [
+                (x_at(idx), f"{working_days[min(idx, len(working_days)-1)].month}/{working_days[min(idx, len(working_days)-1)].day}")
+                for idx in x_ticks_idx
+            ]
+
+            def _series(date_map, value_fn=lambda v: v):
+                seen, pts, dots = set(), [], []
+                for d in sorted(date_map):
+                    xidx = wd_index_for(d)
+                    if xidx in seen:
+                        continue
+                    seen.add(xidx)
+                    yv = value_fn(date_map[d])
+                    pts.append(f"{x_at(xidx):.1f},{y_at(yv):.1f}")
+                    dots.append((x_at(xidx), y_at(yv)))
+                return pts, dots
+
+            combined_points, _ = _series(burndown_by_date_sp, value_fn=_remaining)
+            be_points, be_dots = _series(be_by_date)
+            fe_points, fe_dots = _series(fe_by_date)
+
+            ideal_points = [
+                f"{x_at(0):.1f},{y_at(start_remaining_sp):.1f}",
+                f"{x_at(wd_total):.1f},{y_at(0):.1f}",
+            ]
+
+            extra_series = []
+            if start_be > 0:
+                extra_series.append({
+                    'name': 'BE Ideal',
+                    'points': [f"{x_at(0):.1f},{y_at(start_be):.1f}", f"{x_at(wd_total):.1f},{y_at(0):.1f}"],
+                    'color': '#2dd4a7', 'stroke_width': 1.5, 'dasharray': '4,4', 'opacity': 0.4,
+                })
+            if start_fe > 0:
+                extra_series.append({
+                    'name': 'FE Ideal',
+                    'points': [f"{x_at(0):.1f},{y_at(start_fe):.1f}", f"{x_at(wd_total):.1f},{y_at(0):.1f}"],
+                    'color': '#c4b5fd', 'stroke_width': 1.5, 'dasharray': '4,4', 'opacity': 0.4,
+                })
+            if combined_points:
+                extra_series.append({
+                    'name': 'Combined Actual',
+                    'points': combined_points,
+                    'color': '#243340', 'stroke_width': 1.5, 'dasharray': '2,3', 'opacity': 0.5,
+                })
+
+            be_series = {'name': 'BE Actual', 'points': be_points, 'dots': be_dots, 'color': '#2dd4a7'}
+            fe_series = {'name': 'FE Actual', 'points': fe_points, 'dots': fe_dots, 'color': '#c4b5fd'}
+
+            if ahead_behind > 0.5:
+                pace_label = f"<span style='color: #6ee7c3;'>↑ {ahead_behind:.1f} SP ahead</span>"
+            elif ahead_behind < -0.5:
+                pace_label = f"<span style='color: #fda4a0;'>↓ {abs(ahead_behind):.1f} SP behind</span>"
+            else:
+                pace_label = "<span style='color: #cdd9e5;'>on pace</span>"
+
+            scope_added = (total_be + total_fe) - (start_total_be + start_total_fe)
+            if scope_added > 0.5:
+                pace_vs_original = ahead_behind + scope_added
+                if pace_vs_original < -0.5:
+                    pace_sub = f'+{scope_added:.0f} scope · {abs(pace_vs_original):.0f} SP behind original plan'
+                elif pace_vs_original > 0.5:
+                    pace_sub = f'+{scope_added:.0f} scope · {pace_vs_original:.0f} SP ahead of original plan'
+                else:
+                    pace_sub = f'+{scope_added:.0f} scope · on pace vs original plan'
+            else:
+                pace_sub = f'ideal: {ideal_remaining_today:.0f} SP remaining'
+
+            burndown_html = _render_burndown_chart(
+                title='📈 Story Points Burndown — BE &amp; FE',
+                section_id=f'sp-burndown-chart{id_suffix}',
+                axes=axes,
+                series=extra_series + [be_series, fe_series],
+                summary_cards=[
+                    {
+                        'label': '⚙️ BE Remaining',
+                        'value': f'{current_be:.0f} SP',
+                        'sub': (
+                            f'of {total_be:.0f} SP committed'
+                            + (f' (+{total_be - start_total_be:.0f} added)' if total_be - start_total_be > 0.5 else '')
+                        ),
+                        'color': '#2dd4a7',
+                    },
+                    {
+                        'label': '🎨 FE Remaining',
+                        'value': f'{current_fe:.0f} SP',
+                        'sub': (
+                            f'of {total_fe:.0f} SP committed'
+                            + (f' (+{total_fe - start_total_fe:.0f} added)' if total_fe - start_total_fe > 0.5 else '')
+                        ),
+                        'color': '#c4b5fd',
+                    },
+                    {'label': 'Overall Pace', 'value': pace_label, 'sub': pace_sub},
+                    {'label': 'Time Left', 'value': f'{days_remaining}d', 'sub': f'working day {wd_elapsed + 1} of {wd_total + 1}'},
+                ],
+                legend=[
+                    {'kind': 'solid', 'color': '#2dd4a7', 'label': 'BE Actual'},
+                    {'kind': 'dashed', 'color': '#2dd4a7', 'label': 'BE Ideal'},
+                    {'kind': 'solid', 'color': '#c4b5fd', 'label': 'FE Actual'},
+                    {'kind': 'dashed', 'color': '#c4b5fd', 'label': 'FE Ideal'},
+                    {'kind': 'dashed', 'color': '#243340', 'label': 'Combined'},
+                    {'kind': 'dashed', 'color': '#56cdf9', 'label': 'Today'},
+                ],
+                ideal_points=ideal_points,
+                today_in_sprint=(start_date <= today <= end_date),
+            )
+
+        # Collect tickets by status with story points (Stories+Bugs).
+        # Closed sprints use status_at_sprint_end so ticket placement reflects
+        # how the sprint actually ended; the active sprint falls back to live
+        # status via COALESCE so the in-flight numbers read "now."
+        closed_set = set(CLOSED_STATUSES)
+        inprog_set = set(IN_PROGRESS_STATUSES)
+        open_set = set(OPEN_STATUSES)
+        all_statuses = list(closed_set | inprog_set | open_set)
+        placeholders = ",".join("?" for _ in all_statuses)
+        cursor.execute(
+            f"""
+            SELECT ticket_key, summary, ticket_url, assignee_display_name, status,
+                   COALESCE(status_at_sprint_end, status) AS sprint_end_status,
+                   story_points, issue_type
+            FROM tickets
+            WHERE sprint_id = ?
+              AND issue_type IN ('Story', 'Bug')
+              AND COALESCE(status_at_sprint_end, status) IN ({placeholders})
+            ORDER BY story_points DESC, ticket_key
+            """,
+            [sprint_id] + all_statuses,
+        )
+        sp_rows = [
+            {
+                'ticket_key': r[0],
+                'summary': r[1],
+                'ticket_url': r[2],
+                'assignee': r[3],
+                'status': r[4],
+                'sprint_end_status': r[5],
+                'story_points': r[6] or 0,
+                'issue_type': r[7],
+            }
+            for r in cursor.fetchall()
+        ]
+
+        closed_tickets = [t for t in sp_rows if t['sprint_end_status'] in closed_set]
+        in_progress_tickets = [t for t in sp_rows if t['sprint_end_status'] in inprog_set]
+        open_tickets = [t for t in sp_rows if t['sprint_end_status'] in open_set]
+
+        name_to_role, _ = _build_role_maps(config)
+        closed_by_role = _partition_tickets_by_role(closed_tickets, name_to_role, assignee_key='assignee')
+        inprog_by_role = _partition_tickets_by_role(in_progress_tickets, name_to_role, assignee_key='assignee')
+        open_by_role = _partition_tickets_by_role(open_tickets, name_to_role, assignee_key='assignee')
+        sp_role_m = _role_sp_metrics(closed_by_role, inprog_by_role, open_by_role)
+
+        # Sum across ALL reported roles (BE+FE+other) so the banner total
+        # equals the sum of the role blocks below and reconciles with the
+        # Sprint Reports page (which counts every assignee).
+        banner_completed = sum(sp_role_m[r]['completed'] for r in _REPORTED_ROLES)
+        banner_in_progress = sum(sp_role_m[r]['in_progress'] for r in _REPORTED_ROLES)
+        banner_open = sum(sp_role_m[r]['open'] for r in _REPORTED_ROLES)
+        banner_total = banner_completed + banner_in_progress + banner_open
+        banner_remaining = banner_in_progress + banner_open
+        banner_completion = (banner_completed / banner_total * 100) if banner_total > 0 else 0
+
+        banner_html = (
+            f'<span class="epic-sprint-stat" style="color: #2dd4a7;">{_fmt_sp(banner_completed)} <small>done</small></span>'
+            f'<span class="epic-sprint-stat" style="color: #fbbf24;">{_fmt_sp(banner_remaining)} <small>remaining</small></span>'
+            f'<span class="epic-sprint-stat" style="color: #38bdf8;">{_fmt_sp(banner_total)} <small>total SP</small></span>'
+            f'<span class="epic-sprint-stat" style="color: #7dd3fc;">{banner_completion:.0f}% <small>complete</small></span>'
+            f'{_scope_change_chip(db_path, sprint_id)}'
+        )
+
+        # Empty closed sprints get the same dimmed treatment as elsewhere on
+        # the dashboard so a glance tells you "nothing here."
+        is_empty = banner_total == 0
+        empty_class = ' epic-sprint-empty' if is_empty else ''
+        open_attr = ' open' if is_active else ''
+
+        out = f"""
+            <details class="epic-sprint-block{empty_class}"{open_attr}>
+                <summary class="epic-sprint-summary">
+                    <span class="epic-sprint-caret">▸</span>
+                    <span class="epic-sprint-name">{fmt_sprint_long(sprint['sprint_name'])}</span>
+                    <span class="epic-sprint-counts">{banner_html}</span>
+                </summary>
+                <div class="epic-sprint-body">
+                    {burndown_html}
+        """
+
+        if is_empty:
+            out += (
+                '<div style="color:var(--text-muted); font-size:13px; '
+                'font-style:italic; padding:8px 4px;">No tickets recorded for this sprint.</div>'
+            )
+
+        sp_role_config = [
+            ('BE', 'sp-be', '⚙️ Backend'),
+            ('FE', 'sp-fe', '🎨 Frontend'),
+            ('other', 'sp-other', '👥 Other / Unassigned'),
+        ]
+        role_color = {'BE': '#2dd4a7', 'FE': '#c4b5fd', 'other': '#8194a6'}
+        for role, rid_base, role_label in sp_role_config:
+            rm = sp_role_m[role]
+            # Only surface the catch-all block when it actually holds work —
+            # an empty "Other" row is noise on every well-rostered sprint.
+            if role == 'other' and rm['total'] == 0:
+                continue
+            rid = f"{rid_base}{id_suffix}"
+            r_closed = closed_by_role[role]
+            r_inprog = inprog_by_role[role]
+            r_open = open_by_role[role]
+            role_key = role.lower()
+            accent = role_color.get(role, '#38bdf8')
+
+            out += f"""
+                <details class="epic-role-block role-{role_key}">
+                    <summary class="epic-role-summary">
+                        <span class="epic-role-caret">▸</span>
+                        <span class="epic-role-name">{role_label}</span>
+                        <span class="epic-role-counts">
+                            <span class="epic-role-stat" style="color: #2dd4a7;">{_fmt_sp(rm['completed'])} <small>done</small></span>
+                            <span class="epic-role-stat" style="color: #fbbf24;">{_fmt_sp(rm['in_progress'])} <small>in progress</small></span>
+                            <span class="epic-role-stat" style="color: #38bdf8;">{_fmt_sp(rm['open'])} <small>open</small></span>
+                            <span class="epic-role-stat" style="color: {accent};">{_fmt_sp(rm['total'])} <small>total SP</small></span>
+                            <span class="epic-role-stat" style="color: #7dd3fc;">{rm['completion']:.0f}% <small>complete</small></span>
+                        </span>
+                    </summary>
+                    <div class="epic-role-body">
+                        <div class="metrics-grid">
+                            <button type="button" class="metric-card success" onclick="toggleAccordion('{rid}-closed-panel')" aria-controls="{rid}-closed-panel" aria-expanded="false">
+                                <div class="metric-label">Completed</div>
+                                <div class="metric-value clickable">{rm['completed']:.1f}</div>
+                                <div class="metric-subtext">{rm['completion']:.1f}% complete · Click to view</div>
+                            </button>
+                            <button type="button" class="metric-card warning" onclick="toggleAccordion('{rid}-inprogress-panel')" aria-controls="{rid}-inprogress-panel" aria-expanded="false">
+                                <div class="metric-label">In Progress</div>
+                                <div class="metric-value clickable">{rm['in_progress']:.1f}</div>
+                                <div class="metric-subtext">Click to view</div>
+                            </button>
+                            <button type="button" class="metric-card info" onclick="toggleAccordion('{rid}-open-panel')" aria-controls="{rid}-open-panel" aria-expanded="false">
+                                <div class="metric-label">Not Started</div>
+                                <div class="metric-value clickable">{rm['open']:.1f}</div>
+                                <div class="metric-subtext">Click to view</div>
+                            </button>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {rm['completion']}%"></div>
+                        </div>
+
+                        <div id="{rid}-closed-panel" class="accordion-panel">
+                            <div class="accordion-content">
+                                <div class="accordion-header">✅ Completed Tickets ({len(r_closed)} tickets, {rm['completed']:.1f} SP)</div>
+                                <div class="ticket-grid">
+            """
+
+            for ticket in r_closed:
+                sp_badge = f"<span style='color: #2dd4a7; font-weight: 600; margin-left: 8px;'>{ticket['story_points']:.1f} SP</span>" if ticket['story_points'] > 0 else ""
+                out += f"""
+                                    <div class="ticket-item">
+                                        <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
+                                        {ticket['summary']}
+                                        {sp_badge}
+                                        <span style="color: #566375; font-size: 12px;"> • {ticket['assignee'] or 'Unassigned'}</span>
+                                    </div>
+                """
+
+            out += f"""
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="{rid}-inprogress-panel" class="accordion-panel">
+                            <div class="accordion-content">
+                                <div class="accordion-header">🔄 In Progress Tickets ({len(r_inprog)} tickets, {rm['in_progress']:.1f} SP)</div>
+                                <div class="ticket-grid">
+            """
+
+            for ticket in r_inprog:
+                sp_badge = f"<span style='color: #fbbf24; font-weight: 600; margin-left: 8px;'>{ticket['story_points']:.1f} SP</span>" if ticket['story_points'] > 0 else ""
+                out += f"""
+                                    <div class="ticket-item">
+                                        <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
+                                        {ticket['summary']}
+                                        {sp_badge}
+                                        <span style="color: #566375; font-size: 12px;"> • {ticket['assignee'] or 'Unassigned'} • {ticket['status']}</span>
+                                    </div>
+                """
+
+            out += f"""
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="{rid}-open-panel" class="accordion-panel">
+                            <div class="accordion-content">
+                                <div class="accordion-header">📋 Open / To Do Tickets ({len(r_open)} tickets, {rm['open']:.1f} SP)</div>
+                                <div class="ticket-grid">
+            """
+
+            for ticket in r_open:
+                sp_badge = f"<span style='color: #38bdf8; font-weight: 600; margin-left: 8px;'>{ticket['story_points']:.1f} SP</span>" if ticket['story_points'] > 0 else ""
+                out += f"""
+                                    <div class="ticket-item">
+                                        <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
+                                        {ticket['summary']}
+                                        {sp_badge}
+                                        <span style="color: #566375; font-size: 12px;"> • {ticket['assignee'] or 'Unassigned'} • {ticket['status']}</span>
+                                    </div>
+                """
+
+            out += """
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            """
+
+        out += """
+                </div>
+            </details>
+        """
+        return out
+    finally:
+        conn.close()
+
+
 def generate_story_points_html(config: dict, output_path: Path):
     """Generate HTML story points dashboard."""
     db_path = config['database']['path']
     sprint_prefix = config['jira']['sprint_prefix']
 
-    sprint = get_current_sprint(db_path, sprint_prefix)
-    if not sprint:
-        print("No active sprint found")
-        return
+    active_sprint = get_current_sprint(db_path, sprint_prefix)
 
-    metrics = get_sprint_metrics(db_path, sprint['sprint_id'])
-    if not metrics:
-        print("No metrics found for sprint")
-        return
-
-    # Get burndown data
-    burndown = get_sprint_burndown(db_path, sprint['sprint_id'])
-
-    # Get tickets grouped by status with story points
+    # Pull every FNTSY sprint (active + closed) so each gets its own
+    # collapsible block on the page. Newest-first: the active sprint sits
+    # at the top of the list and the rest read backwards through history.
     conn = get_connection(db_path)
     cursor = conn.cursor()
-
-    closed_statuses = list(CLOSED_STATUSES)
-    in_progress_statuses = list(IN_PROGRESS_STATUSES)
-    open_statuses = list(OPEN_STATUSES)
-
-    def _sum_sp_in(statuses):
+    try:
         cursor.execute(
-            "SELECT COALESCE(SUM(story_points), 0) FROM tickets "
-            "WHERE sprint_id = ? AND issue_type = 'Story' AND status IN ({})".format(
-                ','.join(['?' for _ in statuses])
-            ),
-            [sprint['sprint_id']] + statuses,
+            """
+            SELECT sprint_id, jira_sprint_id, sprint_name, state, start_date, end_date, goal
+              FROM sprints
+             WHERE sprint_name LIKE ? || '%'
+               AND COALESCE(is_placeholder, 0) = 0
+               AND state IN ('active', 'closed')
+             ORDER BY start_date DESC
+            """,
+            (sprint_prefix,),
         )
-        return cursor.fetchone()[0] or 0
+        all_sprints = [dict(r) for r in cursor.fetchall()]
+    finally:
+        conn.close()
 
-    # Recompute story-point totals directly from tickets (excluding Abandoned/Duplicate)
-    # so the dashboard's Total matches the sum of its Completed + In Progress + Open buckets.
-    completed_sp = _sum_sp_in(closed_statuses)
-    in_progress_sp = _sum_sp_in(in_progress_statuses)
-    open_sp = _sum_sp_in(open_statuses)
-    total_sp = completed_sp + in_progress_sp + open_sp
-    remaining_sp = in_progress_sp + open_sp
-    completion = (completed_sp / total_sp * 100) if total_sp > 0 else 0
+    if not all_sprints:
+        print("No sprints found")
+        return
 
-    # Build content. The burndown block is accumulated separately and spliced
-    # in via the <!--BURNDOWN_PLACEHOLDER--> marker below, so it lands at the
-    # top of the content area regardless of where it's built.
+    # Header subtitle stays anchored to the active sprint; the bar chart
+    # above the list still scopes its "active" outline by current_sprint_id.
+    header_sprint = active_sprint or all_sprints[0]
+    active_sprint_id = active_sprint['sprint_id'] if active_sprint else None
+
     nav_menu = generate_nav_menu('story-points')
-    burndown_html = ""
+    completion_bar_chart_html = _render_sprint_completion_bar_chart(
+        db_path, sprint_prefix, config, current_sprint_id=active_sprint_id,
+    )
+
+    sprint_blocks_html = ''.join(
+        _render_sp_sprint_block(
+            s, db_path, config,
+            is_active=(s['sprint_id'] == active_sprint_id),
+        )
+        for s in all_sprints
+    )
+
     content = f"""
         <header>
             <h1>📊 Story Points Dashboard</h1>
-            <div class="subtitle">{fmt_sprint_long(sprint['sprint_name'])} • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
+            <div class="subtitle">{fmt_sprint_long(header_sprint['sprint_name'])} • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
         </header>
         {nav_menu}
         <div class="content">
             <div class="intro-banner">
-                <p>Sprint progress measured by story points instead of ticket count. Story points provide a more accurate measure of work complexity and effort.</p>
+                <p>Sprint progress measured by story points instead of ticket count. Story points provide a more accurate measure of work complexity and effort. The active sprint expands by default; closed sprints stay collapsed.</p>
             </div>
-            <!--BURNDOWN_PLACEHOLDER-->
 
-            <div class="section">
-    """
+            {completion_bar_chart_html}
 
-    # Story-points burndown chart — working-days only, with BE and FE series.
-    if burndown and len(burndown) > 0:
-        from collections import defaultdict
-
-        start_date = parse_iso_tz(sprint['start_date']).date()
-        end_date = parse_iso_tz(sprint['end_date']).date()
-        today = datetime.now().date()
-
-        axes = _build_burndown_axes(start_date, end_date, today)
-        wd_total = axes['wd_total']
-        wd_elapsed = axes['wd_elapsed']
-        days_remaining = axes['days_remaining']
-        wd_index_for = axes['wd_index_for']
-        working_days = axes['working_days']
-
-        def _remaining(day):
-            return day.get('remaining_story_points', day.get('total_story_points', 0)) or 0
-
-        burndown_in_sprint = [
-            d for d in burndown
-            if datetime.fromisoformat(d['snapshot_date']).date() >= start_date
-        ]
-        if not burndown_in_sprint:
-            burndown_in_sprint = burndown
-
-        burndown_by_date_sp = {
-            datetime.fromisoformat(d['snapshot_date']).date(): d
-            for d in burndown_in_sprint
-        }
-
-        start_remaining_sp = _remaining(burndown_in_sprint[0]) if _remaining(burndown_in_sprint[0]) > 0 else total_sp
-        current_remaining_sp = _remaining(burndown_in_sprint[-1])
-        ideal_remaining_today = start_remaining_sp - (start_remaining_sp / wd_total) * wd_elapsed
-        ahead_behind = ideal_remaining_today - current_remaining_sp
-
-        # Per-role daily remaining SP.
-        _, id_to_role = _build_role_maps(config)
-        conn_dev = get_connection(db_path)
-        c_dev = conn_dev.cursor()
-        c_dev.execute(
-            "SELECT developer_id, snapshot_date, assigned_story_points, remaining_story_points "
-            "FROM developer_snapshots WHERE sprint_id = ? AND snapshot_date >= ? ORDER BY snapshot_date",
-            (sprint['sprint_id'], start_date.isoformat()),
-        )
-        role_sp_by_date: dict[str, dict[str, float]] = defaultdict(lambda: {'BE': 0.0, 'FE': 0.0})
-        # Track assigned (committed) SP per role per day too so the summary
-        # cards can show "remaining of currently-committed" — without this
-        # the sub-line uses the day-1 total and reads as "66 of 48 SP" the
-        # moment scope is added mid-sprint.
-        role_assigned_by_date: dict[str, dict[str, float]] = defaultdict(lambda: {'BE': 0.0, 'FE': 0.0})
-        for row in c_dev.fetchall():
-            role = id_to_role.get(row['developer_id'])
-            if role in ('BE', 'FE'):
-                role_sp_by_date[row['snapshot_date']][role] += row['remaining_story_points'] or 0
-                role_assigned_by_date[row['snapshot_date']][role] += row['assigned_story_points'] or 0
-        conn_dev.close()
-
-        be_by_date = {datetime.fromisoformat(ds).date(): v['BE'] for ds, v in role_sp_by_date.items()}
-        fe_by_date = {datetime.fromisoformat(ds).date(): v['FE'] for ds, v in role_sp_by_date.items()}
-        be_assigned_by_date = {datetime.fromisoformat(ds).date(): v['BE'] for ds, v in role_assigned_by_date.items()}
-        fe_assigned_by_date = {datetime.fromisoformat(ds).date(): v['FE'] for ds, v in role_assigned_by_date.items()}
-
-        start_be = be_by_date.get(min(be_by_date, default=start_date), 0) if be_by_date else 0
-        start_fe = fe_by_date.get(min(fe_by_date, default=start_date), 0) if fe_by_date else 0
-        current_be = be_by_date.get(max(be_by_date, default=start_date), 0) if be_by_date else 0
-        current_fe = fe_by_date.get(max(fe_by_date, default=start_date), 0) if fe_by_date else 0
-        # Total currently committed by role (remaining + done). This is the
-        # honest denominator for the summary card — always ≥ remaining.
-        total_be = be_assigned_by_date.get(max(be_assigned_by_date, default=start_date), 0) if be_assigned_by_date else 0
-        total_fe = fe_assigned_by_date.get(max(fe_assigned_by_date, default=start_date), 0) if fe_assigned_by_date else 0
-        # Day-1 commitment for scope-creep callout.
-        start_total_be = be_assigned_by_date.get(min(be_assigned_by_date, default=start_date), 0) if be_assigned_by_date else 0
-        start_total_fe = fe_assigned_by_date.get(min(fe_assigned_by_date, default=start_date), 0) if fe_assigned_by_date else 0
-
-        # Coordinate transforms.
-        svg_w, svg_h = 900, 280
-        pad_l, pad_r, pad_t, pad_b = 52, 20, 18, 34
-        inner_w = svg_w - pad_l - pad_r
-        inner_h = svg_h - pad_t - pad_b
-        max_sp_axis = max(
-            start_remaining_sp,
-            max((_remaining(d) for d in burndown_in_sprint), default=start_remaining_sp),
-            start_be, start_fe,
-        )
-        if max_sp_axis <= 0:
-            max_sp_axis = 1
-
-        def x_at(off):
-            return pad_l + (off / wd_total) * inner_w
-
-        def y_at(v):
-            return pad_t + (1 - v / max_sp_axis) * inner_h
-
-        axes['y_ticks'] = [
-            (y_at(max_sp_axis * (4 - i) / 4), f"{max_sp_axis * (4 - i) / 4:.0f} SP")
-            for i in range(5)
-        ]
-        if wd_total <= 10:
-            x_ticks_idx = list(range(wd_total + 1))
-        else:
-            step = max(1, wd_total // 7)
-            x_ticks_idx = list(range(0, wd_total + 1, step))
-            if wd_total not in x_ticks_idx:
-                x_ticks_idx.append(wd_total)
-        axes['x_ticks'] = [
-            (x_at(idx), f"{working_days[min(idx, len(working_days)-1)].month}/{working_days[min(idx, len(working_days)-1)].day}")
-            for idx in x_ticks_idx
-        ]
-
-        # Build series with weekend dedupe.
-        def _series(date_map, value_fn=lambda v: v):
-            seen, pts, dots = set(), [], []
-            for d in sorted(date_map):
-                xidx = wd_index_for(d)
-                if xidx in seen:
-                    continue
-                seen.add(xidx)
-                yv = value_fn(date_map[d])
-                pts.append(f"{x_at(xidx):.1f},{y_at(yv):.1f}")
-                dots.append((x_at(xidx), y_at(yv)))
-            return pts, dots
-
-        combined_points, _ = _series(burndown_by_date_sp, value_fn=_remaining)
-        be_points, be_dots = _series(be_by_date)
-        fe_points, fe_dots = _series(fe_by_date)
-
-        ideal_points = [
-            f"{x_at(0):.1f},{y_at(start_remaining_sp):.1f}",
-            f"{x_at(wd_total):.1f},{y_at(0):.1f}",
-        ]
-
-        # Per-role ideal lines + combined (dimmed) actual become extra series.
-        extra_series = []
-        if start_be > 0:
-            extra_series.append({
-                'name': 'BE Ideal',
-                'points': [f"{x_at(0):.1f},{y_at(start_be):.1f}", f"{x_at(wd_total):.1f},{y_at(0):.1f}"],
-                'color': '#10b981', 'stroke_width': 1.5, 'dasharray': '4,4', 'opacity': 0.4,
-            })
-        if start_fe > 0:
-            extra_series.append({
-                'name': 'FE Ideal',
-                'points': [f"{x_at(0):.1f},{y_at(start_fe):.1f}", f"{x_at(wd_total):.1f},{y_at(0):.1f}"],
-                'color': '#818cf8', 'stroke_width': 1.5, 'dasharray': '4,4', 'opacity': 0.4,
-            })
-        if combined_points:
-            extra_series.append({
-                'name': 'Combined Actual',
-                'points': combined_points,
-                'color': '#475569', 'stroke_width': 1.5, 'dasharray': '2,3', 'opacity': 0.5,
-            })
-
-        be_series = {'name': 'BE Actual', 'points': be_points, 'dots': be_dots, 'color': '#10b981'}
-        fe_series = {'name': 'FE Actual', 'points': fe_points, 'dots': fe_dots, 'color': '#818cf8'}
-
-        if ahead_behind > 0.5:
-            pace_label = f"<span style='color: #6ee7b7;'>↑ {ahead_behind:.1f} SP ahead</span>"
-        elif ahead_behind < -0.5:
-            pace_label = f"<span style='color: #fca5a5;'>↓ {abs(ahead_behind):.1f} SP behind</span>"
-        else:
-            pace_label = "<span style='color: #cbd5e1;'>on pace</span>"
-
-        # The headline pace number conflates two effects: (a) execution
-        # slipping behind the original plan and (b) scope added mid-sprint
-        # inflating "remaining". Split them so the sub-line tells the reader
-        # how much of the gap is each. `pace_vs_original` adds back scope
-        # so it isolates execution against the day-1 commitment.
-        scope_added = (total_be + total_fe) - (start_total_be + start_total_fe)
-        if scope_added > 0.5:
-            pace_vs_original = ahead_behind + scope_added
-            if pace_vs_original < -0.5:
-                pace_sub = f'+{scope_added:.0f} scope · {abs(pace_vs_original):.0f} SP behind original plan'
-            elif pace_vs_original > 0.5:
-                pace_sub = f'+{scope_added:.0f} scope · {pace_vs_original:.0f} SP ahead of original plan'
-            else:
-                pace_sub = f'+{scope_added:.0f} scope · on pace vs original plan'
-        else:
-            pace_sub = f'ideal: {ideal_remaining_today:.0f} SP remaining'
-
-        burndown_html += _render_burndown_chart(
-            title='📈 Story Points Burndown — BE &amp; FE',
-            section_id='sp-burndown-chart',
-            axes=axes,
-            series=extra_series + [be_series, fe_series],
-            summary_cards=[
-                {
-                    'label': '⚙️ BE Remaining',
-                    'value': f'{current_be:.0f} SP',
-                    'sub': (
-                        f'of {total_be:.0f} SP committed'
-                        + (f' (+{total_be - start_total_be:.0f} added)' if total_be - start_total_be > 0.5 else '')
-                    ),
-                    'color': '#10b981',
-                },
-                {
-                    'label': '🎨 FE Remaining',
-                    'value': f'{current_fe:.0f} SP',
-                    'sub': (
-                        f'of {total_fe:.0f} SP committed'
-                        + (f' (+{total_fe - start_total_fe:.0f} added)' if total_fe - start_total_fe > 0.5 else '')
-                    ),
-                    'color': '#818cf8',
-                },
-                {'label': 'Overall Pace', 'value': pace_label, 'sub': pace_sub},
-                {'label': 'Time Left', 'value': f'{days_remaining}d', 'sub': f'working day {wd_elapsed + 1} of {wd_total + 1}'},
-            ],
-            legend=[
-                {'kind': 'solid', 'color': '#10b981', 'label': 'BE Actual'},
-                {'kind': 'dashed', 'color': '#10b981', 'label': 'BE Ideal'},
-                {'kind': 'solid', 'color': '#818cf8', 'label': 'FE Actual'},
-                {'kind': 'dashed', 'color': '#818cf8', 'label': 'FE Ideal'},
-                {'kind': 'dashed', 'color': '#475569', 'label': 'Combined'},
-                {'kind': 'dashed', 'color': '#60a5fa', 'label': 'Today'},
-            ],
-            ideal_points=ideal_points,
-            today_in_sprint=(start_date <= today <= end_date),
-        )
-
-    # Collect tickets by status with story points — single batched query.
-    closed_set = set(CLOSED_STATUSES)
-    inprog_set = set(IN_PROGRESS_STATUSES)
-    open_set = set(OPEN_STATUSES)
-    all_statuses = list(closed_set | inprog_set | open_set)
-    placeholders = ",".join("?" for _ in all_statuses)
-    cursor.execute(
-        f"""
-        SELECT ticket_key, summary, ticket_url, assignee_display_name, status, story_points
-        FROM tickets
-        WHERE sprint_id = ? AND status IN ({placeholders})
-        ORDER BY story_points DESC, ticket_key
-        """,
-        [sprint['sprint_id']] + all_statuses,
-    )
-    sp_rows = [
-        {
-            'ticket_key': r[0],
-            'summary': r[1],
-            'ticket_url': r[2],
-            'assignee': r[3],
-            'status': r[4],
-            'story_points': r[5] or 0,
-        }
-        for r in cursor.fetchall()
-    ]
-
-    closed_tickets = [t for t in sp_rows if t['status'] in closed_set]
-    in_progress_tickets = [t for t in sp_rows if t['status'] in inprog_set]
-    open_tickets = [t for t in sp_rows if t['status'] in open_set]
-
-    # Build role maps and partition by BE/FE
-    name_to_role, _ = _build_role_maps(config)
-    closed_by_role = _partition_tickets_by_role(closed_tickets, name_to_role, assignee_key='assignee')
-    inprog_by_role = _partition_tickets_by_role(in_progress_tickets, name_to_role, assignee_key='assignee')
-    open_by_role = _partition_tickets_by_role(open_tickets, name_to_role, assignee_key='assignee')
-    sp_role_m = _role_sp_metrics(closed_by_role, inprog_by_role, open_by_role)
-
-    # Render per-role sections stacked vertically
-    sp_role_config = [
-        ('BE', 'sp-be', '⚙️ Backend'),
-        ('FE', 'sp-fe', '🎨 Frontend'),
-    ]
-
-    for role, rid, role_label in sp_role_config:
-        rm = sp_role_m[role]
-        r_closed = closed_by_role[role]
-        r_inprog = inprog_by_role[role]
-        r_open = open_by_role[role]
-
-        content += f"""
-                <div class="section-title" style="margin-top: 32px;">{role_label}</div>
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-label">Total Story Points</div>
-                        <div class="metric-value">{rm['total']:.1f}</div>
-                    </div>
-                    <button type="button" class="metric-card success" onclick="toggleAccordion('{rid}-closed-panel')" aria-controls="{rid}-closed-panel" aria-expanded="false">
-                        <div class="metric-label">Completed</div>
-                        <div class="metric-value clickable">{rm['completed']:.1f}</div>
-                        <div class="metric-subtext">{rm['completion']:.1f}% complete · Click to view</div>
-                    </button>
-                    <button type="button" class="metric-card warning" onclick="toggleAccordion('{rid}-inprogress-panel')" aria-controls="{rid}-inprogress-panel" aria-expanded="false">
-                        <div class="metric-label">In Progress</div>
-                        <div class="metric-value clickable">{rm['in_progress']:.1f}</div>
-                        <div class="metric-subtext">Click to view</div>
-                    </button>
-                    <button type="button" class="metric-card info" onclick="toggleAccordion('{rid}-open-panel')" aria-controls="{rid}-open-panel" aria-expanded="false">
-                        <div class="metric-label">Not Started</div>
-                        <div class="metric-value clickable">{rm['open']:.1f}</div>
-                        <div class="metric-subtext">Click to view</div>
-                    </button>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: {rm['completion']}%"></div>
-                </div>
-                <div style="margin-top: 16px;">
-                    <div class="velocity-card">
-                        <div class="velocity-value">{rm['completed']:.1f} SP</div>
-                        <div class="velocity-label">Sprint Velocity (Story Points)</div>
-                    </div>
-                </div>
-
-                <div id="{rid}-closed-panel" class="accordion-panel">
-                    <div class="accordion-content">
-                        <div class="accordion-header">✅ Completed Tickets ({len(r_closed)} tickets, {rm['completed']:.1f} SP)</div>
-                        <div class="ticket-grid">
-        """
-
-        for ticket in r_closed:
-            sp_badge = f"<span style='color: #10b981; font-weight: 600; margin-left: 8px;'>{ticket['story_points']:.1f} SP</span>" if ticket['story_points'] > 0 else ""
-            content += f"""
-                                <div class="ticket-item">
-                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
-                                    {ticket['summary']}
-                                    {sp_badge}
-                                    <span style="color: #6b7280; font-size: 12px;"> • {ticket['assignee'] or 'Unassigned'}</span>
-                                </div>
-            """
-
-        content += f"""
-                        </div>
-                    </div>
-                </div>
-
-                <div id="{rid}-inprogress-panel" class="accordion-panel">
-                    <div class="accordion-content">
-                        <div class="accordion-header">🔄 In Progress Tickets ({len(r_inprog)} tickets, {rm['in_progress']:.1f} SP)</div>
-                        <div class="ticket-grid">
-        """
-
-        for ticket in r_inprog:
-            sp_badge = f"<span style='color: #f59e0b; font-weight: 600; margin-left: 8px;'>{ticket['story_points']:.1f} SP</span>" if ticket['story_points'] > 0 else ""
-            content += f"""
-                                <div class="ticket-item">
-                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
-                                    {ticket['summary']}
-                                    {sp_badge}
-                                    <span style="color: #6b7280; font-size: 12px;"> • {ticket['assignee'] or 'Unassigned'} • {ticket['status']}</span>
-                                </div>
-            """
-
-        content += f"""
-                        </div>
-                    </div>
-                </div>
-
-                <div id="{rid}-open-panel" class="accordion-panel">
-                    <div class="accordion-content">
-                        <div class="accordion-header">📋 Open / To Do Tickets ({len(r_open)} tickets, {rm['open']:.1f} SP)</div>
-                        <div class="ticket-grid">
-        """
-
-        for ticket in r_open:
-            sp_badge = f"<span style='color: #3b82f6; font-weight: 600; margin-left: 8px;'>{ticket['story_points']:.1f} SP</span>" if ticket['story_points'] > 0 else ""
-            content += f"""
-                                <div class="ticket-item">
-                                    <a href="{ticket['ticket_url']}" class="ticket-key" target="_blank">{ticket['ticket_key']}</a>
-                                    {ticket['summary']}
-                                    {sp_badge}
-                                    <span style="color: #6b7280; font-size: 12px;"> • {ticket['assignee'] or 'Unassigned'} • {ticket['status']}</span>
-                                </div>
-            """
-
-        content += """
-                        </div>
-                    </div>
-                </div>
-        """
-
-    content += """
-            </div>
+            {sprint_blocks_html}
 
             <footer>
                 Generated by Engineering Management Dashboard
@@ -2384,14 +3106,8 @@ def generate_story_points_html(config: dict, output_path: Path):
         </div>
     """
 
-    conn.close()
-
-    # Splice the burndown block into its placeholder so it appears at the
-    # top of the content area.
-    content = content.replace('<!--BURNDOWN_PLACEHOLDER-->', burndown_html)
-
     html = render_html(
-        title=f"Story Points - {fmt_sprint_long(sprint['sprint_name'])}",
+        title=f"Story Points - {fmt_sprint_long(header_sprint['sprint_name'])}",
         content=content,
         body_class=_PAGE_THEME["story-points"],
     )
@@ -2400,58 +3116,35 @@ def generate_story_points_html(config: dict, output_path: Path):
     print(f"✅ Story points dashboard generated: {output_path}")
 
 
-def _build_full_sprint_sequence(sprints, target_milestone=31, target_sprint_in_milestone=4):
-    """Return a list of sprint dicts covering every M<n>.<sp> in the range,
-    mixing real DB rows with synthesized placeholders.
 
-    From M30.3 onward, each milestone slot has two concurrent sprints: one FE
-    and one BE. Both are returned as separate entries (same date range, different
-    role). When only one of the pair exists in Jira, a placeholder is synthesised
-    for the missing counterpart so charts stay symmetric.
+def _build_full_sprint_sequence(sprints, target_milestone=None, target_sprint_in_milestone=None):
+    """Order the real sprint rows for chronological rendering.
 
-    Each returned dict has:
-        sprint_id       — real DB id, or None for placeholders
-        sprint_name     — display name
-        short_label     — e.g. "M30.3 FE" / "M30.3 BE" / "M31.3"
-        start_date      — ISO string (UTC)
-        end_date        — ISO string (UTC)
-        placeholder     — bool
-        role            — 'FE' | 'BE' | None  (None for pre-split sprints)
+    The Jira collector now ingests every active/future sprint directly from
+    the board's Agile API, so the dashboard no longer synthesises placeholder
+    rows for slots that were "missing" — every slot it should care about is
+    a real DB row. This function just sorts those rows (start_date asc, FE
+    before BE within a shared start_date) and tags each with the fields the
+    rest of the page expects.
+
+    Returns a list of dicts:
+        sprint_id    — real DB id
+        sprint_name  — display name
+        short_label  — e.g. "M30.3 FE" / "M30.3 BE" / "M30.2"
+        start_date   — ISO string (UTC)
+        end_date     — ISO string (UTC)
+        placeholder  — always False (kept for back-compat with downstream readers)
+        role         — 'FE' | 'BE' | None  (None for pre-split sprints)
     """
-    from datetime import timedelta as _td
     import re as _re
 
-    SPRINT_LEN_DAYS = 14
-
-    def parse_label(short):
-        try:
-            mpart = short.split(' ', 1)[0]
-            mnum, spnum = mpart.lstrip('M').split('.')
-            return int(mnum), int(spnum)
-        except Exception:
-            return None
-
     def parse_role(sprint_name):
-        """Extract FE/BE suffix from sprint name, or None if absent."""
         m = _re.search(r'\b(FE|BE)\s*$', sprint_name)
         return m.group(1) if m else None
-
-    def next_label(m, sp):
-        if sp >= 4:
-            return m + 1, 1
-        return m, sp + 1
-
-    def iso_date(d):
-        # Match the time-of-day that real Jira sprints use (08:00 UTC) so
-        # synthesized placeholders compare cleanly against neighbours and
-        # don't drift 8 hours when the in-memory entry sits next to a
-        # real DB row in the same chart column.
-        return d.isoformat() + 'T08:00:00.000Z'
 
     if not sprints:
         return []
 
-    # Sort input chronologically, then FE before BE within same start date.
     ordered = sorted(
         sprints,
         key=lambda s: (
@@ -2460,297 +3153,37 @@ def _build_full_sprint_sequence(sprints, target_milestone=31, target_sprint_in_m
         ),
     )
 
-    # Build an anchor: nearest real sprint's slot (m, sp) → year.week token.
-    # The counter ("2026.13") increments by 1 each slot regardless of calendar
-    # (the user sets this in Jira sequentially, not by ISO week-of-year). We
-    # use this to extrapolate week tokens for synthesised placeholders so they
-    # follow the canonical "FNTSY M30.4 Sprint 2026.13 FE" naming.
-    _week_re = _re.compile(r'\bSprint\s+(\d{4})\.(\d+)\b')
-    slot_to_week: dict[tuple[int, int], tuple[int, int]] = {}
-    for s in ordered:
-        lbl = parse_label(s['sprint_name'].replace('FNTSY ', '').replace(' Sprint', ''))
-        m = _week_re.search(s['sprint_name'])
-        if lbl and m:
-            slot_to_week[lbl] = (int(m.group(1)), int(m.group(2)))
-
-    def slot_week_for(m_target: int, sp_target: int) -> tuple[int, int]:
-        """Return (year, week) for an arbitrary (m, sp) slot.
-
-        Linear extrapolation from the nearest real anchor: each slot adds 1
-        to the week counter, rolling year over at week 53 (no team has hit
-        this yet but it's correct for long-range projection). If we have no
-        anchor at all (DB completely empty), fall back to (year_now, 1).
-        """
-        if (m_target, sp_target) in slot_to_week:
-            return slot_to_week[(m_target, sp_target)]
-        if not slot_to_week:
-            return (datetime.now().year, 1)
-        # Pick the closest known anchor by linear distance in slot space
-        # (each milestone holds 4 sprint slots).
-        def slot_distance(a: tuple[int, int]) -> int:
-            return abs((m_target * 4 + sp_target) - (a[0] * 4 + a[1]))
-        anchor_slot = min(slot_to_week.keys(), key=slot_distance)
-        anchor_year, anchor_week = slot_to_week[anchor_slot]
-        # Walk slots forward or backward, incrementing/decrementing the week.
-        slot_delta = (m_target * 4 + sp_target) - (anchor_slot[0] * 4 + anchor_slot[1])
-        year = anchor_year
-        week = anchor_week + slot_delta
-        # Roll over Jira's "53 weeks per year" convention.
-        while week > 53:
-            week -= 53
-            year += 1
-        while week < 1:
-            week += 53
-            year -= 1
-        return (year, week)
-
     out = []
-    prev_label = None
-    prev_end = None
-    # Track which roles are present at each (m, sp) slot so we can synthesise
-    # the missing counterpart.
-    label_roles_seen: dict = {}  # (m, sp) -> set of roles
-
-    def make_sprint_entry(sprint_id, sprint_name, short_label, start_date_iso,
-                          end_date_iso, placeholder, role):
-        return {
-            'sprint_id': sprint_id,
-            'sprint_name': sprint_name,
-            'short_label': short_label,
-            'start_date': start_date_iso,
-            'end_date': end_date_iso,
-            'placeholder': placeholder,
-            'role': role,
-        }
-
-    def emit_placeholder(m, sp, start_date, role=None):
-        # Canonical placeholder name follows the same shape as real Jira
-        # sprints: "FNTSY M30.4 Sprint 2026.13 FE". Week token is computed
-        # by extending from the nearest real sprint's anchor (slot_to_week).
-        end_date = start_date + _td(days=SPRINT_LEN_DAYS)
-        role_suffix = f' {role}' if role else ''
-        year, week = slot_week_for(m, sp)
-        sprint_name = f"FNTSY M{m}.{sp} Sprint {year}.{week:02d}{role_suffix}"
-        short_label = f"M{m}.{sp} {year}.{week:02d}{role_suffix}".strip()
-        out.append(make_sprint_entry(
-            sprint_id=None,
-            sprint_name=sprint_name,
-            short_label=short_label,
-            start_date_iso=iso_date(start_date),
-            end_date_iso=iso_date(end_date),
-            placeholder=True,
-            role=role,
-        ))
-        return end_date
-
-    SPLIT_FROM = (30, 3)  # M30.3 onward is FE/BE-split
-
     for s in ordered:
         short = s['sprint_name'].replace('FNTSY ', '').replace(' Sprint', '')
-        this_label = parse_label(short)
-        this_role = parse_role(s['sprint_name'])
-        this_start = parse_iso_tz(s['start_date']).date()
-        this_end = parse_iso_tz(s['end_date']).date()
-
-        # Pair-split slots (M30.3+) require a role on every row. If a real
-        # Jira sprint at one of those slots is missing the suffix (e.g.
-        # "FNTSY M31.2 Sprint 2026.15"), treat it as BE so the FE counterpart
-        # gets synthesised below. Doesn't change the Jira ticket; only how
-        # the dashboard slots it into pair-rendering displays.
-        if this_role is None and this_label is not None and this_label >= SPLIT_FROM:
-            this_role = 'BE'
-
-        # Fill mid-sequence gaps (skip for same-slot concurrent sprints).
-        # FE + BE placeholders share the same start_date/end_date — they
-        # represent two concurrent role-split sprints, not consecutive ones,
-        # so we capture the FE end-date once and reuse it as the BE start.
-        if (prev_label is not None and this_label is not None
-                and prev_end is not None and this_label != prev_label):
-            m, sp = prev_label
-            cursor_start = prev_end
-            seen = set()
-            while True:
-                m, sp = next_label(m, sp)
-                if (m, sp) == this_label or (m, sp) in seen:
-                    break
-                seen.add((m, sp))
-                # FE + BE for the same slot: same start, same end.
-                slot_start = cursor_start
-                fe_end = emit_placeholder(m, sp, slot_start, 'FE')
-                emit_placeholder(m, sp, slot_start, 'BE')
-                cursor_start = fe_end
-
-        # Track roles seen at this label
-        if this_label is not None:
-            if this_label not in label_roles_seen:
-                label_roles_seen[this_label] = set()
-            if this_role:
-                label_roles_seen[this_label].add(this_role)
-
-        out.append(make_sprint_entry(
-            sprint_id=s['sprint_id'],
-            sprint_name=s['sprint_name'],
-            short_label=short,
-            start_date_iso=s['start_date'],
-            end_date_iso=s['end_date'],
-            placeholder=False,
-            role=this_role,
-        ))
-        if this_label is not None:
-            prev_label = this_label
-        prev_end = this_end
-
-    # After all real sprints are placed, synthesise missing FE/BE counterparts
-    # for split slots. From M30.3 onward every milestone-slot is FE+BE; if
-    # only one role appeared in Jira, add the other; if a role-less sprint
-    # appeared (e.g. legacy "M31.2 Sprint 2026.15" with no suffix), add both.
-    to_add = []
-    for (m, sp), roles in label_roles_seen.items():
-        if (m, sp) < SPLIT_FROM:
-            continue  # M30.1 / M30.2 are pre-split — no pairing needed
-        # Find any existing entry at this slot to clone dates from.
-        existing = next(
-            (e for e in out
-             if not e['placeholder'] and parse_label(e['short_label']) == (m, sp)),
-            None,
-        )
-        if not existing:
-            continue
-        # Use the existing real sibling's week token so counterparts share
-        # the same canonical name shape as the Jira ticket they pair with.
-        existing_match = _week_re.search(existing['sprint_name'])
-        if existing_match:
-            year, week = int(existing_match.group(1)), int(existing_match.group(2))
-        else:
-            year, week = slot_week_for(m, sp)
-        for role in ('FE', 'BE'):
-            if role in roles:
-                continue
-            to_add.append(make_sprint_entry(
-                sprint_id=None,
-                sprint_name=f"FNTSY M{m}.{sp} Sprint {year}.{week:02d} {role}",
-                short_label=f"M{m}.{sp} {year}.{week:02d} {role}",
-                start_date_iso=existing['start_date'],
-                end_date_iso=existing['end_date'],
-                placeholder=True,
-                role=role,
-            ))
-
-    # Insert missing-counterpart placeholders right after the last existing
-    # entry at the same slot. Handles both partial pairs (one role present,
-    # the other missing) and fully-roleless legacy sprints (M31.2 etc.) that
-    # need both FE and BE placeholders inserted alongside.
-    if to_add:
-        # Group placeholders by (m, sp) so we know what to drop into each slot.
-        pending: dict = {}
-        for ph in to_add:
-            lbl = parse_label(ph['short_label'])
-            pending.setdefault(lbl, []).append(ph)
-
-        out_with_pairs = []
-        for i, entry in enumerate(out):
-            out_with_pairs.append(entry)
-            lbl = parse_label(entry['short_label'])
-            if lbl in pending:
-                # Inject after the last entry at this slot — peek ahead.
-                next_lbl = parse_label(out[i + 1]['short_label']) if i + 1 < len(out) else None
-                if next_lbl != lbl:
-                    # Sort FE before BE for consistent rendering.
-                    for ph in sorted(pending[lbl], key=lambda p: 0 if p['role'] == 'FE' else 1):
-                        out_with_pairs.append(ph)
-                    del pending[lbl]
-        out = out_with_pairs
-
-    # Extend forward through the target milestone with paired FE+BE
-    # placeholders. FE and BE share the slot's start/end (concurrent), so
-    # advance the cursor by the FE end-date once per slot.
-    if prev_label is not None and prev_end is not None:
-        m, sp = prev_label
-        cursor_start = prev_end
-        for _ in range(100):
-            if (m, sp) == (target_milestone, target_sprint_in_milestone):
-                break
-            m, sp = next_label(m, sp)
-            fe_end = emit_placeholder(m, sp, cursor_start, 'FE')
-            emit_placeholder(m, sp, cursor_start, 'BE')
-            cursor_start = fe_end
-
+        out.append({
+            'sprint_id': s['sprint_id'],
+            'sprint_name': s['sprint_name'],
+            'short_label': short,
+            'start_date': s['start_date'],
+            'end_date': s['end_date'],
+            'placeholder': False,
+            'role': parse_role(s['sprint_name']),
+        })
     return out
 
 
-def _placeholder_synthetic_id(milestone: int, slot: int, role) -> int:
-    """Stable, deterministic synthetic jira_sprint_id for a placeholder.
-
-    Real Jira IDs are positive auto-increments; we use negative numbers
-    that encode (milestone, slot, role) so the same placeholder always
-    upserts to the same DB row across runs and never collides with a
-    real Jira sprint that lands later.
-    """
-    role_code = {'FE': 1, 'BE': 2, None: 0}.get(role, 0)
-    return -(milestone * 1000 + slot * 10 + role_code)
-
-
 def persist_placeholder_sprints(db_path: str, sequence) -> int:
-    """Upsert placeholder rows from a `_build_full_sprint_sequence` result.
+    """Sweep any leftover placeholder rows from older runs.
 
-    Real Jira sprints (`placeholder=False`) are skipped — the unified
-    Jira collector owns those. Placeholders (`placeholder=True`) get a
-    deterministic synthetic jira_sprint_id from `_placeholder_synthetic_id`,
-    so re-running this function is idempotent.
-
-    Returns the number of placeholder rows touched (insert + update).
+    Placeholder synthesis is gone — every active/future sprint comes from
+    the Jira board's Agile API now. This function is kept only to clean up
+    any synthetic rows (`is_placeholder = 1`) that the prior code wrote into
+    the sprints table. It runs once per regen and turns into a no-op as
+    soon as the table is clean.
     """
-    from utils.sprint_names import parse_sprint_name
-    placeholders = [s for s in sequence if s.get('placeholder')]
-    if not placeholders:
-        return 0
-    now_iso = datetime.now().isoformat()
     conn = get_connection(db_path)
     cur = conn.cursor()
     try:
-        touched = 0
-        for ph in placeholders:
-            parsed = parse_sprint_name(ph['sprint_name'])
-            if parsed is None:
-                # Pre-split (M30.1/M30.2) shouldn't appear here, but be safe.
-                continue
-            jira_id = _placeholder_synthetic_id(
-                parsed.milestone, parsed.slot, ph.get('role')
-            )
-            cur.execute(
-                "SELECT sprint_id FROM sprints WHERE jira_sprint_id = ?",
-                (jira_id,),
-            )
-            row = cur.fetchone()
-            if row is None:
-                cur.execute(
-                    """
-                    INSERT INTO sprints (
-                        jira_sprint_id, sprint_name, state,
-                        start_date, end_date, goal,
-                        is_placeholder, first_seen_at, last_updated_at
-                    ) VALUES (?, ?, 'future', ?, ?, '', 1, ?, ?)
-                    """,
-                    (jira_id, ph['sprint_name'], ph['start_date'], ph['end_date'],
-                     now_iso, now_iso),
-                )
-            else:
-                cur.execute(
-                    """
-                    UPDATE sprints
-                       SET sprint_name = ?,
-                           start_date = ?,
-                           end_date = ?,
-                           is_placeholder = 1,
-                           last_updated_at = ?
-                     WHERE jira_sprint_id = ?
-                    """,
-                    (ph['sprint_name'], ph['start_date'], ph['end_date'],
-                     now_iso, jira_id),
-                )
-            touched += 1
+        cur.execute("DELETE FROM sprints WHERE is_placeholder = 1")
+        deleted = cur.rowcount or 0
         conn.commit()
-        return touched
+        return deleted
     finally:
         conn.close()
 
@@ -2771,9 +3204,14 @@ def _classify_epic_prefix(summary: str) -> str:
     return m.group(1).lower()
 
 
-def _render_epics_per_sprint_line_chart(sprints, epics_by_sprint):
+def _render_epics_per_sprint_line_chart(sprints, epics_by_sprint, *, exclude_completed: bool = False):
     """Render three stacked SVG line charts — BE, FE, and missing-prefix — each with
     its own y-axis scale and a shared x-axis so columns align with the Gantt below.
+
+    When ``exclude_completed`` is True, epics whose status is in the closed
+    bucket (Done / Released / Resolved / Closed) are dropped from every
+    bucket count. Used to render the "Hide Completed Epics" variant of the
+    chart that the toolbar toggle swaps in.
     """
     if not sprints:
         return ''
@@ -2786,17 +3224,21 @@ def _render_epics_per_sprint_line_chart(sprints, epics_by_sprint):
     from datetime import timedelta as _td
 
     def _milestone_key(short_label):
-        """Extract the slot label (e.g. "M30.3") so FE/BE pairs merge into
-        a single x-axis point. The function name is historical — what we
-        actually want here is `format_slot`, not `format_milestone` (which
-        would collapse all four slots in M30 to a single "M30" point)."""
+        """Slot label only (e.g. "M30.3") so concurrent FE/BE Jira sprints
+        merge into a single x-axis point. The Epic Summary accordion below
+        keeps them separate per Jira sprint — the chart deliberately rolls
+        up to the milestone level for a tighter visual."""
         return fmt_sprint_slot(short_label)
 
-    # Group full_seq entries by milestone key, preserving order of first occurrence.
-    # Concurrent FE/BE sprints share dates — collapse them into one x-axis point
-    # and sum their epic counts so no zigzag appears on the line chart.
+    # Group full_seq entries by milestone slot, preserving order of first
+    # occurrence. Concurrent FE/BE Jira sprints share dates — collapse them
+    # into one x-axis point and sum their epic counts so the line doesn't
+    # zigzag across sibling sprints.
     seen_keys = {}
     ordered_keys = []
+    # Dedupe (epic_key, milestone) to avoid double-counting an epic that
+    # appears in BOTH the FE Sprint and BE Sprint of the same milestone.
+    counted_pairs: set[tuple[str, str]] = set()
     for s in full_seq:
         mk = _milestone_key(s['short_label'])
         if mk not in seen_keys:
@@ -2814,9 +3256,19 @@ def _render_epics_per_sprint_line_chart(sprints, epics_by_sprint):
         # A group is real if ANY member is real
         if not s['placeholder']:
             entry['placeholder'] = False
-        # Accumulate epic counts across all sprints in this milestone
+        # Accumulate epic counts across all sprints in this milestone. The
+        # DB stores one row per (epic, sprint) pair, so an epic that's in
+        # both the FE Sprint AND the BE Sprint of the same milestone would
+        # otherwise count twice — guard with `counted_pairs`.
         sprint_epics = epics_by_sprint.get(s['sprint_id'], []) if s['sprint_id'] is not None else []
         for epic in sprint_epics:
+            if exclude_completed and bucket_for(epic.get('status') or '') == 'closed':
+                continue
+            bare_key = (epic.get('ticket_key') or '').split('_s', 1)[0]
+            pair = (bare_key, mk)
+            if pair in counted_pairs:
+                continue
+            counted_pairs.add(pair)
             entry['counts'][_classify_epic_prefix(epic.get('summary', ''))] += 1
 
     points = []
@@ -3009,30 +3461,20 @@ def _render_epics_per_sprint_line_chart(sprints, epics_by_sprint):
             f'</div>'
         )
 
+    has_missing = any(s['key'] == 'none' for s in SERIES)
+    legend_extra = ' / <strong style="color:var(--danger);">missing prefix</strong>' if has_missing else ''
+    legend_note = ' Red signal = Ticket Hygiene will flag under <code>epics_no_prefix</code>.' if has_missing else ''
     return f"""
-            <div class="section">
-                <h2 class="section-title">📈 Epics per Sprint</h2>
-                <div class="chart-container">
-                    <div style="background:#1e293b; border-radius:8px; padding:20px; border:1px solid #475569; overflow-x:auto;">
                         <div style="min-width:800px;">
 {rows_html}
                         </div>
                         <p style="margin-top:var(--space-3); color:var(--text-muted); font-size:var(--fs-sm);">
                             Epic-type tickets per sprint split by
                             <strong style="color:var(--info);">[BE] backend</strong> /
-                            <strong style="color:var(--success);">[FE] frontend</strong>{
-                              ' / <strong style="color:var(--danger);">missing prefix</strong>'
-                              if any(s['key'] == 'none' for s in SERIES) else ''
-                            }.
-                            Dashed tails = projected sprints.{
-                              ' Red signal = Ticket Hygiene will flag under <code>epics_no_prefix</code>.'
-                              if any(s['key'] == 'none' for s in SERIES) else ''
-                            }
+                            <strong style="color:var(--success);">[FE] frontend</strong>{legend_extra}.
+                            Dashed tails = projected sprints.{legend_note}
                         </p>
-                    </div>
-                </div>
-            </div>
-    """
+"""
 
 
 def generate_epics_html(config: dict, output_path: Path):
@@ -3044,24 +3486,42 @@ def generate_epics_html(config: dict, output_path: Path):
     conn = get_connection(db_path)
     cursor = conn.cursor()
 
-    # Get recent, current and future REAL sprints (excluding the synthesized
-    # placeholders we persist via persist_placeholder_sprints — those are an
-    # output of _build_full_sprint_sequence, not an input. Including them as
-    # input would re-trigger placeholder synthesis on top of the persisted
-    # ones and double the sequence each run).
+    # Real Jira sprints only. Window is "recent 2 closed + every active +
+    # the next 6 future", giving the Gantt a stable left-to-right span
+    # without truncating future milestones now that the collector ingests
+    # the whole board (M32+ used to be invisible). is_placeholder = 0 stays
+    # as a belt-and-braces guard against any stale synthetic rows that
+    # haven't been swept yet.
     cursor.execute("""
         SELECT sprint_id, sprint_name, start_date, end_date, state
         FROM (
             SELECT sprint_id, sprint_name, start_date, end_date, state
             FROM sprints
             WHERE is_placeholder = 0
-              AND (sprint_name LIKE ? || '%'
-                   OR jira_sprint_id IN (21197, 21198, 21199, 21200))
+              AND sprint_name LIKE ? || '%'
+              AND state = 'closed'
             ORDER BY start_date DESC
-            LIMIT 8
+            LIMIT 2
+        )
+        UNION
+        SELECT sprint_id, sprint_name, start_date, end_date, state
+        FROM sprints
+        WHERE is_placeholder = 0
+          AND sprint_name LIKE ? || '%'
+          AND state = 'active'
+        UNION
+        SELECT sprint_id, sprint_name, start_date, end_date, state
+        FROM (
+            SELECT sprint_id, sprint_name, start_date, end_date, state
+            FROM sprints
+            WHERE is_placeholder = 0
+              AND sprint_name LIKE ? || '%'
+              AND state = 'future'
+            ORDER BY start_date ASC
+            LIMIT 6
         )
         ORDER BY start_date ASC
-    """, (sprint_prefix,))
+    """, (sprint_prefix, sprint_prefix, sprint_prefix))
 
     sprints = []
     for row in cursor.fetchall():
@@ -3131,6 +3591,20 @@ def generate_epics_html(config: dict, output_path: Path):
             epics_by_sprint[epic['sprint_id']] = []
         epics_by_sprint[epic['sprint_id']].append(epic)
 
+    # Open child-issue counts per epic. Read from epic_open_children, which the
+    # collector populates via a dedicated parent-scoped Jira query. We can NOT
+    # derive this from the tickets table: an epic's open children are commonly
+    # backlog items with no sprint, and the sprint-scoped collection never
+    # pulls those (see jira_collector_agent.count_open_children). Keyed on the
+    # bare epic key (no "_s<sprint>" suffix). Empty until the first collection
+    # after this shipped, in which case every epic shows 0.
+    try:
+        cursor.execute("SELECT epic_key, open_count FROM epic_open_children")
+        open_stories_by_epic = {row[0]: row[1] for row in cursor.fetchall()}
+    except Exception:
+        # Table may not exist yet on a DB that predates the migration.
+        open_stories_by_epic = {}
+
     conn.close()
 
     # Build the full sprint sequence (real DB sprints + synthesized placeholders
@@ -3155,9 +3629,15 @@ def generate_epics_html(config: dict, output_path: Path):
     if full_sprint_sequence:
         all_dates = []
         for sprint in full_sprint_sequence:
-            all_dates.append(parse_iso_tz(sprint['start_date']).date())
-            all_dates.append(parse_iso_tz(sprint['end_date']).date())
+            # parse_iso_tz returns None on a null/malformed date; skip those
+            # endpoints rather than crashing the whole Epics page (a blank
+            # page is the worst possible "fact" to show).
+            for _bound in ('start_date', 'end_date'):
+                _parsed = parse_iso_tz(sprint.get(_bound))
+                if _parsed is not None:
+                    all_dates.append(_parsed.date())
 
+    if full_sprint_sequence and all_dates:
         chart_start = min(all_dates)
         chart_end = max(all_dates)
         total_days = (chart_end - chart_start).days
@@ -3166,8 +3646,30 @@ def generate_epics_html(config: dict, output_path: Path):
         chart_end = chart_start
         total_days = 1
 
-    # Epic-count-per-sprint line chart (shown above the Gantt).
-    line_chart_html = _render_epics_per_sprint_line_chart(sprints, epics_by_sprint)
+    # Epic-count-per-sprint line chart (shown above the Gantt). We render
+    # two variants — full and "completed epics excluded" — and let the
+    # gantt-hide-completed checkbox toggle which is visible. Server-side
+    # SVG can't be edited live without a re-render, so we just emit both
+    # and flip a CSS class. Cheap: both share the same x-axis; the
+    # filtered variant only differs in y-values.
+    chart_full = _render_epics_per_sprint_line_chart(sprints, epics_by_sprint)
+    chart_filtered = _render_epics_per_sprint_line_chart(
+        sprints, epics_by_sprint, exclude_completed=True
+    )
+    if chart_full or chart_filtered:
+        line_chart_html = f"""
+            <div class="section">
+                <h2 class="section-title">📈 Epics per Sprint</h2>
+                <div class="chart-container">
+                    <div style="background:#131c27; border-radius:8px; padding:20px; border:1px solid #243340; overflow-x:auto;">
+                        <div class="epics-chart-variant epics-chart-full">{chart_full}</div>
+                        <div class="epics-chart-variant epics-chart-filtered" style="display:none;">{chart_filtered}</div>
+                    </div>
+                </div>
+            </div>
+        """
+    else:
+        line_chart_html = ''
 
     # Build content
     content = f"""
@@ -3186,22 +3688,29 @@ def generate_epics_html(config: dict, output_path: Path):
             <!-- Gantt Chart -->
             <div class="section">
                 <div class="chart-container">
-                    <div class="chart-title">📊 Epic Timeline (Gantt Chart)</div>
-                    <div style="background: #1e293b; border-radius: 8px; padding: 12px; border: 1px solid #475569; overflow-x: auto;">
+                    <div class="chart-title-row" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                        <div class="chart-title" style="margin: 0;">📊 Epic Timeline (Gantt Chart)</div>
+                        <label class="gantt-filter-chip" style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-size: 13px; color: var(--text-secondary);">
+                            <input type="checkbox" id="gantt-hide-completed" style="cursor: pointer;">
+                            <span>Hide Completed Epics</span>
+                        </label>
+                    </div>
+                    <div style="background: #131c27; border-radius: 8px; padding: 12px; border: 1px solid #243340; overflow-x: auto;">
                         <div class="gantt-wrapper" style="min-width: 1500px; position: relative;">
                             <!-- Sortable column headers for the epic-label area.
                                  Widths must mirror the per-row sub-cells below so
                                  the columns line up with the cells underneath. -->
-                            <div style="display: flex; align-items: center; height: 28px; border-bottom: 1px solid #334155; font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em;">
+                            <div style="display: flex; align-items: center; height: 28px; border-bottom: 1px solid #1a2430; font-size: 11px; font-weight: 600; color: #8194a6; text-transform: uppercase; letter-spacing: 0.04em;">
                                 <div class="gantt-col-header" onclick="sortGanttRows(this, 'key')" style="width: 80px; padding: 0 8px 0 0;">Key</div>
                                 <div class="gantt-col-header" onclick="sortGanttRows(this, 'status')" style="width: 110px; padding: 0 8px 0 0;">Status</div>
                                 <div class="gantt-col-header" onclick="sortGanttRows(this, 'summary')" style="width: 190px; padding: 0 8px 0 0;">Summary</div>
                                 <div class="gantt-col-header" onclick="sortGanttRows(this, 'assignee')" style="width: 60px; padding: 0 8px 0 0;">Assignee</div>
+                                <div class="gantt-col-header" onclick="sortGanttRows(this, 'open')" style="width: 70px; padding: 0 8px 0 0; text-align: right;" title="Open child stories/bugs remaining (not closed)">Open</div>
                                 <div style="flex: 1;"></div>
                             </div>
                             <!-- Header with dates -->
                             <div style="display: flex; margin-bottom: 4px;">
-                                <div style="width: 440px; flex-shrink: 0;"></div>
+                                <div style="width: 510px; flex-shrink: 0;"></div>
                                 <div style="flex: 1; position: relative; height: 50px;">
     """
 
@@ -3263,7 +3772,7 @@ def generate_epics_html(config: dict, output_path: Path):
         rows_html = ''
         for sp in col_sprints:
             role = sp.get('role')
-            role_color = {'FE': '#38bdf8', 'BE': '#a78bfa'}.get(role, '#cbd5e1')
+            role_color = {'BE': '#2dd4a7', 'FE': '#c4b5fd'}.get(role, '#cdd9e5')
             # Visually dim a sprint when it has zero epics — "real but empty"
             # looks identical to "synthesized placeholder" to the reader, so
             # both render italic at 55% opacity. Solid styling reappears the
@@ -3297,14 +3806,14 @@ def generate_epics_html(config: dict, output_path: Path):
                 f'{safe_label}</div>'
             )
         date_label = (
-            f'<div style="height:14px; min-width:0; font-size:10px; color:#94a3b8; '
+            f'<div style="height:14px; min-width:0; font-size:10px; color:#8194a6; '
             f'text-align:center; white-space:nowrap; overflow:hidden; text-overflow:clip; '
-            f'border-top:1px solid #334155; margin-top:1px; padding-top:1px;">'
+            f'border-top:1px solid #1a2430; margin-top:1px; padding-top:1px;">'
             f'{col_start.strftime("%b %d")} – {col_end.strftime("%b %d")}</div>'
         )
         content += (
             f'<div style="position:absolute; left:{left_pct:.2f}%; width:{width_pct:.2f}%; '
-            f'height:50px; border-left:1px solid #475569; box-sizing:border-box; padding:1px 2px; '
+            f'height:50px; border-left:1px solid #243340; box-sizing:border-box; padding:1px 2px; '
             f'overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;" '
             f'title="{col_start.strftime("%b %d, %Y")} – {col_end.strftime("%b %d, %Y")}">'
             f'<div style="display:flex; flex-direction:column; flex:1; min-height:0;">{rows_html}</div>'
@@ -3323,26 +3832,26 @@ def generate_epics_html(config: dict, output_path: Path):
     grid_lines = []
     for (col_start, _col_end, _col_sprints) in sprint_groups:
         col_left = pct((col_start - chart_start).days)
-        # Absolute % is relative to the timeline area only (the 440px first
-        # column lives outside this overlay), so we offset by 440px on the
+        # Absolute % is relative to the timeline area only (the 510px first
+        # column lives outside this overlay), so we offset by 510px on the
         # outer wrapper. Easiest: nest the overlay inside a sibling that
-        # mirrors the same layout the row uses (440px label slot + flex bar).
+        # mirrors the same layout the row uses (510px label slot + flex bar).
         grid_lines.append(
             f'<div style="position:absolute; left:{col_left:.2f}%; '
-            f'top:0; bottom:0; width:1px; background:#334155; '
+            f'top:0; bottom:0; width:1px; background:#1a2430; '
             f'pointer-events:none;"></div>'
         )
     # Also draw the right edge of the last column for visual closure.
     grid_lines.append(
         '<div style="position:absolute; left:100%; top:0; bottom:0; '
-        'width:1px; background:#334155; pointer-events:none;"></div>'
+        'width:1px; background:#1a2430; pointer-events:none;"></div>'
     )
     content += f"""
                             <!-- Vertical sprint dividers spanning the full chart height.
                                  The overlay sits on top of the timeline area only;
-                                 the 440px epic-label column stays untouched.
+                                 the 510px epic-label column stays untouched.
                                  top:83px = 29px col-header + 50px date row + 4px margin. -->
-                            <div style="position:absolute; left:440px; right:0;
+                            <div style="position:absolute; left:510px; right:0;
                                  top:83px; bottom:0; pointer-events:none; z-index:1;">
                                 {''.join(grid_lines)}
                             </div>
@@ -3363,16 +3872,59 @@ def generate_epics_html(config: dict, output_path: Path):
         for sp in col_sprints:
             col_bounds_by_sprint_id[sp.get('sprint_id')] = (col_start, col_end)
 
-    # Render each epic as a row
+    # Group rows by bare ticket key so each epic renders as a single row
+    # whose bar spans the union of every sprint it's in. The DB stores one
+    # row per (epic, sprint) — that's correct for accounting, wrong for
+    # presentation. An epic that genuinely spans M30.2 → M30.3 (e.g. it was
+    # carried over after planning) should show a bar covering both columns.
+    # We pick the latest-sprint row for status/SP/assignee since that's the
+    # epic's "current" state; the bar geometry uses earliest-start to
+    # latest-end across all rows.
+    from collections import OrderedDict
+    epics_by_key = OrderedDict()
     for epic in all_epics:
-        col_bounds = col_bounds_by_sprint_id.get(epic.get('sprint_id'))
-        if col_bounds:
-            epic_sprint_start, epic_sprint_end = col_bounds
-        else:
-            # Fallback for any epic whose sprint isn't in the visible
-            # full_sprint_sequence — keep its raw date math.
-            epic_sprint_start = parse_iso_tz(epic['start_date']).date()
-            epic_sprint_end = parse_iso_tz(epic['end_date']).date()
+        bare = epic['ticket_key'].split('_s', 1)[0]
+        epics_by_key.setdefault(bare, []).append(epic)
+
+    # Render each epic as a row
+    for bare_key, rows in epics_by_key.items():
+        # Latest sprint = largest sprint_id (DB autoincrements per insert,
+        # which loosely tracks recency for non-placeholder real sprints).
+        # When start_date is available on the row, prefer that — it's the
+        # canonical ordering signal the rest of the page already uses.
+        def _row_sort_key(r):
+            try:
+                return parse_iso_tz(r['start_date']).date()
+            except Exception:
+                return None
+        rows_sorted = sorted(
+            rows,
+            key=lambda r: (_row_sort_key(r) or chart_start, r.get('sprint_id') or 0),
+        )
+        epic = rows_sorted[-1]  # latest-sprint row is the "current" view
+
+        # Bar geometry: union of every sprint this epic appears in. Use the
+        # snapped column bounds where available so the bar lines up flush
+        # with grid columns.
+        starts, ends = [], []
+        for r in rows_sorted:
+            cb = col_bounds_by_sprint_id.get(r.get('sprint_id'))
+            if cb:
+                starts.append(cb[0])
+                ends.append(cb[1])
+            else:
+                try:
+                    starts.append(parse_iso_tz(r['start_date']).date())
+                    ends.append(parse_iso_tz(r['end_date']).date())
+                except Exception:
+                    pass
+        if not starts:
+            # Defensive: should never happen since we filter epics by sprint,
+            # but if it does fall back to whatever the latest-row says.
+            starts.append(parse_iso_tz(epic['start_date']).date())
+            ends.append(parse_iso_tz(epic['end_date']).date())
+        epic_sprint_start = min(starts)
+        epic_sprint_end = max(ends)
 
         days_from_chart_start = (epic_sprint_start - chart_start).days
         days_in_epic_sprint = (epic_sprint_end - epic_sprint_start).days
@@ -3384,28 +3936,28 @@ def generate_epics_html(config: dict, output_path: Path):
         # statuses like 'Testing in progress' don't fall through to grey).
         epic_bucket = bucket_for(epic['status'])
         if epic_bucket == 'closed':
-            bar_color = '#10b981'
-            status_badge = 'background: #064e3b; color: #6ee7b7;'
+            bar_color = '#2dd4a7'
+            status_badge = 'background: #07372c; color: #6ee7c3;'
         elif epic['status'] == 'Blocked':
-            bar_color = '#ef4444'
-            status_badge = 'background: #7f1d1d; color: #fca5a5;'
+            bar_color = '#fb6a5f'
+            status_badge = 'background: #5e1a17; color: #fda4a0;'
         elif epic_bucket == 'in_progress':
-            bar_color = '#3b82f6'
-            status_badge = 'background: #1e3a8a; color: #93c5fd;'
+            bar_color = '#38bdf8'
+            status_badge = 'background: #0c3a52; color: #9bdcfb;'
         else:
-            bar_color = '#6b7280'
-            status_badge = 'background: #374151; color: #9ca3af;'
+            bar_color = '#566375'
+            status_badge = 'background: #1a2430; color: #8194a6;'
 
         sp_chip = (
             f"<span style='display:inline-block; padding:2px 6px; border-radius:3px; "
-            f"background:#374151; color:#fcd34d; font-weight:600;'>"
+            f"background:#1a2430; color:#fcd34d; font-weight:600;'>"
             f"{epic['story_points']:.0f} SP</span>"
             if epic['story_points'] > 0 else ""
         )
         assignee_chip = (
-            f"<span style='color:#94a3b8;'>{epic['assignee']}</span>"
+            f"<span style='color:#8194a6;'>{epic['assignee']}</span>"
             if epic['assignee'] else
-            "<span style='color:#64748b; font-style:italic;'>Unassigned</span>"
+            "<span style='color:#566375; font-style:italic;'>Unassigned</span>"
         )
         # Strip the "_s<jira_sprint_id>" cross-sprint suffix that
         # refresh_jira_data appends so the same epic can have one DB row per
@@ -3416,37 +3968,59 @@ def generate_epics_html(config: dict, output_path: Path):
         # itself so the JS sorter only has to look at one element per row,
         # and so 'Unassigned' sorts to the end consistently.
         assignee_sort = epic['assignee'] or '￿'  # Unassigned → bottom
+        # Mark rows whose Jira status is in the completed set so the
+        # "Hide Completed Epics" toolbar above can hide them client-side
+        # without re-rendering. Use the canonical bucket so this agrees with
+        # the per-sprint line chart (which also keys off bucket_for) and with
+        # the FNTSY status vocabulary — NOT sync_project_fantasy's board states.
+        epic_status = (epic['status'] or '').strip()
+        is_completed = bucket_for(epic_status) == 'closed'
+        # Open child issues remaining — looked up by the bare epic key in the
+        # collector-populated epic_open_children table (display_key already has
+        # the "_s<sprint>" suffix stripped).
+        open_stories = open_stories_by_epic.get(display_key, 0)
         sort_attrs = (
             f'data-sort-key="{html.escape(display_key)}" '
             f'data-sort-status="{html.escape(epic["status"] or "")}" '
             f'data-sort-summary="{html.escape(epic["summary"] or "")}" '
-            f'data-sort-assignee="{html.escape(assignee_sort)}"'
+            f'data-sort-assignee="{html.escape(assignee_sort)}" '
+            f'data-sort-open="{open_stories}" '
+            f'data-completed="{"1" if is_completed else "0"}"'
+        )
+        # Render the count muted when zero so non-empty epics stand out.
+        open_cell = (
+            f"<span style='color:#cdd9e5; font-weight:600; font-variant-numeric:tabular-nums;'>{open_stories}</span>"
+            if open_stories > 0 else
+            "<span style='color:#566375;'>0</span>"
         )
         # Initials for the narrow Assignee column — full name appears in tooltip.
         if epic['assignee']:
             parts = epic['assignee'].split()
             initials = (parts[0][:1] + (parts[-1][:1] if len(parts) > 1 else '')).upper()
             assignee_cell = (
-                f"<span style='color:#cbd5e1;' title='{html.escape(epic['assignee'])}'>{html.escape(initials)}</span>"
+                f"<span style='color:#cdd9e5;' title='{html.escape(epic['assignee'])}'>{html.escape(initials)}</span>"
             )
         else:
-            assignee_cell = "<span style='color:#64748b; font-style:italic;' title='Unassigned'>—</span>"
+            assignee_cell = "<span style='color:#566375; font-style:italic;' title='Unassigned'>—</span>"
         content += f"""
-                            <div class="gantt-row" {sort_attrs} style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #334155;">
-                                <!-- Four sortable sub-cells (Key/Status/Summary/Assignee).
-                                     Widths total 440px to match the column headers above. -->
+                            <div class="gantt-row" {sort_attrs} style="display: flex; align-items: stretch; min-height: 30px; border-bottom: 1px solid #1a2430;">
+                                <!-- Five sortable sub-cells (Key/Status/Summary/Assignee/Open).
+                                     Widths total 510px to match the column headers above. -->
                                 <div style="width: 80px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
-                                    <a href="{epic['ticket_url']}" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">{display_key}</a>
+                                    <a href="{epic['ticket_url']}" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">{display_key}</a>
                                 </div>
                                 <div style="width: 110px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap;">
                                     <span style="display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; {status_badge};">{epic['status']}</span>
                                     {sp_chip}
                                 </div>
-                                <div style="width: 190px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; color: #cbd5e1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="{html.escape(epic['summary'] or '')}">
+                                <div style="width: 190px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; color: #cdd9e5; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="{html.escape(epic['summary'] or '')}">
                                     <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{html.escape(epic['summary'] or '')}</span>
                                 </div>
                                 <div style="width: 60px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 12px; display: flex; align-items: center; overflow: hidden; white-space: nowrap;">
                                     {assignee_cell}
+                                </div>
+                                <div style="width: 70px; flex-shrink: 0; padding: 4px 8px 4px 0; font-size: 13px; display: flex; align-items: center; justify-content: flex-end;" title="Open child stories/bugs remaining">
+                                    {open_cell}
                                 </div>
 
                                 <!-- Timeline cell — fills the grid square edge-to-edge.
@@ -3475,13 +4049,13 @@ def generate_epics_html(config: dict, output_path: Path):
         factored out so it can be reused inside each role subgroup."""
         _eb = bucket_for(epic['status'])
         status_color = (
-            '#10b981' if _eb == 'closed'
-            else '#ef4444' if epic['status'] == 'Blocked'
-            else '#3b82f6' if _eb == 'in_progress'
-            else '#6b7280'
+            '#2dd4a7' if _eb == 'closed'
+            else '#fb6a5f' if epic['status'] == 'Blocked'
+            else '#38bdf8' if _eb == 'in_progress'
+            else '#566375'
         )
         sp_html = (
-            f"<span style='color: #f59e0b; font-weight: 600;'>{epic['story_points']:.0f} SP</span>"
+            f"<span style='color: #fbbf24; font-weight: 600;'>{epic['story_points']:.0f} SP</span>"
             if epic['story_points'] > 0 else ""
         )
         # Strip the cross-sprint "_s<jira_sprint_id>" suffix from the display
@@ -3489,15 +4063,15 @@ def generate_epics_html(config: dict, output_path: Path):
         # already correct.
         display_key = epic['ticket_key'].split('_s', 1)[0]
         return f"""
-                        <div style="background: #1e293b; border-left: 3px solid {status_color}; border-radius: 6px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: #131c27; border-left: 3px solid {status_color}; border-radius: 6px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex: 1;">
-                                <a href="{epic['ticket_url']}" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600; font-size: 14px;">{display_key}</a>
-                                <span style="color: #e2e8f0; margin-left: 8px;">{epic['summary']}</span>
+                                <a href="{epic['ticket_url']}" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600; font-size: 14px;">{display_key}</a>
+                                <span style="color: #cdd9e5; margin-left: 8px;">{epic['summary']}</span>
                             </div>
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 {sp_html}
-                                <span style="color: #94a3b8; font-size: 12px;">{epic['assignee'] or 'Unassigned'}</span>
-                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #475569; color: #e2e8f0;">{epic['status']}</span>
+                                <span style="color: #8194a6; font-size: 12px;">{epic['assignee'] or 'Unassigned'}</span>
+                                <span style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #243340; color: #cdd9e5;">{epic['status']}</span>
                             </div>
                         </div>
         """
@@ -3565,10 +4139,10 @@ def generate_epics_html(config: dict, output_path: Path):
                         <span class="epic-sprint-caret">▸</span>
                         <span class="epic-sprint-name">{fmt_sprint_long(sprint['sprint_name'])}</span>
                         <span class="epic-sprint-counts">
-                            <span class="epic-sprint-stat" style="color: #10b981;">{completed_count} <small>done</small></span>
-                            <span class="epic-sprint-stat" style="color: #3b82f6;">{in_progress_count} <small>in progress</small></span>
-                            <span class="epic-sprint-stat" style="color: #6366f1;">{len(sprint_epics)} <small>total</small></span>
-                            <span class="epic-sprint-stat" style="color: #f59e0b;">{total_sp:.0f} <small>SP</small></span>
+                            <span class="epic-sprint-stat" style="color: #2dd4a7;">{completed_count} <small>done</small></span>
+                            <span class="epic-sprint-stat" style="color: #38bdf8;">{in_progress_count} <small>in progress</small></span>
+                            <span class="epic-sprint-stat" style="color: #38bdf8;">{len(sprint_epics)} <small>total</small></span>
+                            <span class="epic-sprint-stat" style="color: #fbbf24;">{total_sp:.0f} <small>SP</small></span>
                         </span>
                     </summary>
                     <div class="epic-sprint-body">
@@ -3605,10 +4179,10 @@ def generate_epics_html(config: dict, output_path: Path):
                                 <span class="epic-role-caret">▸</span>
                                 <span class="epic-role-name">{role_label}</span>
                                 <span class="epic-role-counts">
-                                    <span class="epic-role-stat" style="color: #10b981;">{role_done} <small>done</small></span>
-                                    <span class="epic-role-stat" style="color: #3b82f6;">{role_in_prog} <small>in progress</small></span>
-                                    <span class="epic-role-stat" style="color: #6366f1;">{len(role_epics)} <small>total</small></span>
-                                    <span class="epic-role-stat" style="color: #f59e0b;">{role_total_sp:.0f} <small>SP</small></span>
+                                    <span class="epic-role-stat" style="color: #2dd4a7;">{role_done} <small>done</small></span>
+                                    <span class="epic-role-stat" style="color: #38bdf8;">{role_in_prog} <small>in progress</small></span>
+                                    <span class="epic-role-stat" style="color: #38bdf8;">{len(role_epics)} <small>total</small></span>
+                                    <span class="epic-role-stat" style="color: #fbbf24;">{role_total_sp:.0f} <small>SP</small></span>
                                 </span>
                             </summary>
                             <div class="epic-role-body">
@@ -3649,10 +4223,11 @@ def generate_past_sprints_html(config: dict, output_path: Path):
     """Generate the Sprint Reports page.
 
     Lists every FNTSY sprint (closed, active, and future) with its
-    Story+Bug roster grouped by engineer. Closed sprints render solid +
-    expanded; active/future/empty sprints render dimmed (italic + 55%
-    opacity) and collapsed — same convention as the Epics page so a glance
-    tells you what's settled vs still in flight.
+    Story+Bug roster grouped by engineer. The active sprint renders
+    expanded so the page leads with what's in flight; closed and future
+    sprints render collapsed. Incomplete sprints (active/future/empty) are
+    dimmed (italic + 55% opacity) so a glance still tells you what's settled
+    vs still in flight.
     """
     from collections import defaultdict
 
@@ -3685,6 +4260,7 @@ def generate_past_sprints_html(config: dict, output_path: Path):
                COALESCE(is_placeholder, 0) AS is_placeholder
           FROM sprints
          WHERE sprint_name LIKE ? || '%'
+           AND COALESCE(is_placeholder, 0) = 0
          ORDER BY
            start_date ASC,
            CASE
@@ -3721,6 +4297,11 @@ def generate_past_sprints_html(config: dict, output_path: Path):
             (s['sprint_id'], *EXCLUDED_STATUSES),
         )
         tickets = [dict(r) for r in cursor.fetchall()]
+        # Strip the cross-sprint "_s<jira_sprint_id>" suffix that backfill adds
+        # to rolled-over Story/Bug rows (and to multi-sprint epics) so the link
+        # text + export show the bare Jira key.
+        for t in tickets:
+            t['ticket_key'] = t['ticket_key'].split('_s', 1)[0]
 
         if not tickets:
             sprint_blocks.append(_render_past_sprint_empty(s))
@@ -3784,13 +4365,13 @@ def generate_past_sprints_html(config: dict, output_path: Path):
             /* Per-engineer disclosure inside an expanded sprint */
             details.past-sprint-engineer summary::-webkit-details-marker {{ display: none; }}
             details.past-sprint-engineer[open] .past-sprint-chevron {{ transform: rotate(90deg); }}
-            details.past-sprint-engineer summary:hover .past-sprint-chevron {{ color: #cbd5e1; }}
+            details.past-sprint-engineer summary:hover .past-sprint-chevron {{ color: #cdd9e5; }}
             /* Top-level sprint disclosure */
             details.sprint-report-block summary::-webkit-details-marker {{ display: none; }}
             details.sprint-report-block summary::marker {{ content: ''; }}
             details.sprint-report-block[open] > summary .sprint-report-chevron {{ transform: rotate(90deg); }}
             details.sprint-report-block summary {{ cursor: pointer; user-select: none; }}
-            details.sprint-report-block summary:hover .sprint-report-chevron {{ color: #cbd5e1; }}
+            details.sprint-report-block summary:hover .sprint-report-chevron {{ color: #cdd9e5; }}
             details.sprint-report-block.is-incomplete > summary .sprint-report-name {{
                 font-style: italic;
                 opacity: 0.6;
@@ -3807,10 +4388,10 @@ def generate_past_sprints_html(config: dict, output_path: Path):
                 border-radius: 999px;
                 margin-left: 8px;
             }}
-            .sprint-report-state.closed {{ background: #064e3b; color: #6ee7b7; }}
-            .sprint-report-state.active {{ background: #78350f; color: #fcd34d; }}
-            .sprint-report-state.future {{ background: #334155; color: #94a3b8; }}
-            .sprint-report-state.placeholder {{ background: #1e1b4b; color: #c7d2fe; }}
+            .sprint-report-state.closed {{ background: #07372c; color: #6ee7c3; }}
+            .sprint-report-state.active {{ background: #5a3a09; color: #fcd34d; }}
+            .sprint-report-state.future {{ background: #1a2430; color: #8194a6; }}
+            .sprint-report-state.placeholder {{ background: #0c3a52; color: #9bdcfb; }}
         </style>
         <header>
             <h1>📜 Sprint Reports</h1>
@@ -3819,7 +4400,7 @@ def generate_past_sprints_html(config: dict, output_path: Path):
 {generate_nav_menu('past-sprints')}
         <div class="content">
             <div class="intro-banner">
-                <p>One section per FNTSY sprint — closed sprints first, then active and future. Closed sprints stay expanded; incomplete sprints (active/future/empty) appear dimmed and collapsed. Engineers are sorted by completed story points (Done / Closed / Resolved). Click any sprint header to collapse or expand it.</p>
+                <p>One section per FNTSY sprint — closed sprints first, then active and future. The active sprint stays expanded; closed and future sprints appear collapsed (and in-flight/upcoming ones are dimmed). Engineers are sorted by completed story points (Done / Closed / Resolved). Click any sprint header to collapse or expand it.</p>
             </div>
             {body}
             <footer>
@@ -3842,12 +4423,14 @@ def _render_past_sprint_empty(sprint: dict) -> str:
 
     Placeholder rows (synthesized FE/BE counterparts) get a distinct
     "placeholder" pill so the user can tell them apart from real Jira
-    sprints that simply have nothing assigned yet. Both render dimmed +
-    collapsed.
+    sprints that simply have nothing assigned yet. Both render dimmed; the
+    active sprint stays expanded (consistent with populated sprints) even
+    when empty, everything else collapsed.
     """
     name = html.escape(fmt_sprint_long(sprint['sprint_name']))
     is_placeholder = bool(sprint.get('is_placeholder'))
     state = (sprint.get('state') or '').lower()
+    open_attr = ' open' if (state == 'active' and not is_placeholder) else ''
     if is_placeholder:
         state_class = 'placeholder'
         state_label = 'PLACEHOLDER'
@@ -3872,10 +4455,10 @@ def _render_past_sprint_empty(sprint: dict) -> str:
     else:
         body_msg = "No tickets assigned yet — this sprint hasn't started."
     return f"""
-            <details class="sprint-report-block is-incomplete" style="margin-bottom: 28px;">
+            <details class="sprint-report-block is-incomplete" style="margin-bottom: 28px;"{open_attr}>
                 <summary style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 8px 0; border-bottom: 2px solid var(--border);">
                     <h2 class="section-title sprint-report-name" style="margin: 0; border-bottom: none; padding-bottom: 0;">
-                        <span class="sprint-report-chevron" aria-hidden="true" style="display: inline-block; width: 12px; color: #94a3b8; transition: transform 0.15s; margin-right: 6px;">▶</span>
+                        <span class="sprint-report-chevron" aria-hidden="true" style="display: inline-block; width: 12px; color: #8194a6; transition: transform 0.15s; margin-right: 6px;">▶</span>
                         {name}
                         <span class="sprint-report-state {state_class}">{state_label}</span>
                     </h2>
@@ -3889,13 +4472,13 @@ def _render_past_sprint_empty(sprint: dict) -> str:
 def _status_badge(status: str) -> str:
     """Return a small inline badge for a ticket status, color-coded by bucket."""
     if status in CLOSED_STATUSES:
-        bg, fg = '#064e3b', '#6ee7b7'
+        bg, fg = '#07372c', '#6ee7c3'
     elif status in IN_PROGRESS_STATUSES:
-        bg, fg = '#1e3a8a', '#93c5fd'
+        bg, fg = '#0c3a52', '#9bdcfb'
     elif status == 'Blocked':
-        bg, fg = '#7f1d1d', '#fca5a5'
+        bg, fg = '#5e1a17', '#fda4a0'
     else:
-        bg, fg = '#374151', '#9ca3af'
+        bg, fg = '#1a2430', '#8194a6'
     return (
         f'<span style="padding: 3px 8px; border-radius: 4px; font-size: 11px; '
         f'font-weight: 600; background: {bg}; color: {fg};">{html.escape(status)}</span>'
@@ -3919,10 +4502,11 @@ def _render_past_sprint_block(
 ) -> str:
     """Render one sprint section with per-engineer subgroups.
 
-    Closed sprints render solid + expanded by default. Active / future
-    sprints render dimmed (italic + 60% opacity on the title and meta) +
-    collapsed by default — they have data to inspect, but at a glance the
-    page leads with what's already settled.
+    The active sprint(s) render expanded by default so the page leads with
+    what's in flight right now; closed and future sprints render collapsed.
+    Dimming is a separate axis: incomplete sprints (anything not closed)
+    still render dimmed (italic + 60% opacity on the title and meta) so a
+    glance distinguishes settled work from in-progress/upcoming.
     """
     name = html.escape(fmt_sprint_long(sprint['sprint_name']))
     start = sprint['start_date'][:10] if sprint['start_date'] else ''
@@ -3939,74 +4523,142 @@ def _render_past_sprint_block(
         state_class = 'future'
         state_label = 'UNKNOWN'
     is_complete = (state == 'closed' and not is_placeholder)
-    open_attr = ' open' if is_complete else ''
+    # Expand the active sprint(s); collapse everything else (closed, future,
+    # placeholder). Dimming still keys off is_complete so closed sprints stay
+    # solid and in-flight/upcoming ones stay dimmed.
+    is_active = (state == 'active' and not is_placeholder)
+    open_attr = ' open' if is_active else ''
     block_class = 'sprint-report-block' + ('' if is_complete else ' is-incomplete')
 
+    sprint_slug = re.sub(r'[^a-z0-9]+', '-', sprint['sprint_name'].lower()).strip('-') or 'sprint'
+    sprint_block_id = f'sprint-block-{sprint_slug}'
+    # Sprint-wide TSV: every ticket, with engineer name as a column.
+    sprint_table_rows = []
     engineer_html = []
     for e in engineers:
         rows = []
+        engineer_table_rows = []
         for t in e['tickets']:
             sp = _format_sp(t['story_points'] or 0.0)
             type_label = t['issue_type']
-            type_color = '#fbbf24' if type_label == 'Bug' else '#94a3b8'
+            type_color = '#fbbf24' if type_label == 'Bug' else '#8194a6'
+            status_for_export = t.get('sprint_end_status') or t['status']
             rows.append(f"""
-                            <div style="background: #1e293b; border-left: 3px solid #475569; border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                            <div style="background: #131c27; border-left: 3px solid #243340; border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
                                 <div style="flex: 1; min-width: 0;">
-                                    <a href="{html.escape(t['ticket_url'] or '')}" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600; font-size: 13px;">{html.escape(t['ticket_key'])}</a>
+                                    <a href="{html.escape(t['ticket_url'] or '')}" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600; font-size: 13px;">{html.escape(t['ticket_key'])}</a>
                                     <span style="color: {type_color}; font-size: 10px; font-weight: 600; margin-left: 6px;">{html.escape(type_label)}</span>
-                                    <span style="color: #e2e8f0; margin-left: 8px;">{html.escape(t['summary'] or '')}</span>
+                                    <span style="color: #cdd9e5; margin-left: 8px;">{html.escape(t['summary'] or '')}</span>
                                 </div>
                                 <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0;">
-                                    <span style="color: #cbd5e1; font-size: 12px; font-variant-numeric: tabular-nums;">{sp} SP</span>
-                                    {_status_badge(t.get('sprint_end_status') or t['status'])}
+                                    <span style="color: #cdd9e5; font-size: 12px; font-variant-numeric: tabular-nums;">{sp} SP</span>
+                                    {_status_badge(status_for_export)}
                                 </div>
                             </div>
             """)
+            engineer_table_rows.append([
+                t['ticket_key'],
+                type_label or '',
+                t['summary'] or '',
+                sp,
+                status_for_export or '',
+                t.get('ticket_url') or '',
+            ])
+            sprint_table_rows.append([
+                e['name'],
+                t['ticket_key'],
+                type_label or '',
+                t['summary'] or '',
+                sp,
+                status_for_export or '',
+                t.get('ticket_url') or '',
+            ])
+
+        eng_slug = re.sub(r'[^a-z0-9]+', '-', e['name'].lower()).strip('-') or 'engineer'
+        eng_block_id = f'sprint-{sprint_slug}-eng-{eng_slug}'
+        eng_export_btns = _feature_export_buttons(
+            group_id=eng_block_id,
+            label=f"{fmt_sprint_long(sprint['sprint_name'])} — {e['name']}",
+        )
+        eng_export_table = _export_table_html(
+            ['Ticket', 'Type', 'Summary', 'Story Points', 'Status', 'URL'],
+            engineer_table_rows,
+        )
 
         engineer_html.append(f"""
-                <details class="past-sprint-engineer" style="background: #334155; border-radius: 8px; padding: 16px; margin-bottom: 14px;">
+                <details class="past-sprint-engineer" id="{eng_block_id}" style="background: #1a2430; border-radius: 8px; padding: 16px; margin-bottom: 14px;">
                     <summary style="list-style: none; cursor: pointer; outline: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-                            <h3 style="font-size: 16px; color: #f1f5f9; margin: 0; display: flex; align-items: center; gap: 8px;">
-                                <span class="past-sprint-chevron" aria-hidden="true" style="display: inline-block; width: 10px; color: #94a3b8; transition: transform 0.15s;">▶</span>
+                            <h3 style="font-size: 16px; color: #f4f8fb; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <span class="past-sprint-chevron" aria-hidden="true" style="display: inline-block; width: 10px; color: #8194a6; transition: transform 0.15s;">▶</span>
                                 {html.escape(e['name'])}
                             </h3>
                             <div style="display: flex; gap: 14px;">
                                 <div style="text-align: center;">
                                     <div style="font-size: 18px; font-weight: 700; color: #38bdf8;">{_format_sp(e['in_review_plus_sp'])}</div>
-                                    <div style="font-size: 10px; color: #94a3b8;">In Code Review+</div>
+                                    <div style="font-size: 10px; color: #8194a6;">In Code Review+</div>
                                 </div>
                                 <div style="text-align: center;">
-                                    <div style="font-size: 18px; font-weight: 700; color: #10b981;">{_format_sp(e['completed_sp'])}</div>
-                                    <div style="font-size: 10px; color: #94a3b8;">Completed SP</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: #2dd4a7;">{_format_sp(e['completed_sp'])}</div>
+                                    <div style="font-size: 10px; color: #8194a6;">Completed SP</div>
                                 </div>
                                 <div style="text-align: center;">
-                                    <div style="font-size: 18px; font-weight: 700; color: #6366f1;">{_format_sp(e['total_sp'])}</div>
-                                    <div style="font-size: 10px; color: #94a3b8;">Total SP</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: #38bdf8;">{_format_sp(e['total_sp'])}</div>
+                                    <div style="font-size: 10px; color: #8194a6;">Total SP</div>
                                 </div>
                                 <div style="text-align: center;">
-                                    <div style="font-size: 18px; font-weight: 700; color: #cbd5e1;">{e['count']}</div>
-                                    <div style="font-size: 10px; color: #94a3b8;">Stories</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: #cdd9e5;">{e['count']}</div>
+                                    <div style="font-size: 10px; color: #8194a6;">Stories</div>
                                 </div>
+                                {eng_export_btns}
                             </div>
                         </div>
                     </summary>
+                    {eng_export_table}
                     <div style="display: grid; gap: 6px; margin-top: 12px;">
                         {''.join(rows)}
                     </div>
                 </details>
         """)
 
+    sprint_export_btns = _feature_export_buttons(
+        group_id=sprint_block_id,
+        label=f"Sprint Report — {fmt_sprint_long(sprint['sprint_name'])}",
+    )
+    sprint_export_table = _export_table_html(
+        ['Engineer', 'Ticket', 'Type', 'Summary', 'Story Points', 'Status', 'URL'],
+        sprint_table_rows,
+    )
+
+    # Carryover = committed work that wasn't closed at sprint end (rolled into
+    # a later sprint or dropped). The honest companion to "completed": a sprint
+    # can hit its SP number while still rolling a chunk of tickets. Only shown
+    # for closed sprints, where "at sprint end" is meaningful.
+    completed_count = sum(
+        1 for e in engineers for t in e['tickets']
+        if (t.get('sprint_end_status') or t['status']) in CLOSED_STATUSES
+    )
+    carry_count = total_count - completed_count
+    carry_sp = total_sp - total_completed_sp
+    carryover_meta = ''
+    if is_complete and carry_count > 0:
+        carryover_meta = (
+            f' · <span style="color: var(--warning-text, #fbbf24);">'
+            f'{carry_count} rolled ({_format_sp(carry_sp)} SP)</span>'
+        )
+
     return f"""
-            <details class="{block_class}" style="margin-bottom: 28px;"{open_attr}>
+            <details class="{block_class}" id="{sprint_block_id}" style="margin-bottom: 28px;"{open_attr}>
                 <summary style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 8px 0; margin-bottom: 12px; border-bottom: 2px solid var(--border);">
                     <h2 class="section-title sprint-report-name" style="margin: 0; border-bottom: none; padding-bottom: 0;">
-                        <span class="sprint-report-chevron" aria-hidden="true" style="display: inline-block; width: 12px; color: #94a3b8; transition: transform 0.15s; margin-right: 6px;">▶</span>
+                        <span class="sprint-report-chevron" aria-hidden="true" style="display: inline-block; width: 12px; color: #8194a6; transition: transform 0.15s; margin-right: 6px;">▶</span>
                         {name}
                         <span class="sprint-report-state {state_class}">{state_label}</span>
                     </h2>
-                    <div class="sprint-report-meta" style="color: var(--text-muted); font-size: 13px;">{start} → {end} · {total_count} tickets · {_format_sp(total_completed_sp)} completed · {_format_sp(total_review_plus_sp)} in code review+ · {_format_sp(total_sp)} total SP</div>
+                    <div class="sprint-report-meta" style="color: var(--text-muted); font-size: 13px;">{start} → {end} · {total_count} tickets · {_format_sp(total_completed_sp)} completed · {_format_sp(total_review_plus_sp)} in code review+ · {_format_sp(total_sp)} total SP{carryover_meta}</div>
+                    {sprint_export_btns}
                 </summary>
+                {sprint_export_table}
                 {''.join(engineer_html)}
             </details>
     """
@@ -4026,6 +4678,9 @@ def generate_pull_requests_html(config: dict, output_path: Path):
     pr_size_dist = get_pr_size_distribution(db_path, days=30)
     team_pr_review_time = get_team_pr_review_time(db_path, days=30)
     pr_approvals = get_pr_approvals_by_developer(db_path, days=30)
+    first_review = get_time_to_first_review(db_path, days=30)
+    review_load = get_review_load_by_reviewer(db_path, days=30)
+    size_vs_merge = get_pr_size_vs_merge_time(db_path, days=30)
 
     # Fetch open PRs grouped by repo
     conn = get_connection(db_path)
@@ -4039,6 +4694,10 @@ def generate_pull_requests_html(config: dict, output_path: Path):
                lines_added, lines_deleted
         FROM github_prs
         WHERE state = 'open'
+          -- Defence in depth: a row claiming 'open' but carrying a merge/close
+          -- timestamp is contradictory data — never surface it as open.
+          AND merged_at IS NULL
+          AND closed_at IS NULL
           AND lower(repository) LIKE '%fantasy%'
         ORDER BY repository, created_at
         """
@@ -4181,39 +4840,88 @@ def generate_pull_requests_html(config: dict, output_path: Path):
 
     total_prs = sum(pr_size_dist.values())
     sizes = [
-        ('XS', pr_size_dist['xs'], '<50 lines', '#10b981'),
-        ('S', pr_size_dist['s'], '50-200', '#3b82f6'),
-        ('M', pr_size_dist['m'], '200-400', '#f59e0b'),
-        ('L', pr_size_dist['l'], '400-800', '#ef4444'),
-        ('XL', pr_size_dist['xl'], '>800', '#7f1d1d')
+        ('XS', pr_size_dist['xs'], '<50 lines', '#2dd4a7'),
+        ('S', pr_size_dist['s'], '50-200', '#38bdf8'),
+        ('M', pr_size_dist['m'], '200-400', '#fbbf24'),
+        ('L', pr_size_dist['l'], '400-800', '#fb6a5f'),
+        ('XL', pr_size_dist['xl'], '>800', '#5e1a17')
     ]
 
     for label, count, range_text, color in sizes:
         percentage = (count / total_prs * 100) if total_prs > 0 else 0
         content += f"""
-                        <div style="text-align: center; background: #1e293b; padding: 16px; border-radius: 8px;">
-                            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">{label}</div>
+                        <div style="text-align: center; background: #131c27; padding: 16px; border-radius: 8px;">
+                            <div style="font-size: 12px; color: #8194a6; margin-bottom: 8px;">{label}</div>
                             <div style="font-size: 28px; font-weight: 700; color: {color}; margin-bottom: 4px;">{count}</div>
-                            <div style="font-size: 11px; color: #64748b;">{range_text}</div>
-                            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">{percentage:.0f}%</div>
+                            <div style="font-size: 11px; color: #566375;">{range_text}</div>
+                            <div style="font-size: 11px; color: #566375; margin-top: 4px;">{percentage:.0f}%</div>
                         </div>
         """
 
     avg_review_time_str = f"{team_pr_review_time:.0f}h" if team_pr_review_time else "N/A"
 
-    content += f"""
+    # Time-to-first-review: median is the headline (right-skewed), mean shown
+    # as sub so a few stale PRs don't misrepresent the typical wait.
+    if first_review:
+        ttfr_value = f"{first_review['median_hours']:.0f}h"
+        ttfr_sub = f"median · avg {first_review['avg_hours']:.0f}h ({first_review['pr_count']} PRs)"
+    else:
+        ttfr_value, ttfr_sub = "N/A", "no review data"
+
+    content += """
                     </div>
                 </div>
             </div>
+    """
 
+    # Merge time by PR size — pairs the two halves above (size + merge time)
+    # to show the size→latency relationship with the team's own data. Scaled
+    # to the largest bucket average; buckets with no PRs render as "—".
+    svm_max = max((b['avg_hours'] for b in size_vs_merge if b['avg_hours']), default=0)
+    if svm_max > 0:
+        svm_colors = {'XS': '#2dd4a7', 'S': '#38bdf8', 'M': '#fbbf24', 'L': '#fb6a5f', 'XL': '#5e1a17'}
+        svm_bars = ''
+        for b in size_vs_merge:
+            ah = b['avg_hours']
+            color = svm_colors.get(b['bucket'], '#38bdf8')
+            if ah:
+                pct = ah / svm_max * 100
+                val_label = f"{ah:.0f}h" if ah < 48 else f"{ah/24:.1f}d"
+                fill = f'<div class="flow-stage-fill" style="width: {pct:.0f}%; background: {color};"></div>'
+            else:
+                val_label = '—'
+                fill = ''
+            svm_bars += f"""
+                <div class="flow-stage-row">
+                    <div class="flow-stage-name">{b['bucket']} <span style="color: var(--text-faint);">({b['label']})</span></div>
+                    <div class="flow-stage-track">{fill}</div>
+                    <div class="flow-stage-val">{val_label} <span style="color: var(--text-faint); font-weight: 400;">· n={b['count']}</span></div>
+                </div>
+            """
+        content += f"""
+            <div class="section">
+                <div class="chart-container">
+                    <div class="chart-title">⚖️ Merge Time by PR Size (Last 30 Days)</div>
+                    <div class="chart-subtitle">Avg working hours from open to merge, by lines changed. Smaller PRs typically clear review faster.</div>
+                    <div class="flow-stages">{svm_bars}</div>
+                </div>
+            </div>
+        """
+
+    content += f"""
             <!-- PR Review Metrics -->
             <div class="section">
                 <h2 class="section-title">⏱️ Review Metrics</h2>
                 <div class="metrics-grid">
                     <div class="metric-card">
+                        <div class="metric-label">Time to First Review</div>
+                        <div class="metric-value">{ttfr_value}</div>
+                        <div class="metric-subtext">{ttfr_sub}</div>
+                    </div>
+                    <div class="metric-card">
                         <div class="metric-label">Avg Review Time</div>
                         <div class="metric-value">{avg_review_time_str}</div>
-                        <div class="metric-subtext">time to merge</div>
+                        <div class="metric-subtext">open to merge</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">Total PRs</div>
@@ -4256,6 +4964,50 @@ def generate_pull_requests_html(config: dict, output_path: Path):
                             <td>{avg_hours_str}</td>
                         </tr>
             """
+
+    content += """
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Review Activity by Reviewer -->
+            <div class="section">
+                <h2 class="section-title">🔍 Review Activity by Reviewer (Last 30 Days)</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: -8px;">
+                    Who carries review load. A lopsided share concentrates context (and risk) in a few reviewers.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Reviewer</th>
+                            <th>Reviews</th>
+                            <th>PRs Reviewed</th>
+                            <th>Approved</th>
+                            <th>Changes Req.</th>
+                            <th>Inline Comments</th>
+                            <th>Share</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    """
+
+    if review_load:
+        for rv in review_load:
+            content += f"""
+                        <tr>
+                            <td><strong>{rv['reviewer']}</strong></td>
+                            <td>{rv['reviews']}</td>
+                            <td>{rv['prs_reviewed']}</td>
+                            <td>{rv['approved']}</td>
+                            <td>{rv['changes_requested']}</td>
+                            <td>{rv['inline_comments']}</td>
+                            <td>{rv['share_pct']:.0f}%</td>
+                        </tr>
+            """
+    else:
+        content += """
+                        <tr><td colspan="7" style="color: var(--text-muted); font-style: italic;">No review activity in the last 30 days.</td></tr>
+        """
 
     content += """
                     </tbody>
@@ -4366,8 +5118,8 @@ def generate_project_fantasy_html(output_path: Path):
         tx = x_at(cur)
         month_label = cur.strftime('%b %Y') if cur.month == 1 else cur.strftime('%b')
         month_ticks_svg += (
-            f'<line x1="{tx:.1f}" y1="{baseline_y - 6}" x2="{tx:.1f}" y2="{baseline_y + 6}" stroke="#475569" stroke-width="1" />'
-            f'<text x="{tx:.1f}" y="{baseline_y + 22}" text-anchor="middle" fill="#94a3b8" font-size="10">{month_label}</text>'
+            f'<line x1="{tx:.1f}" y1="{baseline_y - 6}" x2="{tx:.1f}" y2="{baseline_y + 6}" stroke="#243340" stroke-width="1" />'
+            f'<text x="{tx:.1f}" y="{baseline_y + 22}" text-anchor="middle" fill="#8194a6" font-size="10">{month_label}</text>'
         )
         if cur.month == 12:
             cur = date(cur.year + 1, 1, 1)
@@ -4376,8 +5128,9 @@ def generate_project_fantasy_html(output_path: Path):
 
     # Deliverable vertical lines + labels (stagger label Y to avoid overlap on dense clusters)
     phases_svg = ''
-    # Colors cycle through brand + accents so adjacent markers are distinguishable
-    colors = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+    # Colors cycle so adjacent markers are distinguishable. Scoreboard palette:
+    # broadcast cyan leads, then the semantic state hues — no indigo/violet.
+    colors = ['#38bdf8', '#2dd4a7', '#fbbf24', '#fb6a5f', '#9bdcfb', '#5eead4']
     for idx, phase in enumerate(phases):
         px = x_at(phase['date'])
         color = colors[idx % len(colors)]
@@ -4388,11 +5141,11 @@ def generate_project_fantasy_html(output_path: Path):
             # Vertical line from label row down to baseline
             f'<line x1="{px:.1f}" y1="{label_y + 6}" x2="{px:.1f}" y2="{baseline_y}" stroke="{color}" stroke-width="2" {dash} />'
             # Dot on baseline
-            f'<circle cx="{px:.1f}" cy="{baseline_y}" r="5" fill="{color}" stroke="#1e293b" stroke-width="2" />'
+            f'<circle cx="{px:.1f}" cy="{baseline_y}" r="5" fill="{color}" stroke="#0f1620" stroke-width="2" />'
             # Phase name above the line
             f'<text x="{px:.1f}" y="{label_y}" text-anchor="middle" fill="{color}" font-size="11" font-weight="600">{phase["name"]}</text>'
             # Date label above the dot
-            f'<text x="{px:.1f}" y="{baseline_y - 12}" text-anchor="middle" fill="#cbd5e1" font-size="10">{marker}</text>'
+            f'<text x="{px:.1f}" y="{baseline_y - 12}" text-anchor="middle" fill="#cdd9e5" font-size="10">{marker}</text>'
         )
 
     # Today marker (only if today sits in the visible range)
@@ -4400,17 +5153,17 @@ def generate_project_fantasy_html(output_path: Path):
     if timeline_start <= today <= timeline_end:
         tx = x_at(today)
         today_marker_svg = (
-            f'<line x1="{tx:.1f}" y1="{pad_t}" x2="{tx:.1f}" y2="{svg_h - pad_b}" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.8" />'
-            f'<text x="{tx:.1f}" y="{svg_h - pad_b + 40}" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="600">Today · {today.strftime("%b %d, %Y")}</text>'
+            f'<line x1="{tx:.1f}" y1="{pad_t}" x2="{tx:.1f}" y2="{svg_h - pad_b}" stroke="#56cdf9" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.8" />'
+            f'<text x="{tx:.1f}" y="{svg_h - pad_b + 40}" text-anchor="middle" fill="#56cdf9" font-size="11" font-weight="600">Today · {today.strftime("%b %d, %Y")}</text>'
         )
 
     # Baseline bar (filled portion = progress to today)
     baseline_svg = (
-        f'<line x1="{pad_l}" y1="{baseline_y}" x2="{svg_w - pad_r}" y2="{baseline_y}" stroke="#475569" stroke-width="3" />'
+        f'<line x1="{pad_l}" y1="{baseline_y}" x2="{svg_w - pad_r}" y2="{baseline_y}" stroke="#243340" stroke-width="3" />'
     )
     if timeline_start <= today <= timeline_end:
         baseline_svg += (
-            f'<line x1="{pad_l}" y1="{baseline_y}" x2="{x_at(today):.1f}" y2="{baseline_y}" stroke="#6366f1" stroke-width="3" />'
+            f'<line x1="{pad_l}" y1="{baseline_y}" x2="{x_at(today):.1f}" y2="{baseline_y}" stroke="#38bdf8" stroke-width="3" />'
         )
 
     content = f"""
@@ -4498,6 +5251,558 @@ def generate_project_fantasy_html(output_path: Path):
     )
     _atomic_write(output_path, html)
     print(f"✅ Project Fantasy dashboard generated: {output_path}")
+
+
+def generate_features_html(output_path: Path):
+    """Generate the Features page — the two feature-list rollups.
+
+    Reads data/project_fantasy.json (produced by sync_project_fantasy.py)
+    and renders the by-Milestone + by-Launch sections that previously lived
+    on the Project: Fantasy page.
+    """
+    init_key = _jira_initiative_key()
+    init_url = f"{_jira_cloud_base()}/browse/{init_key}"
+    content = f"""
+        <header>
+            <h1>🗂️ Features</h1>
+            <div class="subtitle">Project: Fantasy feature rollups • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
+        </header>
+{generate_nav_menu('features')}
+        <div class="content">
+            <div class="intro-banner">
+                <p>All features under <a href="{init_url}" target="_blank" style="color: var(--accent-text);">{init_key}</a>, grouped by Launch phase. RAG and Weekly Status freshness come from PM weekly updates in Jira.</p>
+            </div>
+    """
+    content += _render_feature_lists()
+    content += """
+            <footer>
+                Generated by Engineering Management Dashboard
+            </footer>
+        </div>
+    """
+
+    html = render_html(
+        title="Features",
+        content=content,
+        body_class=_PAGE_THEME["features"],
+    )
+    _atomic_write(output_path, html)
+    print(f"✅ Features dashboard generated: {output_path}")
+
+
+# ---------------------------------------------------------------------------
+# Readiness by Phase page
+# ---------------------------------------------------------------------------
+# A forecast/burnup is only honest once scope is decomposed. Beta and beyond
+# are still being broken down, so instead of projecting against a denominator
+# we know is wrong, this page measures *how much of each launch phase is even
+# knowable yet* — Features → have Epics → Epics have Stories — and gates the
+# idea of forecasting on a readiness threshold.
+
+# A phase at/above this decomposition % is considered scoped enough that a
+# burnup/forecast for it would be meaningful. Below it, the page says so
+# plainly rather than projecting against unknown scope.
+_READINESS_FORECAST_THRESHOLD = 85.0
+
+# Terminal/abandoned states never count toward decomposition gaps — you don't
+# groom a dropped feature. Mirrors the dropped bucket the snapshot assigns.
+_READINESS_LIVE = lambda bucket: bucket != 'dropped'
+
+
+def _compute_phase_readiness(snap: dict) -> list:
+    """Return per-launch-phase decomposition readiness.
+
+    Walks the Feature → Epic → Story hierarchy from the project snapshot and,
+    for each launch phase, counts:
+      * features with no child epics at all (can't be scoped or sized yet)
+      * epics with no child stories (sized container, unknown contents)
+    Readiness % = share of "decomposition checkpoints" that are satisfied,
+    where each live feature contributes a "has epics?" checkpoint and each
+    live epic contributes a "has stories?" checkpoint. A phase with no live
+    features is reported as readiness=None (nothing to scope yet).
+
+    Returns an ordered list of dicts (one per phase) with the raw worklists
+    so the renderer can show both the rollup bar and the grooming punch list.
+    """
+    features = [f for f in (snap.get('features') or []) if _READINESS_LIVE(f.get('status_bucket'))]
+    epics = [e for e in (snap.get('epics') or []) if _READINESS_LIVE(e.get('status_bucket'))]
+    stories = [s for s in (snap.get('stories') or []) if _READINESS_LIVE(s.get('status_bucket'))]
+
+    epics_by_feature: dict[str, list] = {}
+    for e in epics:
+        epics_by_feature.setdefault(e.get('parent'), []).append(e)
+    stories_by_epic: dict[str, list] = {}
+    for s in stories:
+        stories_by_epic.setdefault(s.get('parent'), []).append(s)
+
+    launch_order = ['Alpha', 'Beta', 'Public Launch', 'Post Launch']
+    groups: dict[str, list] = {name: [] for name in launch_order}
+    groups['Unassigned'] = []
+    for f in features:
+        phase = (f.get('launch') or '').strip()
+        if phase in groups:
+            groups[phase].append(f)
+        elif phase:
+            groups.setdefault(phase, []).append(f)
+        else:
+            groups['Unassigned'].append(f)
+
+    ordered_phases = (
+        launch_order
+        + sorted(k for k in groups if k not in launch_order and k != 'Unassigned')
+        + ['Unassigned']
+    )
+
+    rows = []
+    for phase in ordered_phases:
+        feats = groups.get(phase) or []
+        if not feats:
+            continue
+        features_no_epics = []
+        epics_no_stories = []
+        checkpoints_total = 0
+        checkpoints_met = 0
+        epic_count = 0
+        for f in feats:
+            checkpoints_total += 1  # "feature has epics?" checkpoint
+            fe = epics_by_feature.get(f['key'], [])
+            # A completed feature is fully scoped by definition — the work
+            # shipped — so it's never a decomposition gap even if its epics
+            # weren't modeled here. Same for completed epics below.
+            f_done = f.get('status_bucket') == 'done'
+            if fe:
+                checkpoints_met += 1
+                for e in fe:
+                    epic_count += 1
+                    checkpoints_total += 1  # "epic has stories?" checkpoint
+                    if stories_by_epic.get(e['key']) or e.get('status_bucket') == 'done':
+                        checkpoints_met += 1
+                    else:
+                        epics_no_stories.append(e)
+            elif f_done:
+                checkpoints_met += 1  # done feature counts as scoped
+            else:
+                features_no_epics.append(f)
+
+        readiness = (checkpoints_met / checkpoints_total * 100) if checkpoints_total else None
+        rows.append({
+            'phase': phase,
+            'feature_count': len(feats),
+            'epic_count': epic_count,
+            'features_no_epics': features_no_epics,
+            'epics_no_stories': epics_no_stories,
+            'readiness': readiness,
+            'forecastable': readiness is not None and readiness >= _READINESS_FORECAST_THRESHOLD,
+        })
+    return rows
+
+
+def _readiness_tone(pct):
+    """Map a readiness % to a semantic tone class. None = not-yet-scoped."""
+    if pct is None:
+        return 'muted'
+    if pct >= _READINESS_FORECAST_THRESHOLD:
+        return 'success'
+    if pct >= 50:
+        return 'warning'
+    return 'danger'
+
+
+def _render_readiness_worklist(title: str, items: list, kind: str) -> str:
+    """Render a grooming punch list (features-without-epics or epics-without-
+    stories). `kind` controls the verb shown. Empty list → nothing."""
+    if not items:
+        return ''
+    verb = 'Break down into epics' if kind == 'feature' else 'Add child stories'
+    li = []
+    for it in sorted(items, key=lambda x: x.get('key', '')):
+        key = html.escape(it.get('key', ''))
+        summary = html.escape(it.get('summary') or '')
+        url = it.get('url') or '#'
+        status = html.escape(it.get('status') or '')
+        li.append(
+            f'<li class="readiness-work-item">'
+            f'<a href="{url}" target="_blank" class="ticket-key">{key}</a>'
+            f'<span class="readiness-work-summary">{summary}</span>'
+            f'<span class="badge status">{status}</span>'
+            f'</li>'
+        )
+    return (
+        f'<div class="readiness-worklist">'
+        f'<div class="readiness-worklist-head">{html.escape(title)} '
+        f'<span class="readiness-work-action">→ {verb}</span></div>'
+        f'<ul>{"".join(li)}</ul>'
+        f'</div>'
+    )
+
+
+def generate_readiness_html(output_path: Path):
+    """Generate the Readiness by Phase page.
+
+    Reads data/project_fantasy.json and reports decomposition readiness per
+    launch phase, with a per-phase "ready to forecast?" gate and a grooming
+    worklist of what's not yet broken down. Designed for the case where Beta+
+    scope is still being defined, so a burnup/forecast would project against
+    an unknown denominator.
+    """
+    import json as _json
+    snapshot_path = Path(__file__).parent.parent / "data" / "project_fantasy.json"
+
+    intro = (
+        '<div class="intro-banner">'
+        '<p><strong>Decomposition readiness</strong> measures how much of each launch '
+        'phase is broken down far enough to track or forecast: '
+        '<em>Features → Epics → Stories</em>. A phase only becomes forecastable once it '
+        f'crosses <strong>{_READINESS_FORECAST_THRESHOLD:.0f}%</strong> — below that, scope is '
+        'still being defined and any burnup would project against an unknown total. '
+        'The worklists below are the grooming that closes the gap.</p>'
+        '</div>'
+    )
+
+    if not snapshot_path.exists():
+        body = (
+            '<div class="section"><div class="intro-banner" style="border-left-color: var(--warning);">'
+            '<p><strong>No project snapshot yet.</strong> Run '
+            '<code>python3 scripts/sync_project_fantasy.py</code> to populate readiness.</p>'
+            '</div></div>'
+        )
+    else:
+        try:
+            snap = _json.loads(snapshot_path.read_text())
+        except Exception as e:
+            snap = None
+            body = (
+                f'<div class="section"><div class="intro-banner" style="border-left-color: var(--danger);">'
+                f'<p><strong>Snapshot file is malformed:</strong> {html.escape(str(e))}</p>'
+                f'</div></div>'
+            )
+        if snap is not None:
+            rows = _compute_phase_readiness(snap)
+            if not rows:
+                body = (
+                    '<div class="section"><div class="empty-state">'
+                    '<div class="icon">📦</div><div>No live features found in the snapshot.</div>'
+                    '</div></div>'
+                )
+            else:
+                # Overall readiness banner — weighted by checkpoint counts so a
+                # heavily-scoped phase isn't outvoted by a tiny one.
+                forecastable = [r for r in rows if r['forecastable']]
+                total_feats = sum(r['feature_count'] for r in rows)
+                total_gap_feats = sum(len(r['features_no_epics']) for r in rows)
+                total_gap_epics = sum(len(r['epics_no_stories']) for r in rows)
+                cards = []
+                cards.append(
+                    f'<div class="metric-card success">'
+                    f'<div class="metric-label">Phases Forecastable</div>'
+                    f'<div class="metric-value">{len(forecastable)}<span style="font-size:.5em;color:var(--text-muted)"> / {len(rows)}</span></div>'
+                    f'<div class="metric-subtext">≥ {_READINESS_FORECAST_THRESHOLD:.0f}% decomposed</div></div>'
+                )
+                cards.append(
+                    f'<div class="metric-card{" warning" if total_gap_feats else ""}">'
+                    f'<div class="metric-label">Features Not Broken Down</div>'
+                    f'<div class="metric-value">{total_gap_feats}<span style="font-size:.5em;color:var(--text-muted)"> / {total_feats}</span></div>'
+                    f'<div class="metric-subtext">no child epics yet</div></div>'
+                )
+                cards.append(
+                    f'<div class="metric-card{" warning" if total_gap_epics else ""}">'
+                    f'<div class="metric-label">Epics Not Broken Down</div>'
+                    f'<div class="metric-value">{total_gap_epics}</div>'
+                    f'<div class="metric-subtext">no child stories yet</div></div>'
+                )
+                banner = f'<div class="metrics-grid">{"".join(cards)}</div>'
+
+                phase_blocks = []
+                for r in rows:
+                    pct = r['readiness']
+                    tone = _readiness_tone(pct)
+                    pct_label = '—' if pct is None else f'{pct:.0f}%'
+                    bar_w = 0 if pct is None else pct
+                    gate = (
+                        '<span class="readiness-gate ready">✓ Ready to forecast</span>'
+                        if r['forecastable'] else
+                        '<span class="readiness-gate not-ready">⏳ Scope still being defined</span>'
+                    )
+                    worklists = (
+                        _render_readiness_worklist(
+                            f'{len(r["features_no_epics"])} feature(s) with no epics',
+                            r['features_no_epics'], 'feature')
+                        + _render_readiness_worklist(
+                            f'{len(r["epics_no_stories"])} epic(s) with no stories',
+                            r['epics_no_stories'], 'epic')
+                    )
+                    if not worklists:
+                        worklists = '<div class="readiness-clear">✓ Fully broken down — nothing to groom.</div>'
+
+                    phase_blocks.append(
+                        f'<div class="readiness-phase">'
+                        f'<div class="readiness-phase-head">'
+                        f'<span class="readiness-phase-name">{html.escape(r["phase"])}</span>'
+                        f'<span class="readiness-phase-meta">{r["feature_count"]} features · {r["epic_count"]} epics</span>'
+                        f'{gate}'
+                        f'<span class="readiness-pct {tone}">{pct_label}</span>'
+                        f'</div>'
+                        f'<div class="readiness-bar"><div class="readiness-bar-fill {tone}" style="width:{bar_w:.1f}%"></div></div>'
+                        f'<div class="readiness-worklists">{worklists}</div>'
+                        f'</div>'
+                    )
+
+                body = (
+                    f'<div class="section">{banner}</div>'
+                    f'<div class="section"><h2 class="section-title">🧩 Decomposition by Launch Phase</h2>'
+                    f'<div class="readiness-phase-list">{"".join(phase_blocks)}</div></div>'
+                )
+
+    content = f"""
+        <header>
+            <h1>🧩 Readiness by Phase</h1>
+            <div class="subtitle">Decomposition readiness • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
+        </header>
+{generate_nav_menu('readiness')}
+        <div class="content">
+            {intro}
+            {body}
+            <footer>
+                Generated by Engineering Management Dashboard
+            </footer>
+        </div>
+    """
+    html_page = render_html(
+        title="Readiness by Phase",
+        content=content,
+        body_class=_PAGE_THEME["readiness"],
+    )
+    _atomic_write(output_path, html_page)
+    print(f"✅ Readiness dashboard generated: {output_path}")
+
+
+# ---------------------------------------------------------------------------
+# Delivery Excellence page
+# ---------------------------------------------------------------------------
+# Every other page asks "are we on track?" (status). This page asks "is the
+# WAY we work getting better?" — flow efficiency, rework, and predictability.
+# All team-level (deliberately blameless — no per-dev leaderboards) and
+# trended over the closed-sprint history. Sourced from the transition log and
+# sprint snapshots; see queries.get_flow_efficiency / _rework_rate /
+# _predictability.
+
+def _excellence_gauge(label: str, value, unit: str, tone: str, sub: str,
+                      help_text: str = '', be=None, fe=None) -> str:
+    """One headline metric tile. value=None renders an em-dash.
+
+    When be/fe are given, a split row shows each track's value beneath the
+    team number so the headline never hides a BE/FE divergence.
+    """
+    val = '—' if value is None else f'{value}{unit}'
+    title = f' title="{html.escape(help_text)}"' if help_text else ''
+    split = ''
+    if be is not None or fe is not None:
+        be_s = '—' if be is None else f'{be}{unit}'
+        fe_s = '—' if fe is None else f'{fe}{unit}'
+        split = (
+            f'<div class="excellence-gauge-split">'
+            f'<span class="excellence-split-chip be">BE {be_s}</span>'
+            f'<span class="excellence-split-chip fe">FE {fe_s}</span>'
+            f'</div>'
+        )
+    return (
+        f'<div class="excellence-gauge {tone}"{title}>'
+        f'<div class="excellence-gauge-label">{html.escape(label)}</div>'
+        f'<div class="excellence-gauge-value">{val}</div>'
+        f'<div class="excellence-gauge-sub">{html.escape(sub)}</div>'
+        f'{split}'
+        f'</div>'
+    )
+
+
+def generate_delivery_excellence_html(config: dict, output_path: Path):
+    """Render the Delivery Excellence page (flow / rework / predictability)."""
+    db_path = config['database']['path']
+    sprint_prefix = config['jira']['sprint_prefix']
+    window = 90
+
+    # Assignee → role map drives the BE/FE split on flow & rework (ticket-level
+    # work). Predictability splits by sprint-track role instead (BE/FE run as
+    # separate sprints), handled inside get_predictability.
+    name_to_role, _ = _build_role_maps(config)
+    flow = get_flow_efficiency(db_path, days=window, name_to_role=name_to_role)
+    rework = get_rework_rate(db_path, days=window, name_to_role=name_to_role)
+    pred = get_predictability(db_path, sprint_prefix, num_sprints=12)
+    flow_be, flow_fe = flow['by_role']['BE'], flow['by_role']['FE']
+    rw_be, rw_fe = rework['by_role']['BE'], rework['by_role']['FE']
+    pred_be, pred_fe = pred['by_role']['BE'], pred['by_role']['FE']
+
+    # --- Headline gauges ---------------------------------------------------
+    eff = flow['efficiency_pct']
+    eff_tone = 'muted' if eff is None else ('success' if eff >= 40 else 'warning' if eff >= 25 else 'danger')
+    rw = rework['rework_pct']
+    # Lower rework is better — invert the tone thresholds.
+    rw_tone = 'muted' if rw is None else ('success' if rw <= 10 else 'warning' if rw <= 20 else 'danger')
+    saydo = pred['say_do_avg']
+    saydo_tone = 'muted' if saydo is None else ('success' if 90 <= saydo <= 115 else 'warning' if 75 <= saydo <= 130 else 'danger')
+    cov = pred['velocity_cov_pct']
+    # Lower coefficient of variation = steadier = better.
+    cov_tone = 'muted' if cov is None else ('success' if cov <= 20 else 'warning' if cov <= 35 else 'danger')
+
+    gauges = ''.join([
+        _excellence_gauge(
+            'Flow Efficiency', eff, '%', eff_tone,
+            f'{flow["active_days"]:.0f}d active · {flow["wait_days"]:.0f}d waiting',
+            'Share of in-flight time spent actively worked vs. waiting in a queue. '
+            'Higher is better; industry-typical knowledge work is often 15-40%.',
+            be=flow_be['efficiency_pct'], fe=flow_fe['efficiency_pct']),
+        _excellence_gauge(
+            'Rework Rate', rw, '%', rw_tone,
+            f'{rework["rework_tickets"]} of {rework["total_tickets"]} tickets bounced back',
+            'Share of tickets that moved backward in the pipeline at least once '
+            '(e.g. review → in-progress). Lower is better.',
+            be=rw_be['rework_pct'], fe=rw_fe['rework_pct']),
+        _excellence_gauge(
+            'Say / Do', saydo, '%', saydo_tone,
+            'avg completed ÷ committed, recent sprints',
+            'Commitment reliability: completed vs committed work per sprint, averaged. '
+            '~100% means the team finishes what it plans.',
+            be=pred_be['say_do_avg'], fe=pred_fe['say_do_avg']),
+        _excellence_gauge(
+            'Velocity Stability', cov, '%', cov_tone,
+            f'± around {pred["velocity_mean"] or 0:.0f} SP/sprint',
+            'Coefficient of variation of completed story points across sprints. '
+            'LOWER is better — a steady team is more predictable than a high-but-erratic one.',
+            be=pred_be['velocity_cov_pct'], fe=pred_fe['velocity_cov_pct']),
+    ])
+
+    # --- Where the waiting happens (flow breakdown) ------------------------
+    wait_rows = ''
+    wbs = flow['wait_by_status']
+    wait_max = max(wbs.values()) if wbs else 0
+    for status, dval in wbs.items():
+        pctw = (dval / wait_max * 100) if wait_max else 0
+        wait_rows += (
+            f'<div class="excellence-flow-row">'
+            f'<span class="excellence-flow-name">{html.escape(status)}</span>'
+            f'<span class="excellence-flow-track"><span class="excellence-flow-fill" style="width:{pctw:.1f}%"></span></span>'
+            f'<span class="excellence-flow-val">{dval:.0f}d</span>'
+            f'</div>'
+        )
+    if not wait_rows:
+        wait_rows = '<div class="readiness-clear">No measurable queue time in the window.</div>'
+    top_q = flow['top_queue']
+    queue_callout = (
+        f'<p class="excellence-callout">Biggest queue: <strong>{html.escape(top_q["status"])}</strong> '
+        f'— {top_q["days"]:.0f} cumulative working-days of tickets waiting here. '
+        f'This is the handoff to optimize first.</p>'
+    ) if top_q else ''
+
+    # BE-vs-FE flow comparison — the team number can hide a big track gap.
+    def _track_line(role_label, rdata):
+        e = rdata['efficiency_pct']
+        tq = rdata['top_queue']
+        e_txt = '—' if e is None else f'{e:.0f}%'
+        tq_txt = f' · biggest queue {html.escape(tq["status"])} ({tq["days"]:.0f}d)' if tq else ''
+        return (
+            f'<div class="excellence-track-line">'
+            f'<span class="excellence-split-chip {role_label.lower()}">{role_label}</span>'
+            f'<strong>{e_txt}</strong> flow efficiency'
+            f'<span class="excellence-track-detail">{rdata["active_days"]:.0f}d active · '
+            f'{rdata["wait_days"]:.0f}d waiting{tq_txt}</span>'
+            f'</div>'
+        )
+    track_compare = (
+        f'<div class="excellence-track-compare">{_track_line("BE", flow_be)}{_track_line("FE", flow_fe)}</div>'
+    )
+
+    # --- Rework hotspots ---------------------------------------------------
+    hop_rows = ''
+    for h in rework['top_hops']:
+        hop_rows += (
+            f'<li class="excellence-hop"><span class="excellence-hop-name">{html.escape(h["hop"])}</span>'
+            f'<span class="badge status">{h["count"]}×</span></li>'
+        )
+    hop_block = (
+        f'<ul class="excellence-hop-list">{hop_rows}</ul>'
+        if hop_rows else '<div class="readiness-clear">✓ No backward transitions in the window.</div>'
+    )
+
+    # --- Predictability trend (per-sprint say/do bars) ---------------------
+    trend_rows = ''
+    for s in pred['sprints']:
+        acc = s['accuracy']
+        if not s['planned']:
+            continue
+        tone = 'success' if 90 <= acc <= 115 else 'warning' if 75 <= acc <= 130 else 'danger'
+        bar = min(acc, 150) / 150 * 100
+        role = s.get('role')
+        role_chip = (
+            f'<span class="excellence-split-chip {role.lower()}">{role}</span>'
+            if role in ('BE', 'FE') else ''
+        )
+        trend_rows += (
+            f'<div class="excellence-trend-row">'
+            f'<span class="excellence-trend-name">{role_chip}{html.escape(fmt_sprint_short(s["sprint_name"]))}</span>'
+            f'<span class="excellence-trend-track"><span class="excellence-trend-fill {tone}" style="width:{bar:.1f}%"></span>'
+            f'<span class="excellence-trend-target"></span></span>'
+            f'<span class="excellence-trend-val">{acc:.0f}%</span>'
+            f'<span class="excellence-trend-detail">{s["completed"]}/{s["planned"]} · {s["completed_sp"]:.0f} SP</span>'
+            f'</div>'
+        )
+    if not trend_rows:
+        trend_rows = '<div class="readiness-clear">Not enough closed-sprint history yet.</div>'
+
+    body = f"""
+        <div class="section">
+            <div class="excellence-gauges">{gauges}</div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">⏳ Where the Time Goes</h2>
+            <p class="section-note">In-flight time split by queue. Active work is healthy; long queues are
+            waste between handoffs — the lever for faster delivery without working harder.</p>
+            {queue_callout}
+            {track_compare}
+            <div class="excellence-flow">{wait_rows}</div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">↩️ Rework Hotspots</h2>
+            <p class="section-note">Backward transitions in the last {window} days — work bouncing back a stage.
+            These are the points where quality or clarity is breaking down.</p>
+            {hop_block}
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🎯 Predictability Trend</h2>
+            <p class="section-note">Completed ÷ committed per closed sprint. The marker at 100% is the target —
+            consistently near it matters more than any single high number.</p>
+            <div class="excellence-trend">{trend_rows}</div>
+        </div>
+    """
+
+    content = f"""
+        <header>
+            <h1>🏅 Delivery Excellence</h1>
+            <div class="subtitle">How well we deliver — flow, rework &amp; predictability • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
+        </header>
+{generate_nav_menu('delivery-excellence')}
+        <div class="content">
+            <div class="intro-banner">
+                <p>This page measures the <strong>delivery system</strong>, not project status: how efficiently
+                work flows, how often it bounces back, and how reliably the team hits its commitments.
+                Flow &amp; rework are team-wide over the last {window} days, split BE/FE by assignee;
+                predictability covers recent closed sprints, split by sprint track.</p>
+            </div>
+            {body}
+            <footer>
+                Generated by Engineering Management Dashboard
+            </footer>
+        </div>
+    """
+    html_page = render_html(
+        title="Delivery Excellence",
+        content=content,
+        body_class=_PAGE_THEME["delivery-excellence"],
+    )
+    _atomic_write(output_path, html_page)
+    print(f"✅ Delivery Excellence dashboard generated: {output_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -4649,6 +5954,7 @@ _DEP_STATUS_CLASS = {
     'to do':                'todo',
     'open':                 'open',
     'product discovery':    'todo',
+    'ready for prioritization review': 'todo',
     'in progress':          'inprogress',
     'in development':       'inprogress',
     'in review':            'inprogress',
@@ -4703,13 +6009,217 @@ def _dep_lookup_from_db(db_path: str, key: str) -> dict:
         conn.close()
 
 
+def _jira_cloud_base() -> str:
+    """https://<tenant> root from jira.cloud_id. Cached for the regen pass;
+    falls back to the betfanatics tenant when config is unavailable."""
+    cached = getattr(_jira_cloud_base, '_cache', None)
+    if cached is not None:
+        return cached
+    try:
+        cloud_id = (load_config().get('jira') or {}).get('cloud_id') or "betfanatics.atlassian.net"
+    except Exception:
+        cloud_id = "betfanatics.atlassian.net"
+    base = f"https://{cloud_id}"
+    _jira_cloud_base._cache = base
+    return base
+
+
+def _structure_board_url() -> str:
+    """Full URL to the Jira Structure board (jira.structure_board_url). Surfaced
+    under 'Useful Links' on the Project snapshot page; empty string hides it."""
+    try:
+        return (load_config().get('jira') or {}).get('structure_board_url') or ''
+    except Exception:
+        return ''
+
+
 def _dep_default_url(key: str) -> str:
     """Best-effort Jira URL for any project key — the cloud_id lives in config
-    but we don't need it here since the format is uniform. We hit the standard
-    Atlassian Cloud URL for the betfanatics tenant."""
+    but the browse/ format is uniform, so we just prefix the configured tenant."""
     if not key:
         return ''
-    return f"https://betfanatics.atlassian.net/browse/{key}"
+    return f"{_jira_cloud_base()}/browse/{key}"
+
+
+def _normalize_rag(value) -> str:
+    """Map free-text rag values to one of: red, amber, green, or '' (none)."""
+    if not value:
+        return ''
+    v = str(value).strip().lower()
+    if v in ('red', 'r'):
+        return 'red'
+    if v in ('amber', 'yellow', 'y', 'a'):
+        return 'amber'
+    if v in ('green', 'g'):
+        return 'green'
+    return ''
+
+
+def _normalize_weekly_history(raw) -> list[dict]:
+    """Coerce `weekly_status` YAML into a list of {date, text} dicts.
+
+    Accepts:
+      - missing/None → []
+      - a string → single entry with no date
+      - list of strings → entries with no date
+      - list of dicts {date, text} (or {date, status}) → kept as-is
+    Newest entries first. Stable string-sort on ISO dates handles ordering;
+    entries without a date sort to the end.
+    """
+    if not raw:
+        return []
+    if isinstance(raw, str):
+        return [{'date': '', 'text': raw}]
+    if not isinstance(raw, list):
+        return []
+    today_iso = datetime.now().strftime('%Y-%m-%d')
+    out = []
+    for item in raw:
+        if isinstance(item, str):
+            out.append({'date': '', 'text': item})
+        elif isinstance(item, dict):
+            text = item.get('text') or item.get('status') or item.get('note') or ''
+            date = item.get('date') or ''
+            date_str = str(date)
+            if date_str and date_str > today_iso:
+                date_str = today_iso
+            if text or date_str:
+                out.append({'date': date_str, 'text': str(text)})
+    # Newest first — empty dates float to the end.
+    out.sort(key=lambda e: (e.get('date') or ''), reverse=True)
+    out.sort(key=lambda e: 0 if e.get('date') else 1)
+    return out
+
+
+# Field that holds the human-curated weekly status updates on FEAT/CAT/FNTSY
+# tickets. Each paragraph in the ADF doc starts with a `date` node (Unix ms
+# timestamp) followed by the entry body — see FEAT-8216 for the canonical
+# example. Hit the issue REST endpoint with this single field for cheap
+# fetches.
+_DEP_WEEKLY_STATUS_FIELD = 'customfield_10120'
+# RAG status field — single-select with options "Red" / "Amber" / "Green".
+# Sample payload: {"value": "Amber", "id": "10240", ...}.
+_DEP_RAG_FIELD = 'customfield_10155'
+
+
+def _jira_session():
+    """Return a (session, base_url) tuple authenticated for Atlassian Cloud,
+    or None if creds aren't available — caller should fall back to YAML.
+
+    Loads JIRA_EMAIL/JIRA_API_TOKEN from env, with config/.env as a backup
+    so this works in local regen too. Cached on the function object to avoid
+    rebuilding for every dependency on a single regen pass.
+    """
+    if hasattr(_jira_session, '_cache'):
+        return _jira_session._cache
+    try:
+        import requests
+        repo_root = Path(__file__).resolve().parent.parent
+        env_file = repo_root / 'config' / '.env'
+        if env_file.exists():
+            for line in env_file.read_text().splitlines():
+                line = line.strip()
+                if not line or line.startswith('#') or '=' not in line:
+                    continue
+                k, v = line.split('=', 1)
+                os.environ.setdefault(k.strip(), v.strip())
+        email = os.environ.get('JIRA_EMAIL')
+        token = os.environ.get('JIRA_API_TOKEN')
+        if not email or not token:
+            _jira_session._cache = None
+            return None
+        sess = requests.Session()
+        sess.auth = (email, token)
+        sess.headers.update({'Accept': 'application/json'})
+        base = f"{_jira_cloud_base()}/rest/api/3"
+        _jira_session._cache = (sess, base)
+        return _jira_session._cache
+    except Exception:
+        _jira_session._cache = None
+        return None
+
+
+def _parse_weekly_status_adf(doc: dict) -> list[dict]:
+    """Parse the customfield_10120 ADF doc into [{date, text}] entries.
+
+    Each top-level paragraph has the shape:
+      [{type: "date", attrs: {timestamp: "<unix_ms>"}}, {type: "text", text: " body..."}]
+    Some paragraphs have multiple text nodes; we concatenate them. Paragraphs
+    with no date node still surface as entries with date='' so nothing is
+    silently dropped. Newest first.
+
+    Future-dated entries (typo'd timestamps that land after today — Jira's
+    date picker makes it easy to mis-tap a month) are clamped to today so the
+    dashboard never advertises a status update from the future. The QA review
+    agent flags these in parallel so a human can fix the source ticket.
+    """
+    if not isinstance(doc, dict):
+        return []
+    today_iso = datetime.now().strftime('%Y-%m-%d')
+    out = []
+    for para in doc.get('content') or []:
+        if (para.get('type') or '') != 'paragraph':
+            continue
+        nodes = para.get('content') or []
+        date_str = ''
+        text_parts = []
+        for node in nodes:
+            ntype = node.get('type')
+            if ntype == 'date':
+                ts = (node.get('attrs') or {}).get('timestamp')
+                if ts:
+                    try:
+                        ms = int(ts)
+                        date_str = datetime.utcfromtimestamp(ms / 1000).strftime('%Y-%m-%d')
+                    except (TypeError, ValueError):
+                        pass
+            elif ntype == 'text':
+                t = node.get('text') or ''
+                if t:
+                    text_parts.append(t)
+        text = ''.join(text_parts).strip()
+        if date_str and date_str > today_iso:
+            date_str = today_iso
+        if text or date_str:
+            out.append({'date': date_str, 'text': text})
+    # Already in newest-first order from Jira, but sort to be safe — empty
+    # dates float to the end so they don't shoulder real-dated entries aside.
+    out.sort(key=lambda e: (e.get('date') or ''), reverse=True)
+    out.sort(key=lambda e: 0 if e.get('date') else 1)
+    return out
+
+
+def _fetch_dep_jira_fields(key: str) -> dict | None:
+    """Fetch the dep-card extras (weekly status + RAG) for `key` in one call.
+
+    Returns a dict with `weekly_status: list[{date,text}]` and `rag: str` (one
+    of red/amber/green or '' when unset). Returns None when the request can't
+    run (no creds / network / 404) so callers can fall back to YAML.
+    """
+    sess_info = _jira_session()
+    if not sess_info:
+        return None
+    session, base = sess_info
+    url = f"{base}/issue/{key}"
+    fields = ','.join([_DEP_WEEKLY_STATUS_FIELD, _DEP_RAG_FIELD])
+    try:
+        resp = session.get(url, params={'fields': fields}, timeout=10)
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception:
+        return None
+    fmap = data.get('fields') or {}
+    weekly_doc = fmap.get(_DEP_WEEKLY_STATUS_FIELD)
+    weekly = _parse_weekly_status_adf(weekly_doc) if weekly_doc else []
+    rag_field = fmap.get(_DEP_RAG_FIELD)
+    rag_value = ''
+    if isinstance(rag_field, dict):
+        rag_value = _normalize_rag(rag_field.get('value'))
+    elif isinstance(rag_field, str):
+        rag_value = _normalize_rag(rag_field)
+    return {'weekly_status': weekly, 'rag': rag_value}
 
 
 def _render_dependency_card(dep: dict, db_path: str) -> str:
@@ -4729,23 +6239,75 @@ def _render_dependency_card(dep: dict, db_path: str) -> str:
     url = dep.get('url') or db_row.get('ticket_url') or _dep_default_url(key)
     team = dep.get('team') or ''
     notes = dep.get('notes') or ''
+    # Live-fetch RAG + weekly status from Jira in a single request. On any
+    # failure (no creds, network blip, 404) we fall back to YAML so the card
+    # still renders something useful instead of blanking.
+    live = _fetch_dep_jira_fields(key)
+    if live is not None:
+        weekly_entries = live['weekly_status']
+        rag = live['rag'] or _normalize_rag(dep.get('rag'))
+    else:
+        weekly_entries = _normalize_weekly_history(dep.get('weekly_status'))
+        rag = _normalize_rag(dep.get('rag'))
 
     status_cls = _dep_status_class(status)
     team_html = f'<span class="dep-team">{html.escape(team)}</span>' if team else ''
+    rag_html = (
+        f'<span class="dep-rag {rag}">{rag.upper()}</span>' if rag else ''
+    )
     safe_notes = html.escape(notes)
     safe_key = html.escape(key)
+
+    # Weekly status block: latest entry on top, the rest in a collapsible.
+    if weekly_entries:
+        latest = weekly_entries[0]
+        latest_date = html.escape(latest.get('date') or '')
+        latest_text = html.escape(latest.get('text') or '')
+        latest_html = (
+            f'<div class="dep-weekly-date">{latest_date}</div>' if latest_date else ''
+        ) + f'<div class="dep-weekly-latest">{latest_text}</div>'
+        if len(weekly_entries) > 1:
+            rest = weekly_entries[1:]
+            entries_html = ''.join(
+                f'<div class="dep-weekly-entry">'
+                + (f'<div class="dep-weekly-date">{html.escape(e.get("date") or "")}</div>' if e.get('date') else '')
+                + html.escape(e.get('text') or '')
+                + '</div>'
+                for e in rest
+            )
+            history_html = (
+                f'<details class="dep-weekly-history">'
+                f'<summary>{len(rest)} earlier update{"s" if len(rest) != 1 else ""}</summary>'
+                f'<div class="dep-weekly-history-list">{entries_html}</div>'
+                f'</details>'
+            )
+        else:
+            history_html = ''
+    else:
+        latest_html = '<div class="dep-weekly-empty">No weekly updates yet.</div>'
+        history_html = ''
+
+    weekly_block = (
+        '<div class="dep-weekly">'
+        '<div class="dep-weekly-label">Weekly Status</div>'
+        f'{latest_html}'
+        f'{history_html}'
+        '</div>'
+    )
 
     return f"""
         <div class="dep-card" data-key="{safe_key}">
             <div class="dep-head">
                 <a class="dep-key" href="{html.escape(url)}" target="_blank" rel="noopener">{safe_key}</a>
                 {team_html}
+                {rag_html}
                 <span class="dep-status {status_cls}">{html.escape(status)}</span>
             </div>
             <div class="dep-summary">{html.escape(summary)}</div>
             <div class="dep-meta">
                 <span><strong>Owner:</strong>{html.escape(owner)}</span>
             </div>
+            {weekly_block}
             <label class="dep-notes-label" for="dep-notes-{safe_key}">Status notes</label>
             <textarea id="dep-notes-{safe_key}" class="dep-notes" rows="4"
                 placeholder="What's the latest? (free-text — no history kept)">{safe_notes}</textarea>
@@ -5089,125 +6651,187 @@ def _render_project_fantasy_snapshot():
             </div>
     """)
 
-    # ---- By Target Milestone ----------------------------------------------
-    # Group features by their Proposed Milestone (Jira customfield_10646),
-    # not by fixVersion. fixVersion is a release-train concept that doesn't
-    # match how DFS plans work; Proposed Milestone is the single-select the
-    # PMs actually fill in.  Features without a milestone fall under
-    # "Unassigned". Progress bar per milestone is driven by status buckets.
-    features_list = snap.get('features', []) or []
-    if features_list:
-        by_release: dict[str, list[dict]] = {}
-        for feat in features_list:
-            if feat.get('status_bucket') == 'dropped':
-                continue
-            milestone = (feat.get('proposed_milestone') or '').strip()
-            if not milestone:
-                by_release.setdefault('Unassigned', []).append(feat)
-            else:
-                by_release.setdefault(milestone, []).append(feat)
-
-        if by_release:
-            # Milestone option values come prefixed with a number ("30. Milestone
-            # 30 - …"), so a plain alphabetical sort already gives chronological
-            # order. "Unassigned" is pushed to the end.
-            release_names = sorted(
-                by_release.keys(),
-                key=lambda n: (n == 'Unassigned', n),
-            )
-
-            rows_html = []
-            bucket_order_ms = {'in_flight': 0, 'discovery': 1, 'done': 2, 'other': 3, 'dropped': 4}
-            status_color_map_ms = {
-                'done': 'var(--success-text)',
-                'in_flight': 'var(--info-text)',
-                'discovery': 'var(--text-muted)',
-                'dropped': 'var(--text-faint)',
-                'other': 'var(--text-secondary)',
-            }
-            first_open_ms = False
-            for name in release_names:
-                feats = by_release[name]
-                total = len(feats)
-                buckets = Counter(f['status_bucket'] for f in feats)
-                done = buckets.get('done', 0)
-                in_flight = buckets.get('in_flight', 0)
-                discovery = buckets.get('discovery', 0)
-                pct_done = (done / total * 100) if total else 0
-
-                # Sort features within milestone by status bucket then key.
-                sorted_feats = sorted(
-                    feats,
-                    key=lambda f: (bucket_order_ms.get(f.get('status_bucket', 'other'), 9), f.get('key', '')),
-                )
-
-                # Render each feature as a table row.
-                feat_rows_html = []
-                for f in sorted_feats:
-                    bucket = f.get('status_bucket', 'other')
-                    color = status_color_map_ms.get(bucket, 'var(--text-secondary)')
-                    updated_days = _days_since_iso(f.get('updated'))
-                    updated_label = f"{updated_days}d ago" if updated_days is not None else '—'
-                    updated_sort = updated_days if updated_days is not None else 999999
-                    status_owner = f.get('status_owner') or ''
-                    owner_cell = (
-                        html.escape(status_owner)
-                        if status_owner
-                        else '<span style="color: var(--text-faint);">unassigned</span>'
-                    )
-                    feat_rows_html.append(f"""
-                                <tr>
-                                    <td><a href="{html.escape(f.get('url') or '#')}" target="_blank" class="ticket-key">{html.escape(f.get('key') or '')}</a></td>
-                                    <td>{html.escape(f.get('summary') or '')}</td>
-                                    <td><span style="color: {color};">{html.escape(f.get('status') or '')}</span></td>
-                                    <td>{owner_cell}</td>
-                                    <td data-sort="{updated_sort}" style="text-align: right; color: var(--text-muted); font-size: 12px;">{updated_label}</td>
-                                </tr>
-                    """)
-
-                badge_cls = 'release-badge unscheduled' if name == 'Unassigned' else 'release-badge'
-                # Open the first milestone so the section isn't entirely collapsed.
-                open_attr = ' open' if not first_open_ms else ''
-                first_open_ms = True
-                rows_html.append(f"""
-                    <details class="release-group"{open_attr}>
-                        <summary class="release-group-summary">
-                            <span class="release-group-caret">▸</span>
-                            <span class="{badge_cls}">{html.escape(name)}</span>
-                            <span class="release-group-counts">
-                                <strong>{total}</strong> feature{'s' if total != 1 else ''}
-                                · {done} done · {in_flight} in flight · {discovery} discovery
-                            </span>
-                            <span class="release-group-pct">{pct_done:.0f}%</span>
-                        </summary>
-                        <div class="release-group-body">
-                            {_status_bar(buckets, total)}
-                            <table class="release-group-table">
-                                <thead>
-                                    <tr>
-                                        <th>Key</th>
-                                        <th>Summary</th>
-                                        <th>Status</th>
-                                        <th>Owner</th>
-                                        <th style="text-align: right;">Updated</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {''.join(feat_rows_html)}
-                                </tbody>
-                            </table>
-                        </div>
-                    </details>
-                """)
-
-            parts.append(f"""
+    # ---- Useful Links -----------------------------------------------------
+    # Hand-curated tools/environments that aren't in Confluence. Add new
+    # entries here as `(label, url, description)`; description is optional.
+    useful_links = [
+        ('Playmaker',
+         'https://playmaker-internal.dev1.fanatics.bet/fantasy/contests',
+         'Internal contest admin (dev1)'),
+    ]
+    structure_board_url = _structure_board_url()
+    if structure_board_url:
+        useful_links.append(
+            ('Structure Board', structure_board_url, 'Jira Structure board'))
+    parts.append("""
             <div class="section">
-                <h2 class="section-title">🎯 By Target Milestone</h2>
-                <div class="release-group-list">
-                    {''.join(rows_html)}
+                <h2 class="section-title">🔗 Useful Links</h2>
+                <ul class="useful-links">
+    """)
+    for label, url, desc in useful_links:
+        desc_html = f' <span style="color: var(--text-muted); font-size: 12px;">— {html.escape(desc)}</span>' if desc else ''
+        parts.append(
+            f'<li><a href="{html.escape(url)}" target="_blank">{html.escape(label)}</a>{desc_html}</li>'
+        )
+    parts.append("""
+                </ul>
+            </div>
+    """)
+
+    # ---- Confluence doc index ---------------------------------------------
+    docs = snap.get('confluence_docs', []) or []
+    if docs:
+        space_url = snap.get('confluence_space_url', '#')
+        parts.append(f"""
+            <div class="section">
+                <h2 class="section-title">📚 Confluence Docs</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+                    Curated links to working docs in the
+                    <a href="{space_url}" target="_blank" style="color: var(--accent-text);">DFS space</a>.
+                </p>
+                <div class="confluence-grid">
+        """)
+        for group in docs:
+            parts.append(f"""
+                    <div class="confluence-group">
+                        <div class="confluence-group-title">{group['folder']}</div>
+                        <ul class="confluence-links">
+            """)
+            for doc in group.get('docs', []):
+                parts.append(
+                    f'<li><a href="{doc["url"]}" target="_blank">{doc["title"]}</a></li>'
+                )
+            parts.append("""
+                        </ul>
+                    </div>
+            """)
+        parts.append("""
                 </div>
             </div>
-            """)
+        """)
+
+    return ''.join(parts)
+
+
+def _load_feature_work_status() -> dict:
+    """Return {feature_key: {'be_done': bool, 'fe_done': bool}} from
+    config/feature_work_status.yaml. Missing file or unreadable YAML →
+    empty dict (every feature renders as un-checked, which matches the
+    schema's documented default)."""
+    import yaml as _yaml
+    path = Path(__file__).resolve().parent.parent / 'config' / 'feature_work_status.yaml'
+    if not path.exists():
+        return {}
+    try:
+        data = _yaml.safe_load(path.read_text()) or {}
+    except Exception:
+        return {}
+    out = {}
+    for entry in (data.get('features') or []):
+        if not isinstance(entry, dict):
+            continue
+        key = (entry.get('key') or '').strip()
+        if not key:
+            continue
+        out[key] = {
+            'be_done': bool(entry.get('be_done')),
+            'fe_done': bool(entry.get('fe_done')),
+        }
+    return out
+
+
+def _feature_toggle_cell(key: str, kind: str, checked: bool) -> str:
+    """Render a sortable BE/FE-done checkbox cell.
+
+    `kind` is 'be' or 'fe'. The cell sets data-sort to '1' when checked, '0'
+    otherwise so the existing sortTable(..., 'number') path works. The
+    checkbox itself wires onchange to saveFeatureWorkStatus, which POSTs to
+    /api/feature-work-status. On GitHub Pages the JS disables it instead.
+    """
+    state = '1' if checked else '0'
+    checked_attr = ' checked' if checked else ''
+    safe_key = html.escape(key)
+    return (
+        f'<td data-sort="{state}" class="feature-toggle-cell">'
+        f'<input type="checkbox" class="feature-toggle" '
+        f'data-key="{safe_key}" data-kind="{kind}"{checked_attr} '
+        f'onchange="saveFeatureWorkStatus(this)" '
+        f'aria-label="{kind.upper()} work complete for {safe_key}">'
+        f'</td>'
+    )
+
+
+def _render_feature_lists():
+    """Render the two feature-list sections (by Milestone + by Launch).
+
+    Lives on its own page (features.html) so the Project: Fantasy page can
+    stay focused on vision + rollup. Reads the same project_fantasy.json
+    snapshot. Empty state mirrors _render_project_fantasy_snapshot's.
+    """
+    import json as _json
+    initiative_key = _jira_initiative_key()
+    snapshot_path = Path(__file__).parent.parent / "data" / "project_fantasy.json"
+    if not snapshot_path.exists():
+        return """
+            <div class="section">
+                <div class="intro-banner" style="border-left-color: var(--warning);">
+                    <p><strong>No project snapshot yet.</strong> Run the snapshot agent to populate features:</p>
+                    <p><code>python3 scripts/sync_project_fantasy.py</code></p>
+                </div>
+            </div>
+        """
+
+    try:
+        snap = _json.loads(snapshot_path.read_text())
+    except Exception as e:
+        return f"""
+            <div class="section">
+                <div class="intro-banner" style="border-left-color: var(--danger);">
+                    <p><strong>Snapshot file is malformed:</strong> {e}</p>
+                </div>
+            </div>
+        """
+
+    # Per-feature BE/FE work-complete checkbox state. Defaults to all-false
+    # for any feature not listed in the YAML.
+    work_status = _load_feature_work_status()
+
+    # Open-epic count per feature. "Open" = an epic that still has work left,
+    # i.e. its status bucket is neither 'done' nor 'dropped' (so discovery +
+    # in-flight + any other live state count). Keyed by the epic's parent
+    # feature key. Reads the same snapshot's epics list — no schema change.
+    open_epics_by_feature: dict[str, int] = {}
+    for e in snap.get('epics', []) or []:
+        if e.get('status_bucket') in ('done', 'dropped'):
+            continue
+        parent_key = e.get('parent')
+        if parent_key:
+            open_epics_by_feature[parent_key] = open_epics_by_feature.get(parent_key, 0) + 1
+
+    parts = []
+
+    def _status_bar(counts, total):
+        """Render a stacked bar showing done / in_flight / discovery / dropped."""
+        if total <= 0:
+            return '<div class="status-bar"></div>'
+        order = [
+            ('done', 'Done', 'var(--success)'),
+            ('in_flight', 'In Flight', 'var(--info)'),
+            ('discovery', 'Discovery', 'var(--text-muted)'),
+            ('dropped', 'Dropped', 'var(--danger)'),
+            ('other', 'Other', 'var(--text-faint)'),
+        ]
+        segments = []
+        for bucket, label, color in order:
+            c = counts.get(bucket, 0)
+            if c <= 0:
+                continue
+            pct = (c / total) * 100
+            segments.append(
+                f'<div class="status-bar-seg" style="width: {pct:.1f}%; background: {color};" '
+                f'title="{label}: {c} ({pct:.0f}%)"></div>'
+            )
+        return f'<div class="status-bar">{"".join(segments)}</div>'
 
     # ---- Feature roster grouped by Launch (collapsible) -------------------
     # Features carry a Jira "Launch" custom field with values Alpha / Beta /
@@ -5239,9 +6863,24 @@ def _render_project_fantasy_snapshot():
             'other': 'var(--text-secondary)',
         }
 
-        parts.append("""
+        parts.append(f"""
             <div class="section">
-                <h2 class="section-title">🗂️ Features (INIT-185) — by Launch</h2>
+                <h2 class="section-title">🗂️ Features ({html.escape(initiative_key)}) — by Launch</h2>
+                <div class="feature-filter-bar" id="feature-filter-bar">
+                    <span class="feature-filter-label">Filter:</span>
+                    <label class="feature-filter-chip">
+                        <input type="checkbox" data-filter="completed">
+                        <span>Hide Completed</span>
+                    </label>
+                    <label class="feature-filter-chip">
+                        <input type="checkbox" data-filter="be">
+                        <span>Hide BE Done</span>
+                    </label>
+                    <label class="feature-filter-chip">
+                        <input type="checkbox" data-filter="fe">
+                        <span>Hide FE Done</span>
+                    </label>
+                </div>
                 <div class="launch-group-list">
         """)
 
@@ -5288,18 +6927,70 @@ def _render_project_fantasy_snapshot():
                     if status_owner
                     else '<span style="color: var(--text-faint);">unassigned</span>'
                 )
+                rag_html, rag_sort = _rag_cell(f.get('rag'))
+                ws_days = _days_since_iso(f.get('weekly_status_updated'))
+                ws_label = f"{ws_days}d ago" if ws_days is not None else '—'
+                ws_sort = ws_days if ws_days is not None else 999999
+                fkey = f.get('key') or ''
+                open_epics = open_epics_by_feature.get(fkey, 0)
+                fws = work_status.get(fkey, {})
+                be_done = bool(fws.get('be_done'))
+                fe_done = bool(fws.get('fe_done'))
+                be_cell = _feature_toggle_cell(fkey, 'be', be_done)
+                fe_cell = _feature_toggle_cell(fkey, 'fe', fe_done)
+                # "Completed" for filter purposes is the union of three
+                # signals: Jira status of Resolved or Abandoned, or a RAG
+                # value of "Completed" (PMs sometimes set RAG=Completed
+                # before the ticket is formally closed). The status_bucket
+                # alone misses RAG=Completed since RAG is independent of
+                # Jira workflow state.
+                f_status = (f.get('status') or '').strip()
+                f_rag = (f.get('rag') or '').strip().lower()
+                is_completed = (
+                    f_status in ('Resolved', 'Abandoned')
+                    or f_rag == 'completed'
+                )
+                # Row-level data attrs feed the top-of-page filter bar. JS
+                # walks .feature-row and toggles display based on these +
+                # the active filter checkboxes; the BE/FE attrs also get
+                # rewritten when a toggle flips so live filtering stays
+                # consistent without a full re-render.
                 rows_html.append(f"""
-                            <tr>
-                                <td><a href="{f['url']}" target="_blank" class="ticket-key">{f['key']}</a></td>
+                            <tr class="feature-row" data-bucket="{html.escape(bucket)}" data-completed="{'1' if is_completed else '0'}" data-be-done="{'1' if be_done else '0'}" data-fe-done="{'1' if fe_done else '0'}">
+                                <td><a href="{f['url']}" target="_blank" class="ticket-key">{fkey}</a></td>
                                 <td>{html.escape(f.get('summary') or '')}</td>
                                 <td><span style="color: {color};">{html.escape(f.get('status') or '')}</span></td>
+                                <td data-sort="{rag_sort}">{rag_html}</td>
                                 <td>{owner_cell}</td>
+                                <td data-sort="{open_epics}" style="text-align: right;">{open_epics}</td>
+                                {be_cell}
+                                {fe_cell}
                                 <td data-sort="{updated_sort}" style="text-align: right; color: var(--text-muted); font-size: 12px;">{updated_label}</td>
+                                <td data-sort="{ws_sort}" style="text-align: right; color: var(--text-muted); font-size: 12px;">{ws_label}</td>
                             </tr>
                 """)
 
+            if phase == 'Unassigned':
+                jql_launch = (
+                    f'parent = {initiative_key} AND '
+                    f'{_JIRA_CF_LAUNCH} is EMPTY AND '
+                    'status not in (Abandoned, Duplicate) ORDER BY status, key'
+                )
+            else:
+                jql_launch = (
+                    f'parent = {initiative_key} AND '
+                    f'{_JIRA_CF_LAUNCH} = {_quote_jql_value(phase)} AND '
+                    'status not in (Abandoned, Duplicate) ORDER BY status, key'
+                )
+            launch_slug = re.sub(r'[^a-z0-9]+', '-', phase.lower()).strip('-') or 'unassigned'
+            group_id_launch = f'features-launch-{launch_slug}'
+            export_btns_launch = _feature_export_buttons(
+                group_id=group_id_launch,
+                jql=jql_launch,
+                label=f'Features — {phase}',
+            )
             parts.append(f"""
-                    <details class="launch-group"{open_attr}>
+                    <details class="launch-group" id="{group_id_launch}"{open_attr}>
                         <summary class="launch-group-summary">
                             <span class="launch-group-caret">▸</span>
                             <span class="{badge_cls}">{html.escape(phase)}</span>
@@ -5308,6 +6999,7 @@ def _render_project_fantasy_snapshot():
                                 · {done} done · {in_flight} in flight · {discovery} discovery
                             </span>
                             <span class="launch-group-pct">{pct_done:.0f}%</span>
+                            {export_btns_launch}
                         </summary>
                         <div class="launch-group-body">
                             {_status_bar(buckets, total)}
@@ -5317,8 +7009,13 @@ def _render_project_fantasy_snapshot():
                                         <th class="sortable" onclick="sortTable(this.closest('table'), 0, 'string')">Key</th>
                                         <th class="sortable" onclick="sortTable(this.closest('table'), 1, 'string')">Summary</th>
                                         <th class="sortable" onclick="sortTable(this.closest('table'), 2, 'string')">Status</th>
-                                        <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'string')">Status Owner</th>
-                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 4, 'number')">Updated</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'number')">RAG</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 4, 'string')">Status Owner</th>
+                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 5, 'number')" title="Open epics remaining in this feature (not done or dropped)">Open Epics</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 6, 'number')">BE Done</th>
+                                        <th class="sortable" onclick="sortTable(this.closest('table'), 7, 'number')">FE Done</th>
+                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 8, 'number')">Updated</th>
+                                        <th class="sortable" style="text-align: right;" onclick="sortTable(this.closest('table'), 9, 'number')">Weekly Status Updated</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -5329,64 +7026,6 @@ def _render_project_fantasy_snapshot():
                     </details>
             """)
 
-        parts.append("""
-                </div>
-            </div>
-        """)
-
-    # ---- Useful Links -----------------------------------------------------
-    # Hand-curated tools/environments that aren't in Confluence. Add new
-    # entries here as `(label, url, description)`; description is optional.
-    useful_links = [
-        ('Playmaker',
-         'https://playmaker-internal.dev1.fanatics.bet/fantasy/contests',
-         'Internal contest admin (dev1)'),
-        ('Fantasy Structure Board',
-         'https://betfanatics.atlassian.net/jira/apps/94d5de1a-112d-4549-bd03-5f910d5fd27b/880424a7-af14-4c77-b446-5ef9feee797a/structure/board/6464',
-         'Jira Structure board'),
-    ]
-    parts.append("""
-            <div class="section">
-                <h2 class="section-title">🔗 Useful Links</h2>
-                <ul class="useful-links">
-    """)
-    for label, url, desc in useful_links:
-        desc_html = f' <span style="color: var(--text-muted); font-size: 12px;">— {html.escape(desc)}</span>' if desc else ''
-        parts.append(
-            f'<li><a href="{html.escape(url)}" target="_blank">{html.escape(label)}</a>{desc_html}</li>'
-        )
-    parts.append("""
-                </ul>
-            </div>
-    """)
-
-    # ---- Confluence doc index ---------------------------------------------
-    docs = snap.get('confluence_docs', []) or []
-    if docs:
-        space_url = snap.get('confluence_space_url', '#')
-        parts.append(f"""
-            <div class="section">
-                <h2 class="section-title">📚 Confluence Docs</h2>
-                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
-                    Curated links to working docs in the
-                    <a href="{space_url}" target="_blank" style="color: var(--accent-text);">DFS space</a>.
-                </p>
-                <div class="confluence-grid">
-        """)
-        for group in docs:
-            parts.append(f"""
-                    <div class="confluence-group">
-                        <div class="confluence-group-title">{group['folder']}</div>
-                        <ul class="confluence-links">
-            """)
-            for doc in group.get('docs', []):
-                parts.append(
-                    f'<li><a href="{doc["url"]}" target="_blank">{doc["title"]}</a></li>'
-                )
-            parts.append("""
-                        </ul>
-                    </div>
-            """)
         parts.append("""
                 </div>
             </div>
@@ -5458,9 +7097,132 @@ def _days_since_iso(ts):
         dt = parse_iso_tz(ts)
     except Exception:
         return None
+    # parse_iso_tz returns None (doesn't raise) on a malformed-but-truthy
+    # timestamp, so guard explicitly before .astimezone() — otherwise the
+    # Features freshness columns crash on a single bad date string.
+    if dt is None:
+        return None
     from datetime import timezone as _tz
     now = datetime.now(_tz.utc)
     return max(0, (now - dt.astimezone(_tz.utc)).days)
+
+
+# RAG (Red / Amber-Yellow / Green) is a single-select field on Jira. PMs
+# sometimes use "Amber" and sometimes "Yellow" for the same idea — collapse
+# both onto the same warning color. Unknown values fall through to the
+# muted text color so a typo doesn't render as a misleading "Green".
+_RAG_COLORS = {
+    'red': 'var(--danger-text)',
+    'amber': 'var(--warning-text)',
+    'yellow': 'var(--warning-text)',
+    'green': 'var(--success-text)',
+    'blue': 'var(--info-text)',
+}
+
+
+def _rag_cell(value):
+    """Return cell HTML and a sort key for a RAG value.
+
+    Sort puts Red first, then Amber/Yellow, then Green, then unknown — so an
+    ascending sort surfaces problems at the top of the table.
+    """
+    if not value:
+        return '<span style="color: var(--text-faint);">—</span>', 9
+    label = str(value).strip()
+    color = _RAG_COLORS.get(label.lower(), 'var(--text-secondary)')
+    sort_key = {'red': 0, 'amber': 1, 'yellow': 1, 'green': 2, 'blue': 3}.get(label.lower(), 8)
+    return f'<span style="color: {color}; font-weight: 600;">{html.escape(label)}</span>', sort_key
+
+
+# Custom-field IDs for the JQL we hand to Jira. Mirror sync_project_fantasy.py
+# so a clone of either file alone is correct. Jira's Issue Navigator accepts
+# `cf[10646]` (numeric form) for custom field references in JQL.
+_JIRA_CF_LAUNCH = "cf[10441]"
+_JIRA_CF_MILESTONE = "cf[10646]"
+
+
+def _jira_initiative_key() -> str:
+    """Top-level initiative key (jira.initiative_key), used to build the
+    Feature-section JQL deep-links. Cached so repeated calls during one regen
+    don't re-read config; falls back to INIT-185 when config is unavailable."""
+    cached = getattr(_jira_initiative_key, '_cache', None)
+    if cached is not None:
+        return cached
+    try:
+        key = (load_config().get('jira') or {}).get('initiative_key') or "INIT-185"
+    except Exception:
+        key = "INIT-185"
+    _jira_initiative_key._cache = key
+    return key
+
+
+def _quote_jql_value(value: str) -> str:
+    """Quote a value for inclusion in a JQL string literal."""
+    return '"' + str(value).replace('\\', '\\\\').replace('"', '\\"') + '"'
+
+
+def _feature_export_buttons(*, group_id: str, label: str, jql: Optional[str] = None) -> str:
+    """Render the per-section export buttons (Jira + Sheets + PDF).
+
+    `group_id` is the DOM id of the `<details>` element we'll print.
+    `label` is human-readable text used in the PDF print title.
+    `jql` is the JQL string to open in the Jira Issue Navigator. When
+    omitted, the Jira link is skipped — used for sections like sprint
+    reports where there's no clean per-block JQL.
+    """
+    parts = ['<span class="feature-export-actions" onclick="event.stopPropagation();">']
+    if jql:
+        jira_url = f'{_jira_cloud_base()}/issues/?jql=' + _url_quote(jql)
+        parts.append(
+            f'<a class="feature-export-btn" href="{html.escape(jira_url)}" target="_blank" rel="noopener" '
+            f'title="Open this section in Jira" '
+            f'data-jql="{html.escape(jql)}">'
+            '<span aria-hidden="true">↗</span> Jira</a>'
+        )
+    parts.append(
+        f'<button type="button" class="feature-export-btn" '
+        f'data-export-sheets="{html.escape(group_id)}" '
+        f'data-export-label="{html.escape(label)}" '
+        f'title="Copy this section as TSV and open a new Google Sheet to paste into">'
+        '<span aria-hidden="true">⊞</span> Sheets</button>'
+    )
+    parts.append(
+        f'<button type="button" class="feature-export-btn" '
+        f'data-export-pdf="{html.escape(group_id)}" '
+        f'data-export-label="{html.escape(label)}" '
+        f'title="Export this section to PDF (uses your browser\'s Save as PDF)">'
+        '<span aria-hidden="true">⤓</span> PDF</button>'
+    )
+    parts.append('</span>')
+    return ''.join(parts)
+
+
+def _export_table_html(headers: list, rows: list) -> str:
+    """Build a hidden <table class="export-table"> with TSV-shaped data.
+
+    The table is `hidden` so it doesn't render in the page; the Sheets
+    export JS reads it first when serializing a section. PDF export
+    ignores it (already isolates the section's visible content).
+    Each `rows` entry is a list of plain strings; we HTML-escape on the
+    way in.
+    """
+    th = ''.join(f'<th>{html.escape(h)}</th>' for h in headers)
+    body = []
+    for r in rows:
+        cells = ''.join(f'<td>{html.escape(str(c))}</td>' for c in r)
+        body.append(f'<tr>{cells}</tr>')
+    return (
+        '<table class="export-table" hidden aria-hidden="true">'
+        f'<thead><tr>{th}</tr></thead>'
+        f'<tbody>{"".join(body)}</tbody>'
+        '</table>'
+    )
+
+
+def _url_quote(value: str) -> str:
+    """Percent-encode a JQL string for use in a Jira URL."""
+    from urllib.parse import quote as _q
+    return _q(value, safe='')
 
 
 def refresh_mbr_nav(mbr_path: Path) -> None:
@@ -5501,6 +7263,12 @@ def main():
         # Generate project fantasy roadmap
         generate_project_fantasy_html(report_dir / "project_fantasy.html")
 
+        # Generate features rollup (by Milestone + by Launch)
+        generate_features_html(report_dir / "features.html")
+
+        # Generate decomposition readiness by phase
+        generate_readiness_html(report_dir / "readiness_dashboard.html")
+
         # Generate team report
         generate_team_html(config, report_dir / "team_dashboard.html")
 
@@ -5512,6 +7280,9 @@ def main():
 
         # Generate past sprint reports
         generate_past_sprints_html(config, report_dir / "past_sprints_dashboard.html")
+
+        # Generate delivery excellence (flow / rework / predictability)
+        generate_delivery_excellence_html(config, report_dir / "delivery_excellence_dashboard.html")
 
         # Generate pull requests report
         generate_pull_requests_html(config, report_dir / "pull_requests_dashboard.html")
