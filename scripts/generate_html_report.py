@@ -92,6 +92,10 @@ from database.queries import (
     get_flow_efficiency,
     get_rework_rate,
     get_predictability,
+    get_pto_spans_in_window,
+    get_pto_days_in_window,
+    available_working_days,
+    working_days_between,
 )
 
 
@@ -639,12 +643,62 @@ def _render_sprint_story_bar_chart(db_path: str, sprint_prefix: str, config: dic
     """
 
 
-def _render_stories_burndown_html(sprint: dict, db_path: str) -> str:
+def _team_capacity_fractions(db_path: str, config: dict, working_days: list) -> Optional[list]:
+    """Fraction of the team available on each working day (PTO-adjusted).
+
+    Returns a list parallel to `working_days` where each entry is
+    (available_engineers / team_size) for that day, or None when there's no
+    team roster or no PTO in the window (so callers fall back to the flat
+    straight-line ideal — behaviour unchanged when PTO data is absent).
+    """
+    members = config.get('team_members', []) if config else []
+    account_ids = [m.get('jira_account_id') for m in members if m.get('jira_account_id')]
+    team_size = len(account_ids)
+    if team_size == 0 or not working_days:
+        return None
+
+    win_start, win_end = working_days[0], working_days[-1]
+    spans = get_pto_spans_in_window(db_path, win_start, win_end)
+    if not spans:
+        return None  # no PTO → flat ideal, unchanged
+
+    # Build per-account set of off-days within the window.
+    valid = set(account_ids)
+    off_by_day: dict = {}
+    from datetime import timedelta as _td
+    for sp in spans:
+        acct = sp.get('jira_account_id')
+        if acct not in valid:
+            continue
+        s = parse_iso_tz(sp['start_date'])
+        e = parse_iso_tz(sp['end_date'])
+        if not s or not e:
+            continue
+        cur, last = s.date(), e.date()
+        while cur <= last:
+            if cur.weekday() < 5:
+                off_by_day.setdefault(cur, set()).add(acct)
+            cur += _td(days=1)
+
+    if not off_by_day:
+        return None  # PTO existed but none of it belongs to this roster
+
+    return [
+        (team_size - len(off_by_day.get(d, ()))) / team_size
+        for d in working_days
+    ]
+
+
+def _render_stories_burndown_html(sprint: dict, db_path: str, *, config: dict = None) -> str:
     """Build the SVG burndown chart for one sprint's Stories.
 
     Returns '' if no daily snapshots exist for the sprint. Forecast/projection
     line is only drawn when we have at least one working day of data and a
     positive burn rate — otherwise that line collapses to a single point.
+
+    When `config` (the team roster) is supplied and the sprint window has PTO,
+    the ideal line bends to follow the team's available capacity per working
+    day instead of assuming everyone is in every day.
     """
     burndown = get_sprint_burndown(db_path, sprint['sprint_id'])
     if not burndown:
@@ -677,7 +731,24 @@ def _render_stories_burndown_html(sprint: dict, db_path: str) -> str:
 
     start_remaining = burndown_in_sprint[0].get('open_tickets', burndown_in_sprint[0].get('total_tickets', 0))
     current_remaining = burndown_in_sprint[-1].get('open_tickets', 0)
-    ideal_remaining_today = start_remaining - (start_remaining / wd_total) * wd_elapsed if wd_total > 0 else 0
+
+    # Capacity-weighted ideal burn: the team should burn down in proportion to
+    # how many engineers are available each working day. cap_fracs[i] is the
+    # available fraction on working_days[i]; cumulative capacity through a day
+    # over total capacity gives the ideal "fraction burned" by then. Falls back
+    # to a flat straight line when there's no roster or no PTO.
+    cap_fracs = _team_capacity_fractions(db_path, config, working_days)
+    pto_adjusted_ideal = cap_fracs is not None
+    if pto_adjusted_ideal:
+        # cumulative capacity at the END of each working-day index 0..wd_total.
+        cum = [0.0]
+        for f in cap_fracs[1:]:  # day 0 is the start anchor (nothing burned yet)
+            cum.append(cum[-1] + f)
+        total_cap = cum[-1] or 1.0
+        ideal_remaining_by_idx = [start_remaining * (1 - c / total_cap) for c in cum]
+        ideal_remaining_today = ideal_remaining_by_idx[min(wd_elapsed, wd_total)]
+    else:
+        ideal_remaining_today = start_remaining - (start_remaining / wd_total) * wd_elapsed if wd_total > 0 else 0
     ahead_behind = ideal_remaining_today - current_remaining
 
     tickets_burned = max(start_remaining - current_remaining, 0)
@@ -736,10 +807,17 @@ def _render_stories_burndown_html(sprint: dict, db_path: str) -> str:
         actual_points.append(f"{x_at(xidx):.1f},{y_at(y_val):.1f}")
         actual_dots.append((x_at(xidx), y_at(y_val)))
 
-    ideal_points = [
-        f"{x_at(0):.1f},{y_at(start_remaining):.1f}",
-        f"{x_at(wd_total):.1f},{y_at(0):.1f}",
-    ]
+    if pto_adjusted_ideal:
+        # One vertex per working day so the line bends across PTO stretches.
+        ideal_points = [
+            f"{x_at(i):.1f},{y_at(ideal_remaining_by_idx[i]):.1f}"
+            for i in range(wd_total + 1)
+        ]
+    else:
+        ideal_points = [
+            f"{x_at(0):.1f},{y_at(start_remaining):.1f}",
+            f"{x_at(wd_total):.1f},{y_at(0):.1f}",
+        ]
     projection_points = None
     if projected_extra_wd is not None and wd_elapsed > 0:
         projection_points = [
@@ -777,7 +855,8 @@ def _render_stories_burndown_html(sprint: dict, db_path: str) -> str:
         ],
         legend=[
             {'kind': 'solid', 'color': '#2dd4a7', 'label': 'Actual'},
-            {'kind': 'dashed', 'color': '#566375', 'label': 'Ideal'},
+            {'kind': 'dashed', 'color': '#566375',
+             'label': 'Ideal (PTO-adjusted)' if pto_adjusted_ideal else 'Ideal'},
             {'kind': 'dashed', 'color': '#fbbf24', 'label': 'Projected'},
             {'kind': 'dashed', 'color': '#56cdf9', 'label': 'Today'},
         ],
@@ -853,6 +932,65 @@ def _render_flow_breakdown(db_path: str) -> str:
     """
 
 
+def _render_pto_panel(sprint: dict, db_path: str) -> str:
+    """Render a 'Who's out' panel for a sprint's date window.
+
+    Lists each engineer with PTO overlapping the sprint, the dates, and how
+    many of the sprint's working days they're away. Returns '' when the sprint
+    has no dates or nobody is out, so it adds nothing to PTO-free sprints.
+    """
+    start_iso, end_iso = sprint.get('start_date'), sprint.get('end_date')
+    if not start_iso or not end_iso:
+        return ''
+    s = parse_iso_tz(start_iso)
+    e = parse_iso_tz(end_iso)
+    if not s or not e:
+        return ''
+    win_start, win_end = s.date(), e.date()
+
+    spans = get_pto_spans_in_window(db_path, win_start, win_end)
+    spans = [sp for sp in spans if sp.get('working_days_in_window', 0) > 0]
+    if not spans:
+        return ''
+
+    sprint_wd = working_days_between(win_start, win_end)
+    rows = []
+    for sp in spans:
+        wd = sp['working_days_in_window']
+        pct = f"{wd / sprint_wd * 100:.0f}%" if sprint_wd else '—'
+        s_lbl = parse_iso_tz(sp['start_date'])
+        e_lbl = parse_iso_tz(sp['end_date'])
+        date_lbl = (
+            f"{s_lbl.strftime('%b %-d')} – {e_lbl.strftime('%b %-d')}"
+            if s_lbl and e_lbl else ''
+        )
+        rows.append(
+            f'<tr>'
+            f'<td>{html.escape(sp["developer_name"])}</td>'
+            f'<td style="color: var(--text-muted);">{date_lbl}</td>'
+            f'<td style="text-align: right;">{wd:g} working day{"s" if wd != 1 else ""}</td>'
+            f'<td style="text-align: right; color: var(--text-muted);">{pct} of sprint</td>'
+            f'</tr>'
+        )
+
+    return f"""
+            <div class="section">
+                <h2 class="section-title">🌴 Time Off This Sprint</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin: 0 0 8px;">
+                    PTO overlapping this sprint's {sprint_wd} working days. Capacity and
+                    burndown targets below are adjusted for this.</p>
+                <table class="roadmap-table">
+                    <thead><tr>
+                        <th>Engineer</th><th>Dates</th>
+                        <th style="text-align: right;">Away</th>
+                        <th style="text-align: right;">Impact</th>
+                    </tr></thead>
+                    <tbody>{''.join(rows)}</tbody>
+                </table>
+            </div>
+    """
+
+
 def _render_stories_sprint_block(sprint: dict, db_path: str, config: dict, *, is_active: bool) -> str:
     """Render one collapsible Stories block for a single sprint.
 
@@ -921,7 +1059,7 @@ def _render_stories_sprint_block(sprint: dict, db_path: str, config: dict, *, is
     empty_class = ' epic-sprint-empty' if is_empty else ''
     open_attr = ' open' if is_active else ''
 
-    burndown_html = _render_stories_burndown_html(sprint, db_path)
+    burndown_html = _render_stories_burndown_html(sprint, db_path, config=config)
 
     # Team-metrics row only shown for the active sprint. Cycle/throughput are
     # in-flight indicators; PR-review-time is a 30-day team-wide rolling
@@ -929,7 +1067,7 @@ def _render_stories_sprint_block(sprint: dict, db_path: str, config: dict, *, is
     team_metrics_html = ''
     if is_active:
         team_cycle_time = get_team_cycle_time(db_path, sprint_id)
-        team_throughput = get_team_throughput(db_path, sprint_id, days=7)
+        team_throughput = get_team_throughput(db_path, sprint_id, days=7, config=config)
         team_pr_review_time = get_team_pr_review_time(db_path, days=30)
         commitment_accuracy = get_sprint_commitment_accuracy(db_path, sprint_id)
         # Flow metrics (team-wide, 30-day window — status history only spans
@@ -993,6 +1131,7 @@ def _render_stories_sprint_block(sprint: dict, db_path: str, config: dict, *, is
             <div class="epic-sprint-body">
                 {burndown_html}
                 {team_metrics_html}
+                {_render_pto_panel(sprint, db_path)}
     """
 
     if is_empty:
@@ -1408,13 +1547,31 @@ def _build_member_card_html(dev, config, db_path, sprint,
         concerns.append(("⚠️", "No progress on assigned tickets - check for blockers or availability", "critical"))
         status, status_text = "needs-attention", "Needs Attention"
 
-    # Capacity check: the team's baseline is 8 SP/sprint/engineer. Flag
-    # anyone under-capacity so it shows up on the card.
+    # Capacity check: the team's baseline is 8 SP for a full sprint. Scale the
+    # floor down by how much of the sprint this engineer is actually available
+    # (PTO-adjusted), so someone out half the sprint isn't wrongly flagged as
+    # under-capacity for carrying ~half the load. With no PTO data the
+    # availability ratio is 1.0 and behaviour is unchanged.
     SP_CAPACITY_FLOOR = 8
-    if total_sp < SP_CAPACITY_FLOOR:
+    capacity_floor = SP_CAPACITY_FLOOR
+    pto_note = ""
+    s_iso, e_iso = sprint.get('start_date'), sprint.get('end_date')
+    if s_iso and e_iso:
+        s_dt, e_dt = parse_iso_tz(s_iso), parse_iso_tz(e_iso)
+        if s_dt and e_dt:
+            win_start, win_end = s_dt.date(), e_dt.date()
+            sprint_wd = working_days_between(win_start, win_end)
+            avail_wd = available_working_days(db_path, dev_id, win_start, win_end)
+            if sprint_wd > 0 and avail_wd < sprint_wd:
+                ratio = avail_wd / sprint_wd
+                capacity_floor = SP_CAPACITY_FLOOR * ratio
+                off_wd = sprint_wd - avail_wd
+                pto_note = f" (adjusted from {SP_CAPACITY_FLOOR} for {off_wd:g} day{'s' if off_wd != 1 else ''} PTO)"
+    if total_sp < capacity_floor:
         concerns.append((
             "📉",
-            f"Under capacity — only {total_sp:g} SP assigned this sprint (target {SP_CAPACITY_FLOOR} SP/engineer)",
+            f"Under capacity — only {total_sp:g} SP assigned this sprint "
+            f"(target {capacity_floor:.1f} SP{pto_note})",
             "concern",
         ))
         if status == "on-track":
@@ -2031,6 +2188,7 @@ def _build_member_past_sprints_html(
             sprint_days = _sprint_length_days(s['start_date'], s['end_date'])
             sprint_throughput = get_developer_throughput(
                 db_path, s['sprint_id'], dev_id, days=max(sprint_days, 1),
+                config=config,
             )
             sp_throughput_per_week = (
                 (completed_sp / sprint_days) * 7 if sprint_days > 0 else 0
@@ -2340,7 +2498,7 @@ def generate_team_members_html(config: dict, output_path: Path):
         'review_metrics':  get_review_metrics_bulk(db_path, github_usernames, days=90),
         'cycle_time':      get_developer_cycle_time_bulk(db_path, sprint['sprint_id']),
         'cycle_per_point': get_developer_cycle_per_point_bulk(db_path, sprint['sprint_id']),
-        'throughput':      get_developer_throughput_bulk(db_path, sprint['sprint_id'], days=7),
+        'throughput':      get_developer_throughput_bulk(db_path, sprint['sprint_id'], days=7, config=config),
         'meetings':        get_one_on_one_meetings_bulk(db_path),
         'id_to_github':    id_to_github,
         'id_to_level':     id_to_level,
@@ -5629,7 +5787,7 @@ def generate_delivery_excellence_html(config: dict, output_path: Path):
     name_to_role, _ = _build_role_maps(config)
     flow = get_flow_efficiency(db_path, days=window, name_to_role=name_to_role)
     rework = get_rework_rate(db_path, days=window, name_to_role=name_to_role)
-    pred = get_predictability(db_path, sprint_prefix, num_sprints=12)
+    pred = get_predictability(db_path, sprint_prefix, num_sprints=12, config=config)
     flow_be, flow_fe = flow['by_role']['BE'], flow['by_role']['FE']
     rw_be, rw_fe = rework['by_role']['BE'], rework['by_role']['FE']
     pred_be, pred_fe = pred['by_role']['BE'], pred['by_role']['FE']

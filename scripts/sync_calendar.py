@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sync 1-on-1 meetings from Google Calendar.
+Sync 1-on-1 meetings and engineer PTO from Google Calendar.
 """
 
 import sys
@@ -27,15 +27,29 @@ def main():
 
     logger.info("Starting Google Calendar sync")
 
-    try:
-        collector = CalendarCollector(config)
-        collector.collect_one_on_one_meetings()
-        logger.info("Calendar sync complete")
-        return 0
+    collector = CalendarCollector(config)
+    # Meetings and PTO are independent feeds — a failure in one shouldn't lose
+    # the other. Track both so the exit code reflects any failure.
+    failures = []
 
+    try:
+        collector.collect_one_on_one_meetings()
     except Exception as e:
-        logger.error(f"Calendar sync failed: {e}", exc_info=True)
+        logger.error(f"1-on-1 meeting sync failed: {e}", exc_info=True)
+        failures.append("meetings")
+
+    try:
+        collector.collect_pto()
+    except Exception as e:
+        logger.error(f"PTO sync failed: {e}", exc_info=True)
+        failures.append("pto")
+
+    if failures:
+        logger.error("Calendar sync finished with failures: %s", ", ".join(failures))
         return 1
+
+    logger.info("Calendar sync complete")
+    return 0
 
 
 if __name__ == "__main__":

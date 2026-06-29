@@ -22,7 +22,16 @@ logger = logging.getLogger(__name__)
 #   3 — Added: is_placeholder column on sprints so synthesized FE/BE
 #       placeholders (filled in for missing slots) persist between runs
 #       and share one source of truth with real Jira sprints.
-SCHEMA_VERSION = 3
+#   4 — Added: parent_key column on tickets (Jira parent/epic-link) so the
+#       Epics Gantt can count open child stories per epic.
+#   5 — Added: epic_open_children table. Open child counts can't be derived
+#       from the tickets table because backlog children (no sprint) are never
+#       collected; this table is populated by a dedicated parent-scoped Jira
+#       query that ignores sprint membership.
+#   6 — Added: pto table. Engineer time-off (all-day OOO/PTO events) synced
+#       from a shared Google Calendar so capacity, burndown, velocity, and
+#       predictability metrics can discount unavailable working days.
+SCHEMA_VERSION = 6
 
 SCHEMA_SQL = """
 -- Schema version tracking
@@ -73,6 +82,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     summary TEXT NOT NULL,
     status TEXT NOT NULL,
     status_at_sprint_end TEXT,
+    parent_key TEXT,
     assignee_account_id TEXT,
     assignee_display_name TEXT,
     story_points REAL DEFAULT 0,
@@ -84,6 +94,17 @@ CREATE TABLE IF NOT EXISTS tickets (
     first_seen_at TEXT NOT NULL,
     last_updated_at TEXT NOT NULL,
     FOREIGN KEY (sprint_id) REFERENCES sprints(sprint_id)
+);
+
+-- Open child-issue counts per epic. Kept separate from `tickets` because an
+-- epic's open children often live in the backlog (no sprint) and so are never
+-- pulled by the sprint-scoped collection. Populated by a dedicated
+-- parent-scoped Jira query (statusCategory != Done) that ignores sprint.
+-- Keyed on the bare epic key (no "_s<sprint>" suffix).
+CREATE TABLE IF NOT EXISTS epic_open_children (
+    epic_key TEXT PRIMARY KEY,
+    open_count INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT NOT NULL
 );
 
 -- Historical status changes for tickets
@@ -235,7 +256,30 @@ CREATE TABLE IF NOT EXISTS one_on_one_meetings (
     UNIQUE(developer_name)
 );
 
+-- Engineer time-off, synced from a shared Google Calendar. Each row is one
+-- contiguous OOO/PTO span. Dates are inclusive ISO dates (YYYY-MM-DD); for a
+-- single-day PTO start_date == end_date. day_count is the number of working
+-- days the span covers (precomputed at sync time, weekends excluded), so the
+-- capacity helpers don't have to re-walk every span. event_id is the Google
+-- Calendar id used to upsert on re-sync.
+CREATE TABLE IF NOT EXISTS pto (
+    pto_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    developer_name TEXT NOT NULL,
+    jira_account_id TEXT,
+    github_username TEXT,
+    event_id TEXT NOT NULL,
+    summary TEXT,
+    start_date TEXT NOT NULL,
+    end_date TEXT NOT NULL,
+    day_count REAL NOT NULL DEFAULT 0,
+    source TEXT NOT NULL DEFAULT 'google_calendar',
+    last_synced_at TEXT NOT NULL,
+    UNIQUE(event_id)
+);
+
 -- Indexes for common queries
+CREATE INDEX IF NOT EXISTS idx_pto_account ON pto(jira_account_id, start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_pto_name ON pto(developer_name, start_date, end_date);
 CREATE INDEX IF NOT EXISTS idx_tickets_sprint ON tickets(sprint_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_assignee ON tickets(assignee_account_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
@@ -254,24 +298,27 @@ CREATE INDEX IF NOT EXISTS idx_hygiene_issues_type ON hygiene_issues(issue_type)
 
 
 def ensure_ticket_columns(conn: sqlite3.Connection) -> None:
-    """Idempotent migration: add status_at_sprint_end to tickets if missing.
+    """Idempotent migration: add late-added tickets columns if missing.
 
-    The column was originally added by backfill_past_sprint.py at runtime;
-    this brings the canonical schema in sync so freshly-initialised DBs
-    have it too, and existing DBs get it backfilled here on first startup.
+    status_at_sprint_end was originally added by backfill_past_sprint.py at
+    runtime; parent_key (Jira parent / epic link) feeds the Epics Gantt's
+    open-stories-per-epic count. This brings the canonical schema in sync so
+    freshly-initialised DBs have both, and existing DBs get them backfilled
+    here on first startup.
     """
     cur = conn.cursor()
     cur.execute("PRAGMA table_info(tickets)")
     existing = {row[1] for row in cur.fetchall()}
     if not existing:
         return  # table doesn't exist yet; SCHEMA_SQL will create it.
-    if "status_at_sprint_end" not in existing:
-        try:
-            cur.execute("ALTER TABLE tickets ADD COLUMN status_at_sprint_end TEXT")
-            conn.commit()
-        except sqlite3.OperationalError:
-            # Race with another initialiser — safe to ignore; column will exist either way.
-            pass
+    for name, ddl_type in (("status_at_sprint_end", "TEXT"), ("parent_key", "TEXT")):
+        if name not in existing:
+            try:
+                cur.execute(f"ALTER TABLE tickets ADD COLUMN {name} {ddl_type}")
+                conn.commit()
+            except sqlite3.OperationalError:
+                # Race with another initialiser — safe to ignore; column will exist either way.
+                pass
 
 
 def ensure_sprint_columns(conn: sqlite3.Connection) -> None:
