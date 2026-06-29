@@ -20,6 +20,8 @@ import re
 import socket
 import subprocess
 import sys
+import threading
+import uuid
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from typing import Optional
@@ -31,6 +33,67 @@ REPO_ROOT = Path(__file__).parent.parent
 REPORTS_DIR = REPO_ROOT / "reports" / "html"
 CONFIG_PATH = REPO_ROOT / "config" / "team_config.yaml"
 GENERATE_SCRIPT = REPO_ROOT / "scripts" / "generate_html_report.py"
+
+def _initiative_key() -> str:
+    """Top-level initiative key (jira.initiative_key) for UI labels. Read
+    directly from the config file so this stays a dependency-free module;
+    falls back to INIT-185 if config can't be read."""
+    try:
+        import yaml as _yaml
+        cfg = _yaml.safe_load(CONFIG_PATH.read_text()) or {}
+        return (cfg.get('jira') or {}).get('initiative_key') or "INIT-185"
+    except Exception:
+        return "INIT-185"
+
+
+# Pipeline for the "Refresh Data" button. Each step pulls a fresh slice of
+# Jira data and the final step regenerates every dashboard page from the
+# updated DB + JSON snapshot. Adjust the weights (% of total) here so the
+# progress bar moves in proportion to wall-clock cost — not step count.
+REFRESH_STEPS = [
+    {
+        'id': 'jira_collector',
+        'label': 'Fetching tickets from Jira',
+        'script': 'jira_collector_agent.py',
+        'weight': 60,
+        'timeout': 600,
+    },
+    {
+        'id': 'project_fantasy',
+        'label': f'Refreshing {_initiative_key()} features',
+        'script': 'sync_project_fantasy.py',
+        'weight': 25,
+        'timeout': 300,
+    },
+    {
+        'id': 'generate_html',
+        'label': 'Regenerating dashboards',
+        'script': 'generate_html_report.py',
+        'weight': 15,
+        'timeout': 180,
+    },
+]
+
+# Refresh job state. Keyed by job_id. Single-user dashboard so a small in-memory
+# dict is enough — restarts wipe state, which is fine since the user has
+# already seen the resulting page reload.
+_REFRESH_JOBS: dict = {}
+_REFRESH_LOCK = threading.Lock()
+
+# Pipeline for the "Publish to GitHub" button. Copies the freshly-generated
+# reports/html/ tree into docs/, rewrites the entry-point filename, and
+# pushes to origin/main so GitHub Pages picks up the change. Steps run
+# in-process (not as scripts), so the runner uses _run_publish_pipeline
+# rather than the subprocess-based REFRESH_STEPS pattern.
+PUBLISH_STEPS = [
+    {'id': 'sync_docs',   'label': 'Copying dashboards into docs/',     'weight': 20},
+    {'id': 'rewrite',     'label': 'Rewriting entry-point links',        'weight': 10},
+    {'id': 'git_stage',   'label': 'Staging changes',                    'weight': 10},
+    {'id': 'git_commit',  'label': 'Committing',                         'weight': 15},
+    {'id': 'git_push',    'label': 'Pushing to origin/main',             'weight': 45},
+]
+_PUBLISH_JOBS: dict = {}
+_PUBLISH_LOCK = threading.Lock()
 
 ALLOWED_MEMBER_FIELDS = {"github_username", "jira_account_id", "level"}
 
@@ -61,6 +124,10 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             return self._handle_health()
         if self.path == "/api/version":
             return self._handle_version()
+        if self.path.startswith("/api/refresh/status"):
+            return self._handle_refresh_status()
+        if self.path.startswith("/api/publish/status"):
+            return self._handle_publish_status()
         return super().do_GET()
 
     def do_POST(self):
@@ -70,6 +137,12 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             return self._handle_ask()
         if self.path == "/api/dependency-notes":
             return self._handle_dependency_notes()
+        if self.path == "/api/feature-work-status":
+            return self._handle_feature_work_status()
+        if self.path == "/api/refresh":
+            return self._handle_refresh_start()
+        if self.path == "/api/publish":
+            return self._handle_publish_start()
         self.send_error(405)
 
     def _handle_health(self):
@@ -137,6 +210,108 @@ class DashboardHandler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)
+
+    def _handle_refresh_start(self):
+        """POST /api/refresh — kick off a Jira → DB → HTML refresh in the
+        background. Returns {job_id} immediately; the client polls
+        /api/refresh/status?id=<job_id> for progress.
+
+        Only one job runs at a time. A second POST while a job is still
+        running returns the existing job_id so the modal stays in sync.
+        """
+        with _REFRESH_LOCK:
+            for jid, job in _REFRESH_JOBS.items():
+                if job.get('status') == 'running':
+                    return self._send_json(200, {'job_id': jid, 'reused': True})
+
+            job_id = uuid.uuid4().hex[:12]
+            _REFRESH_JOBS[job_id] = {
+                'status': 'running',
+                'step_index': 0,
+                'step_id': REFRESH_STEPS[0]['id'],
+                'step_label': REFRESH_STEPS[0]['label'],
+                'percent': 0,
+                'started_at': _dt_now_iso(),
+                'finished_at': None,
+                'error': None,
+                'log_tail': '',
+            }
+
+        thread = threading.Thread(
+            target=_run_refresh_pipeline,
+            args=(job_id,),
+            name=f'refresh-{job_id}',
+            daemon=True,
+        )
+        thread.start()
+        logger.info("refresh: started job %s", job_id)
+        return self._send_json(200, {'job_id': job_id, 'reused': False})
+
+    def _handle_refresh_status(self):
+        """GET /api/refresh/status?id=<job_id> — return the current state of
+        the refresh job. Returns 404 if the job_id is unknown.
+        """
+        from urllib.parse import urlparse, parse_qs
+        qs = parse_qs(urlparse(self.path).query)
+        job_id = (qs.get('id') or [''])[0].strip()
+        if not job_id:
+            return self._send_json(400, {'error': 'Missing id parameter.'})
+        with _REFRESH_LOCK:
+            job = _REFRESH_JOBS.get(job_id)
+            if not job:
+                return self._send_json(404, {'error': 'Unknown job id.'})
+            payload = dict(job)
+        payload['job_id'] = job_id
+        return self._send_json(200, payload)
+
+    def _handle_publish_start(self):
+        """POST /api/publish — copy reports/html/ → docs/, rewrite the
+        entry-point filename, then git add/commit/push so GitHub Pages
+        rebuilds. Single-job-at-a-time semantics matching /api/refresh.
+        """
+        with _PUBLISH_LOCK:
+            for jid, job in _PUBLISH_JOBS.items():
+                if job.get('status') == 'running':
+                    return self._send_json(200, {'job_id': jid, 'reused': True})
+            job_id = uuid.uuid4().hex[:12]
+            _PUBLISH_JOBS[job_id] = {
+                'status': 'running',
+                'step_index': 0,
+                'step_id': PUBLISH_STEPS[0]['id'],
+                'step_label': PUBLISH_STEPS[0]['label'],
+                'percent': 0,
+                'started_at': _dt_now_iso(),
+                'finished_at': None,
+                'error': None,
+                'log_tail': '',
+                'commit_sha': None,
+                'pushed': False,
+                'no_changes': False,
+            }
+        thread = threading.Thread(
+            target=_run_publish_pipeline,
+            args=(job_id,),
+            name=f'publish-{job_id}',
+            daemon=True,
+        )
+        thread.start()
+        logger.info("publish: started job %s", job_id)
+        return self._send_json(200, {'job_id': job_id, 'reused': False})
+
+    def _handle_publish_status(self):
+        """GET /api/publish/status?id=<job_id>."""
+        from urllib.parse import urlparse, parse_qs
+        qs = parse_qs(urlparse(self.path).query)
+        job_id = (qs.get('id') or [''])[0].strip()
+        if not job_id:
+            return self._send_json(400, {'error': 'Missing id parameter.'})
+        with _PUBLISH_LOCK:
+            job = _PUBLISH_JOBS.get(job_id)
+            if not job:
+                return self._send_json(404, {'error': 'Unknown job id.'})
+            payload = dict(job)
+        payload['job_id'] = job_id
+        return self._send_json(200, payload)
 
     def _handle_member_edit(self):
         try:
@@ -255,6 +430,61 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             return self._send_json(200, {"ok": True, "key": key})
         except Exception as e:
             logger.exception("dependency notes save failed")
+            return self._send_json(500, {"error": f"Unexpected error: {e}"})
+
+    def _handle_feature_work_status(self):
+        """POST /api/feature-work-status — toggle BE/FE work-complete flags
+        for one feature in config/feature_work_status.yaml.
+
+        Body: {"key": "FEAT-1234", "be_done": bool, "fe_done": bool}
+        Either flag may be omitted; only the provided fields are updated, so
+        the client can post just the one that changed.
+        Response: 200 {ok: True} on success.
+
+        Mirrors /api/dependency-notes: holds an flock on the YAML, regenerates
+        features.html in-process so the next page load reflects the toggle.
+        """
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            if length <= 0 or length > 16 * 1024:
+                return self._send_json(400, {"error": "Invalid request body size."})
+            raw = self.rfile.read(length)
+            try:
+                body = json.loads(raw.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                return self._send_json(400, {"error": "Body must be valid JSON."})
+
+            key = (body.get("key") or "").strip()
+            if not key:
+                return self._send_json(400, {"error": "Missing 'key'."})
+            if not re.match(r"^[A-Z][A-Z0-9_]*-\d+$", key):
+                return self._send_json(400, {"error": f"Invalid ticket key: {key!r}"})
+
+            updates = {}
+            for field in ("be_done", "fe_done"):
+                if field in body:
+                    if not isinstance(body[field], bool):
+                        return self._send_json(400, {"error": f"'{field}' must be a boolean."})
+                    updates[field] = body[field]
+            if not updates:
+                return self._send_json(400, {"error": "Provide at least one of be_done / fe_done."})
+
+            ok = _update_feature_work_status(key, updates)
+            if not ok:
+                return self._send_json(500, {"error": "Could not write feature_work_status.yaml"})
+
+            try:
+                _regen_features_page()
+            except Exception as e:
+                # YAML is saved; full regen cron picks it up.
+                logger.warning("features.html regen failed (YAML saved): %s", e)
+
+            logger.info(
+                "Feature work status saved: key=%s updates=%s", key, sorted(updates.keys())
+            )
+            return self._send_json(200, {"ok": True, "key": key})
+        except Exception as e:
+            logger.exception("feature work status save failed")
             return self._send_json(500, {"error": f"Unexpected error: {e}"})
 
     def _handle_ask(self):
@@ -693,6 +923,304 @@ def _update_dependency_notes(key: str, notes: str) -> bool:
         return False
 
 
+# ---------------------------------------------------------------------------
+# Feature work-status YAML writer — used by /api/feature-work-status
+# ---------------------------------------------------------------------------
+
+def _feature_work_status_path() -> Path:
+    return REPO_ROOT / "config" / "feature_work_status.yaml"
+
+
+def _regen_features_page() -> None:
+    """Render reports/html/features.html in-process from the current YAML +
+    project_fantasy.json snapshot. Used by /api/feature-work-status after a
+    save so the toggle's persistence is visible on the next page load."""
+    sys.path.insert(0, str(REPO_ROOT / "src"))
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    import importlib
+    import generate_html_report as _ghr
+    importlib.reload(_ghr)
+    out = REPO_ROOT / "reports" / "html" / "features.html"
+    _ghr.generate_features_html(out)
+
+
+def _update_feature_work_status(key: str, updates: dict) -> bool:
+    """Update (or insert) the BE/FE flags for one feature in
+    config/feature_work_status.yaml. `updates` is a partial dict containing
+    any subset of {be_done, fe_done}; missing fields are left unchanged.
+
+    Concurrent calls are serialized via flock on a sibling .lock file. Uses
+    ruamel.yaml when available so the schema-comment header at the top of
+    the file survives round-trips; falls back to PyYAML otherwise.
+    """
+    import fcntl
+    path = _feature_work_status_path()
+    if not path.exists():
+        path.write_text("features: []\n")
+
+    lock_path = path.with_suffix(path.suffix + ".lock")
+    try:
+        with open(lock_path, "w") as lock_fh:
+            fcntl.flock(lock_fh.fileno(), fcntl.LOCK_EX)
+
+            try:
+                from ruamel.yaml import YAML  # type: ignore
+                yaml = YAML()
+                yaml.preserve_quotes = True
+                yaml.width = 4096
+                with open(path) as f:
+                    data = yaml.load(f) or {}
+            except ImportError:
+                import yaml as _yaml
+                yaml = None
+                with open(path) as f:
+                    data = _yaml.safe_load(f) or {}
+
+            features = data.get("features") or []
+            updated = False
+            for entry in features:
+                if (entry.get("key") or "").strip() == key:
+                    for field, value in updates.items():
+                        entry[field] = value
+                    updated = True
+                    break
+            if not updated:
+                # New row — fill any unspecified flag with False so the YAML
+                # always has the full schema. Keeps hand-editing predictable.
+                row = {"key": key, "be_done": False, "fe_done": False}
+                row.update(updates)
+                features.append(row)
+                data["features"] = features
+
+            tmp = path.with_suffix(path.suffix + ".tmp")
+            if yaml is not None:
+                with open(tmp, "w") as f:
+                    yaml.dump(data, f)
+            else:
+                import yaml as _yaml
+                with open(tmp, "w") as f:
+                    _yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
+            os.replace(tmp, path)
+            return True
+    except Exception as e:
+        logger.exception("feature work status write failed for %s: %s", key, e)
+        return False
+
+
+def _run_refresh_pipeline(job_id: str) -> None:
+    """Run the refresh pipeline end-to-end and stream progress into
+    _REFRESH_JOBS[job_id]. Designed to run in a daemon thread.
+
+    Each step is a separate Python script. We launch with the same Python
+    interpreter that's running the server so virtualenv selection is
+    consistent. stderr is captured and surfaced in the job state on failure.
+    Cumulative progress is computed from REFRESH_STEPS' weight values.
+    """
+    weights_total = sum(s['weight'] for s in REFRESH_STEPS) or 1
+    cumulative = 0
+    python_bin = sys.executable
+
+    def _set(**fields):
+        with _REFRESH_LOCK:
+            _REFRESH_JOBS[job_id].update(fields)
+
+    try:
+        for idx, step in enumerate(REFRESH_STEPS):
+            _set(
+                step_index=idx,
+                step_id=step['id'],
+                step_label=step['label'],
+                percent=int((cumulative / weights_total) * 100),
+            )
+            script_path = REPO_ROOT / 'scripts' / step['script']
+            logger.info("refresh %s: step %s (%s)", job_id, step['id'], script_path.name)
+
+            try:
+                proc = subprocess.run(
+                    [python_bin, str(script_path)],
+                    cwd=str(REPO_ROOT),
+                    capture_output=True,
+                    text=True,
+                    timeout=step['timeout'],
+                )
+            except subprocess.TimeoutExpired as e:
+                msg = f"{step['script']} timed out after {step['timeout']}s"
+                logger.error("refresh %s: %s", job_id, msg)
+                _set(
+                    status='failed',
+                    error=msg,
+                    log_tail=(e.stderr or '')[-2000:] if hasattr(e, 'stderr') and e.stderr else '',
+                    finished_at=_dt_now_iso(),
+                )
+                return
+
+            if proc.returncode != 0:
+                tail = (proc.stderr or proc.stdout or '')[-2000:]
+                logger.error(
+                    "refresh %s: %s exited %d. tail=%s",
+                    job_id, step['script'], proc.returncode, tail[-400:],
+                )
+                _set(
+                    status='failed',
+                    error=f"{step['script']} failed with exit code {proc.returncode}",
+                    log_tail=tail,
+                    finished_at=_dt_now_iso(),
+                )
+                return
+
+            cumulative += step['weight']
+            _set(percent=int((cumulative / weights_total) * 100))
+
+        _set(
+            status='done',
+            percent=100,
+            step_index=len(REFRESH_STEPS) - 1,
+            step_id='done',
+            step_label='Refresh complete',
+            finished_at=_dt_now_iso(),
+        )
+        logger.info("refresh %s: done", job_id)
+    except Exception as e:
+        logger.exception("refresh %s: unexpected error", job_id)
+        _set(
+            status='failed',
+            error=f'Unexpected error: {e}',
+            finished_at=_dt_now_iso(),
+        )
+
+
+def _run_publish_pipeline(job_id: str) -> None:
+    """Sync reports/html/ → docs/, rewrite project_fantasy.html links to
+    index.html, then git add/commit/push. Mirrors the manual flow documented
+    in GITHUB_PAGES_SETUP.md so GitHub Pages picks up the new dashboards.
+    """
+    import shutil
+    weights_total = sum(s['weight'] for s in PUBLISH_STEPS) or 1
+    cumulative = 0
+    docs_dir = REPO_ROOT / 'docs'
+    src_dir = REPO_ROOT / 'reports' / 'html'
+
+    def _set(**fields):
+        with _PUBLISH_LOCK:
+            _PUBLISH_JOBS[job_id].update(fields)
+
+    def _enter(idx: int):
+        nonlocal cumulative
+        step = PUBLISH_STEPS[idx]
+        _set(
+            step_index=idx,
+            step_id=step['id'],
+            step_label=step['label'],
+            percent=int((cumulative / weights_total) * 100),
+        )
+
+    def _advance(idx: int):
+        nonlocal cumulative
+        cumulative += PUBLISH_STEPS[idx]['weight']
+        _set(percent=int((cumulative / weights_total) * 100))
+
+    def _git(*args: str, timeout: int = 120) -> subprocess.CompletedProcess:
+        return subprocess.run(
+            ['git', *args],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+
+    try:
+        # 1. sync reports/html → docs (preserves README.md / .nojekyll already in docs/)
+        _enter(0)
+        if not src_dir.exists():
+            _set(status='failed', error=f'Source not found: {src_dir}', finished_at=_dt_now_iso())
+            return
+        docs_dir.mkdir(exist_ok=True)
+        for entry in src_dir.iterdir():
+            dest = docs_dir / entry.name
+            if entry.is_dir():
+                if dest.exists():
+                    shutil.rmtree(dest)
+                shutil.copytree(entry, dest)
+            else:
+                shutil.copy2(entry, dest)
+        _advance(0)
+
+        # 2. rename project_fantasy.html → index.html and rewrite internal links
+        _enter(1)
+        pf = docs_dir / 'project_fantasy.html'
+        idx_html = docs_dir / 'index.html'
+        if pf.exists():
+            if idx_html.exists():
+                idx_html.unlink()
+            pf.rename(idx_html)
+        for html in docs_dir.rglob('*.html'):
+            try:
+                text = html.read_text(encoding='utf-8')
+            except (OSError, UnicodeDecodeError):
+                continue
+            if 'project_fantasy.html' in text:
+                html.write_text(text.replace('project_fantasy.html', 'index.html'), encoding='utf-8')
+        _advance(1)
+
+        # 3. git add docs/
+        _enter(2)
+        r = _git('add', 'docs')
+        if r.returncode != 0:
+            _set(status='failed', error='git add failed', log_tail=(r.stderr or r.stdout)[-2000:], finished_at=_dt_now_iso())
+            return
+        _advance(2)
+
+        # 4. git commit (skip cleanly if there's nothing to commit)
+        _enter(3)
+        diff = _git('diff', '--cached', '--quiet')
+        if diff.returncode == 0:
+            _set(no_changes=True)
+            cumulative += PUBLISH_STEPS[3]['weight'] + PUBLISH_STEPS[4]['weight']
+            _set(
+                status='done',
+                percent=100,
+                step_index=len(PUBLISH_STEPS) - 1,
+                step_id='done',
+                step_label='Already up to date — nothing to publish',
+                finished_at=_dt_now_iso(),
+            )
+            logger.info("publish %s: no changes", job_id)
+            return
+        msg = 'Refresh GitHub Pages dashboards'
+        r = _git('commit', '-m', msg)
+        if r.returncode != 0:
+            _set(status='failed', error='git commit failed', log_tail=(r.stderr or r.stdout)[-2000:], finished_at=_dt_now_iso())
+            return
+        sha = _git('rev-parse', '--short', 'HEAD')
+        _set(commit_sha=sha.stdout.strip() if sha.returncode == 0 else None)
+        _advance(3)
+
+        # 5. git push
+        _enter(4)
+        r = _git('push', 'origin', 'HEAD:main', timeout=300)
+        if r.returncode != 0:
+            _set(status='failed', error='git push failed', log_tail=(r.stderr or r.stdout)[-2000:], finished_at=_dt_now_iso())
+            return
+        _set(pushed=True)
+        _advance(4)
+
+        _set(
+            status='done',
+            percent=100,
+            step_index=len(PUBLISH_STEPS) - 1,
+            step_id='done',
+            step_label='Published to GitHub Pages',
+            finished_at=_dt_now_iso(),
+        )
+        logger.info("publish %s: done", job_id)
+    except subprocess.TimeoutExpired as e:
+        logger.exception("publish %s: timeout", job_id)
+        _set(status='failed', error=f'Timed out: {e}', finished_at=_dt_now_iso())
+    except Exception as e:
+        logger.exception("publish %s: unexpected error", job_id)
+        _set(status='failed', error=f'Unexpected error: {e}', finished_at=_dt_now_iso())
+
+
 def _lan_ip() -> str:
     """Best-effort discovery of the Mac's LAN IP for the startup banner."""
     try:
@@ -731,12 +1259,14 @@ def main():
         return 2
     os.chdir(REPORTS_DIR)
 
-    # Default landing page: logs_dashboard.html. We accomplish this by
-    # rewriting "/" before the handler reads a file.
+    # Default landing page: project_fantasy.html (the dashboard home that
+    # every page's nav links to). reports/html/ has no index.html — only
+    # the published docs/ copy renames project_fantasy.html → index.html
+    # at deploy time. Rewrite "/" so SimpleHTTPRequestHandler doesn't 404.
     class RootRedirectHandler(DashboardHandler):
         def do_GET(self):
             if self.path in ("/", "/index.html"):
-                self.path = "/logs_dashboard.html"
+                self.path = "/project_fantasy.html"
             return super().do_GET()
 
     server = HTTPServer((args.host, args.port), RootRedirectHandler)

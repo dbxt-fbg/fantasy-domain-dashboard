@@ -2,7 +2,8 @@
 """
 Project: Fantasy snapshot agent.
 
-Pulls INIT-185 + descendants from Jira, computes summary stats, and writes
+Pulls the configured initiative (jira.initiative_key) + descendants from
+Jira, computes summary stats, and writes
 a JSON snapshot to data/project_fantasy.json. The Project: Fantasy dashboard
 page reads from that cache.
 
@@ -27,7 +28,29 @@ from collectors.jira_api_collector import JiraAPICollector
 
 logger = logging.getLogger(__name__)
 
-INITIATIVE_KEY = "INIT-185"
+# Default Atlassian tenant + initiative used when config doesn't specify them.
+# Real values come from config/team_config.yaml (jira.cloud_id, jira.initiative_key,
+# jira.confluence_space); these constants only keep the script runnable in a
+# bare smoke-test where config is absent.
+_DEFAULT_CLOUD_ID = "betfanatics.atlassian.net"
+_DEFAULT_INITIATIVE_KEY = "INIT-185"
+_DEFAULT_CONFLUENCE_SPACE = "DFS"
+
+
+def _jira_base(config) -> str:
+    """https://<tenant> root for browse/ links, from jira.cloud_id."""
+    cloud_id = (config.get('jira') or {}).get('cloud_id') or _DEFAULT_CLOUD_ID
+    return f"https://{cloud_id}"
+
+
+def _initiative_key(config) -> str:
+    return (config.get('jira') or {}).get('initiative_key') or _DEFAULT_INITIATIVE_KEY
+
+
+def _confluence_base(config) -> str:
+    """Confluence space root, e.g. https://<tenant>/wiki/spaces/<SPACE>."""
+    space = (config.get('jira') or {}).get('confluence_space') or _DEFAULT_CONFLUENCE_SPACE
+    return f"{_jira_base(config)}/wiki/spaces/{space}"
 
 # Custom field id for the "Launch" option field (Alpha / Beta / Public Launch /
 # Post Launch). Discovered via /rest/api/3/field — keep here so the rest of the
@@ -40,10 +63,15 @@ MILESTONE_FIELD = "customfield_10646"
 # for the current state of a feature. Distinct from `assignee`. Shape:
 # {displayName, accountId, emailAddress, ...} or None.
 STATUS_OWNER_FIELD = "customfield_10377"
+# "RAG" — single-select option (Red / Amber / Yellow / Green) used by PMs as
+# the at-a-glance health indicator on weekly status updates.
+RAG_FIELD = "customfield_10155"
+# "Weekly Status Last Update" — date the PM last edited the Weekly Status
+# field. Drives the freshness column on the feature roster.
+WEEKLY_STATUS_UPDATED_FIELD = "customfield_10545"
 
-# Curated Confluence doc index. Links point to the DFS space.
-# Update this list when new high-value docs land.
-CONFLUENCE_BASE = "https://betfanatics.atlassian.net/wiki/spaces/DFS"
+# Curated Confluence doc index. Links point to the configured Confluence
+# space (jira.confluence_space). Update this list when new high-value docs land.
 CONFLUENCE_DOCS = [
     {
         "folder": "North Star",
@@ -163,8 +191,13 @@ def _days_since(ts):
     return max(0, (now - dt.astimezone(timezone.utc)).days)
 
 
-def _slim(issue, extra=None):
-    """Return a small, JSON-friendly dict for a Jira issue."""
+def _slim(issue, extra=None, *, jira_base=None):
+    """Return a small, JSON-friendly dict for a Jira issue.
+
+    `jira_base` is the https://<tenant> root used to build the browse URL;
+    defaults to the betfanatics tenant when not supplied.
+    """
+    jira_base = jira_base or f"https://{_DEFAULT_CLOUD_ID}"
     f = issue.get('fields', {})
     status = f.get('status', {}).get('name') if f.get('status') else None
     issuetype = f.get('issuetype', {}).get('name') if f.get('issuetype') else None
@@ -204,6 +237,18 @@ def _slim(issue, extra=None):
         status_owner = status_owner_val.get('displayName')
     else:
         status_owner = None
+    # "RAG" — single-select option, same shape as Launch.
+    rag_val = f.get(RAG_FIELD)
+    if isinstance(rag_val, dict):
+        rag = rag_val.get('value')
+    elif isinstance(rag_val, str):
+        rag = rag_val
+    else:
+        rag = None
+    # "Weekly Status Last Update" — date string (YYYY-MM-DD) or None.
+    weekly_status_updated = f.get(WEEKLY_STATUS_UPDATED_FIELD)
+    if not isinstance(weekly_status_updated, str):
+        weekly_status_updated = None
     row = {
         'key': issue['key'],
         'summary': f.get('summary'),
@@ -216,11 +261,13 @@ def _slim(issue, extra=None):
         'fix_versions': fix_versions,
         'launch': launch,
         'proposed_milestone': proposed_milestone,
+        'rag': rag,
+        'weekly_status_updated': weekly_status_updated,
         'created': f.get('created'),
         'updated': f.get('updated'),
         'resolutiondate': f.get('resolutiondate'),
         'duedate': f.get('duedate'),
-        'url': f"https://betfanatics.atlassian.net/browse/{issue['key']}",
+        'url': f"{jira_base}/browse/{issue['key']}",
     }
     if extra:
         row.update(extra)
@@ -247,29 +294,31 @@ def _fetch(jira, jql, fields, max_results=500):
 
 def build_snapshot(config):
     jira = JiraAPICollector(config)
+    initiative_key = _initiative_key(config)
+    jira_base = _jira_base(config)
 
     # 1) Initiative itself
-    logger.info("Fetching initiative %s", INITIATIVE_KEY)
+    logger.info("Fetching initiative %s", initiative_key)
     init_issues = _fetch(
         jira,
-        f"key = {INITIATIVE_KEY}",
+        f"key = {initiative_key}",
         ["summary", "status", "description", "created", "updated", "duedate", "assignee"],
         max_results=1,
     )
     if not init_issues:
-        raise RuntimeError(f"Could not fetch {INITIATIVE_KEY}")
+        raise RuntimeError(f"Could not fetch {initiative_key}")
     init = init_issues[0]
     init_fields = init.get('fields', {})
 
     # 2) All Features under the initiative
-    logger.info("Fetching child Features of %s", INITIATIVE_KEY)
+    logger.info("Fetching child Features of %s", initiative_key)
     feature_issues = _fetch(
         jira,
-        f'parent = {INITIATIVE_KEY} ORDER BY created ASC',
-        ["summary", "status", "issuetype", "assignee", "priority", "duedate", "created", "updated", "resolutiondate", "fixVersions", LAUNCH_FIELD, MILESTONE_FIELD, STATUS_OWNER_FIELD],
+        f'parent = {initiative_key} ORDER BY created ASC',
+        ["summary", "status", "issuetype", "assignee", "priority", "duedate", "created", "updated", "resolutiondate", "fixVersions", LAUNCH_FIELD, MILESTONE_FIELD, STATUS_OWNER_FIELD, RAG_FIELD, WEEKLY_STATUS_UPDATED_FIELD],
         max_results=200,
     )
-    features = [_slim(f) for f in feature_issues]
+    features = [_slim(f, jira_base=jira_base) for f in feature_issues]
     feature_keys = [f['key'] for f in features if f['status_bucket'] != 'dropped']
     logger.info("Got %d features (%d not dropped)", len(features), len(feature_keys))
 
@@ -286,18 +335,22 @@ def build_snapshot(config):
             ["summary", "status", "issuetype", "assignee", "parent", "created", "updated", "resolutiondate", "fixVersions"],
             max_results=500,
         )
-        epics = [_slim(e) for e in epic_issues]
+        epics = [_slim(e, jira_base=jira_base) for e in epic_issues]
         logger.info("Got %d epics", len(epics))
 
-        # 4) Stories under those epics
+        # 4) Work items under those epics. Count Story, Task AND Bug — teams
+        # break epics down into any of these, so a Story-only fetch makes an
+        # epic decomposed into Tasks look empty (e.g. FNTSY-175 / Playbook C4,
+        # whose children are all Tasks). The `stories` list is used as the
+        # generic "epic children" set downstream (readiness, etc.).
         epic_keys = [e['key'] for e in epics if e['status_bucket'] != 'dropped']
         if epic_keys:
             # Chunk epic keys in batches of 50 to keep JQL size reasonable
             chunk_size = 50
             for i in range(0, len(epic_keys), chunk_size):
                 chunk = epic_keys[i:i + chunk_size]
-                jql = f'parent in ({", ".join(chunk)}) AND type = Story ORDER BY key'
-                logger.info("Fetching stories under %d epics (chunk %d)", len(chunk), i // chunk_size + 1)
+                jql = f'parent in ({", ".join(chunk)}) AND type in (Story, Task, Bug) ORDER BY key'
+                logger.info("Fetching work items under %d epics (chunk %d)", len(chunk), i // chunk_size + 1)
                 story_issues = _fetch(
                     jira, jql,
                     ["summary", "status", "issuetype", "assignee", "parent", "created", "updated", "resolutiondate", "fixVersions"],
@@ -305,7 +358,7 @@ def build_snapshot(config):
                 )
                 # Dedupe across chunks
                 for raw in story_issues:
-                    slim = _slim(raw)
+                    slim = _slim(raw, jira_base=jira_base)
                     if slim['key'] in story_keys_seen:
                         continue
                     story_keys_seen.add(slim['key'])
@@ -336,13 +389,14 @@ def build_snapshot(config):
             at_risk.append({**feat, 'risk_reasons': reasons})
 
     # Build Confluence index with URLs
+    confluence_base = _confluence_base(config)
     confluence_index = []
     for group in CONFLUENCE_DOCS:
         entries = []
         for title, page_id in group['docs']:
             entries.append({
                 'title': title,
-                'url': f"https://betfanatics.atlassian.net/wiki/spaces/DFS/pages/{page_id}",
+                'url': f"{confluence_base}/pages/{page_id}",
             })
         confluence_index.append({'folder': group['folder'], 'docs': entries})
 
@@ -356,7 +410,7 @@ def build_snapshot(config):
             'created': init_fields.get('created'),
             'updated': init_fields.get('updated'),
             'duedate': init_fields.get('duedate'),
-            'url': f"https://betfanatics.atlassian.net/browse/{init['key']}",
+            'url': f"{jira_base}/browse/{init['key']}",
         },
         'summary': {
             'features_total': len(features),
@@ -372,7 +426,7 @@ def build_snapshot(config):
         'epics': epics,
         'stories': stories,
         'at_risk': at_risk,
-        'confluence_space_url': f"{CONFLUENCE_BASE}/overview",
+        'confluence_space_url': f"{confluence_base}/overview",
         'confluence_docs': confluence_index,
     }
     return snapshot

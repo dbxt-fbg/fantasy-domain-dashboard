@@ -8,6 +8,20 @@ jira:
     - "Story Points"
   sprint_prefix: "FNTSY"
   project_key: "FNTSY"
+  # Agile board id used to list every active/future sprint regardless of
+  # whether tickets have landed in it yet. Looked up once via
+  # GET /rest/agile/1.0/board?projectKeyOrId=FNTSY&type=scrum.
+  board_id: 6479
+  # Top-level Jira initiative whose Feature → Epic → Story subtree drives the
+  # Project snapshot (data/project_fantasy.json) and the Features / Readiness
+  # pages. Re-point the whole initiative view by changing this one key.
+  initiative_key: "INIT-185"
+  # Confluence space key used to build the doc index + space links that appear
+  # on the Project snapshot page.
+  confluence_space: "DFS"
+  # Full URL to the Jira Structure board surfaced under "Useful Links". It's a
+  # full URL (not just a board id) because it embeds tenant-specific app GUIDs.
+  structure_board_url: "https://betfanatics.atlassian.net/jira/apps/94d5de1a-112d-4549-bd03-5f910d5fd27b/880424a7-af14-4c77-b446-5ef9feee797a/structure/board/6464"
 
 # GitHub Configuration
 github:
