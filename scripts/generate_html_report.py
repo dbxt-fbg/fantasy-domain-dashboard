@@ -4393,6 +4393,14 @@ def generate_past_sprints_html(config: dict, output_path: Path):
     db_path = config['database']['path']
     sprint_prefix = config['jira']['sprint_prefix']
 
+    # Map engineer display name → Jira account id so we can attribute PTO
+    # (stored by account id) to the per-engineer rows (grouped by display name).
+    name_to_account = {
+        m['name']: m.get('jira_account_id')
+        for m in config.get('team_members', [])
+        if m.get('name') and m.get('jira_account_id')
+    }
+
     # "In Code Review+" rollup: anything from code-review through Done in the
     # forward pipeline. Excludes side-states (Blocked, Waiting for Customer)
     # since those aren't strictly "past code review."
@@ -4471,6 +4479,15 @@ def generate_past_sprints_html(config: dict, output_path: Path):
             name = t['assignee_display_name'] or 'Unassigned'
             groups[name].append(t)
 
+        # Sprint working-day window, for PTO attribution. Parsed once per sprint.
+        s_dt = parse_iso_tz(s['start_date']) if s['start_date'] else None
+        e_dt = parse_iso_tz(s['end_date']) if s['end_date'] else None
+        win_start = s_dt.date() if s_dt else None
+        win_end = e_dt.date() if e_dt else None
+        sprint_working_days = (
+            working_days_between(win_start, win_end) if win_start and win_end else 0
+        )
+
         engineers = []
         for name, items in groups.items():
             completed_sp = sum(
@@ -4484,6 +4501,13 @@ def generate_past_sprints_html(config: dict, output_path: Path):
                 if it['sprint_end_status'] in in_code_review_plus
             )
             total_sp = sum((it['story_points'] or 0.0) for it in items)
+            # PTO working days this engineer took within the sprint window. 0
+            # for Unassigned or anyone without an account id / without PTO.
+            account_id = name_to_account.get(name)
+            pto_days = (
+                get_pto_days_in_window(db_path, account_id, win_start, win_end)
+                if account_id and win_start and win_end else 0
+            )
             engineers.append({
                 'name': name,
                 'tickets': sorted(items, key=lambda x: x['ticket_key']),
@@ -4491,6 +4515,8 @@ def generate_past_sprints_html(config: dict, output_path: Path):
                 'in_review_plus_sp': in_review_plus_sp,
                 'total_sp': total_sp,
                 'count': len(items),
+                'pto_days': pto_days,
+                'sprint_working_days': sprint_working_days,
             })
 
         engineers.sort(key=lambda e: (-(e['completed_sp']), e['name'] == 'Unassigned', e['name']))
@@ -4499,12 +4525,14 @@ def generate_past_sprints_html(config: dict, output_path: Path):
         sprint_total_review_plus = sum(e['in_review_plus_sp'] for e in engineers)
         sprint_total_sp = sum(e['total_sp'] for e in engineers)
         sprint_total_count = sum(e['count'] for e in engineers)
+        sprint_total_pto = sum(e['pto_days'] for e in engineers)
 
         sprint_blocks.append(
             _render_past_sprint_block(
                 s, engineers,
                 sprint_total_completed, sprint_total_review_plus,
                 sprint_total_sp, sprint_total_count,
+                sprint_total_pto,
             )
         )
 
@@ -4651,6 +4679,28 @@ def _format_sp(value: float) -> str:
     return f"{value:.1f}"
 
 
+def _render_eng_pto_stat(e: dict) -> str:
+    """Per-engineer PTO stat for the sprint-report header.
+
+    Only rendered when the engineer had PTO in the sprint window, so the
+    common (no-PTO) case adds nothing. Shows days off and, when the sprint
+    working-day count is known, the share of the sprint missed.
+    """
+    days = e.get('pto_days', 0)
+    if not days:
+        return ''
+    sprint_wd = e.get('sprint_working_days', 0)
+    sub = 'PTO days'
+    if sprint_wd:
+        sub = f"PTO ({days / sprint_wd * 100:.0f}% of sprint)"
+    return f"""
+                                <div style="text-align: center;">
+                                    <div style="font-size: 18px; font-weight: 700; color: #fbbf24;">{days:g}</div>
+                                    <div style="font-size: 10px; color: #8194a6;">{sub}</div>
+                                </div>
+    """
+
+
 def _render_past_sprint_block(
     sprint: dict,
     engineers: list,
@@ -4658,6 +4708,7 @@ def _render_past_sprint_block(
     total_review_plus_sp: float,
     total_sp: float,
     total_count: int,
+    total_pto_days: float = 0,
 ) -> str:
     """Render one sprint section with per-engineer subgroups.
 
@@ -4769,6 +4820,7 @@ def _render_past_sprint_block(
                                     <div style="font-size: 18px; font-weight: 700; color: #cdd9e5;">{e['count']}</div>
                                     <div style="font-size: 10px; color: #8194a6;">Stories</div>
                                 </div>
+                                {_render_eng_pto_stat(e)}
                                 {eng_export_btns}
                             </div>
                         </div>
@@ -4806,6 +4858,14 @@ def _render_past_sprint_block(
             f'{carry_count} rolled ({_format_sp(carry_sp)} SP)</span>'
         )
 
+    # Surface total PTO across the team for the sprint, when any was taken.
+    pto_meta = ''
+    if total_pto_days > 0:
+        pto_meta = (
+            f' · <span style="color: #fbbf24;">'
+            f'🌴 {total_pto_days:g} PTO day{"s" if total_pto_days != 1 else ""}</span>'
+        )
+
     return f"""
             <details class="{block_class}" id="{sprint_block_id}" style="margin-bottom: 28px;"{open_attr}>
                 <summary style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 8px 0; margin-bottom: 12px; border-bottom: 2px solid var(--border);">
@@ -4814,7 +4874,7 @@ def _render_past_sprint_block(
                         {name}
                         <span class="sprint-report-state {state_class}">{state_label}</span>
                     </h2>
-                    <div class="sprint-report-meta" style="color: var(--text-muted); font-size: 13px;">{start} → {end} · {total_count} tickets · {_format_sp(total_completed_sp)} completed · {_format_sp(total_review_plus_sp)} in code review+ · {_format_sp(total_sp)} total SP{carryover_meta}</div>
+                    <div class="sprint-report-meta" style="color: var(--text-muted); font-size: 13px;">{start} → {end} · {total_count} tickets · {_format_sp(total_completed_sp)} completed · {_format_sp(total_review_plus_sp)} in code review+ · {_format_sp(total_sp)} total SP{carryover_meta}{pto_meta}</div>
                     {sprint_export_btns}
                 </summary>
                 {sprint_export_table}
