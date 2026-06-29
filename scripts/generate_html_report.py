@@ -49,6 +49,7 @@ from utils.statuses import (
 )
 from utils.io import atomic_write as _atomic_write
 from utils.nav import generate_nav_menu
+from utils.project_name import project_label
 from utils.sprint_names import format_long as fmt_sprint_long
 from utils.sprint_names import format_short as fmt_sprint_short
 from utils.sprint_names import format_slot as fmt_sprint_slot
@@ -5166,9 +5167,10 @@ def generate_project_fantasy_html(output_path: Path):
             f'<line x1="{pad_l}" y1="{baseline_y}" x2="{x_at(today):.1f}" y2="{baseline_y}" stroke="#38bdf8" stroke-width="3" />'
         )
 
+    project_label_str = project_label()
     content = f"""
         <header>
-            <h1>🎯 Project: Fantasy</h1>
+            <h1>🎯 {project_label_str}</h1>
             <div class="subtitle">Launch roadmap • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
         </header>
 {generate_nav_menu('project-fantasy')}
@@ -5245,12 +5247,12 @@ def generate_project_fantasy_html(output_path: Path):
     """
 
     html = render_html(
-        title="Project: Fantasy",
+        title=project_label_str,
         content=content,
         body_class=_PAGE_THEME["project-fantasy"],
     )
     _atomic_write(output_path, html)
-    print(f"✅ Project Fantasy dashboard generated: {output_path}")
+    print(f"✅ {project_label_str} dashboard generated: {output_path}")
 
 
 def generate_features_html(output_path: Path):
@@ -5265,7 +5267,7 @@ def generate_features_html(output_path: Path):
     content = f"""
         <header>
             <h1>🗂️ Features</h1>
-            <div class="subtitle">Project: Fantasy feature rollups • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
+            <div class="subtitle">{project_label()} feature rollups • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
         </header>
 {generate_nav_menu('features')}
         <div class="content">
@@ -5920,7 +5922,7 @@ def generate_stakeholders_html(config: dict, output_path: Path):
     content = f"""
         <header>
             <h1>👥 Stakeholders</h1>
-            <div class="subtitle">Project: Fantasy · Source: config/stakeholders.yaml{(" · Last edited " + last_updated_label) if last_updated_label else ""}</div>
+            <div class="subtitle">{project_label()} · Source: config/stakeholders.yaml{(" · Last edited " + last_updated_label) if last_updated_label else ""}</div>
         </header>
 {generate_nav_menu('stakeholders')}
         <div class="content stakeholders-page">
@@ -5938,7 +5940,7 @@ def generate_stakeholders_html(config: dict, output_path: Path):
     """
 
     page = render_html(
-        title="Stakeholders — Project: Fantasy",
+        title=f"Stakeholders — {project_label()}",
         content=content,
         body_class=_PAGE_THEME["stakeholders"],
     )
@@ -6400,7 +6402,7 @@ def generate_dependencies_html(config: dict, output_path: Path):
     content = f"""
         <header>
             <h1>🔗 Dependencies</h1>
-            <div class="subtitle">Project: Fantasy · {len(deps)} tracked · Source: config/dependencies.yaml{(" · Last edited " + last_updated_label) if last_updated_label else ""}</div>
+            <div class="subtitle">{project_label()} · {len(deps)} tracked · Source: config/dependencies.yaml{(" · Last edited " + last_updated_label) if last_updated_label else ""}</div>
         </header>
 {generate_nav_menu('dependencies')}
         <div class="content">
@@ -6415,7 +6417,7 @@ def generate_dependencies_html(config: dict, output_path: Path):
     """
 
     page = render_html(
-        title="Dependencies — Project: Fantasy",
+        title=f"Dependencies — {project_label()}",
         content=content,
         body_class=_PAGE_THEME["dependencies"],
     )
@@ -7292,6 +7294,10 @@ def main():
 
         # Dependencies dashboard (driven by config/dependencies.yaml)
         generate_dependencies_html(config, report_dir / "dependencies.html")
+
+        # MBR is hand-authored, but its nav must stay in sync with everything
+        # else (incl. the dynamic "Project: {Name}" label), so splice it in.
+        refresh_mbr_nav(report_dir / "mbr.html")
 
         print(f"\n✅ HTML reports generated in {report_dir}")
         return 0
