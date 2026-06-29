@@ -7,21 +7,27 @@ both hardcoded their own nav at different times).
 
 from __future__ import annotations
 
+from utils.project_name import project_label
 
+# The primary "Project: {Name}" label is resolved at render time from the
+# initiative snapshot (None here is a placeholder filled in by generate_nav_menu).
 PRIMARY_NAV = [
-    ('project-fantasy', 'project_fantasy.html', 'Project: Fantasy'),
+    ('project-fantasy', 'project_fantasy.html', None),
     ('logs',            'logs_dashboard.html', 'Agents and Logs'),
 ]
 
-# Secondary tabs live under Project: Fantasy and appear only when the active
+# Secondary tabs live under the initiative and appear only when the active
 # page belongs to that group.
 SECONDARY_NAV = [
-    ('stories',       'team_dashboard.html#team-metrics', 'Stories'),
-    ('story-points',  'story_points_dashboard.html', 'Story Points'),
+    ('features',      'features.html', 'Features'),
+    ('readiness',     'readiness_dashboard.html', 'Readiness'),
     ('epics',         'epics_dashboard.html', 'Epics'),
+    ('stories',       'team_dashboard.html', 'Stories'),
+    ('story-points',  'story_points_dashboard.html', 'Story Points'),
+    ('past-sprints',  'past_sprints_dashboard.html', 'Sprint Reports'),
+    ('delivery-excellence', 'delivery_excellence_dashboard.html', 'Delivery'),
     ('pull-requests', 'pull_requests_dashboard.html', 'Repositories'),
     ('hygiene',       'hygiene_dashboard.html', 'Ticket Hygiene'),
-    ('past-sprints',  'past_sprints_dashboard.html', 'Sprint Reports'),
     ('stakeholders',  'stakeholders.html', 'Stakeholders'),
     ('dependencies',  'dependencies.html', 'Dependencies'),
     ('mbr',           'mbr.html', 'MBR'),
@@ -35,6 +41,8 @@ def generate_nav_menu(active_page: str = 'stories') -> str:
 
     parts = ['        <nav class="top-nav">\n            <ul class="nav-menu">\n']
     for key, url, label in PRIMARY_NAV:
+        if label is None:  # the "Project: {Name}" entry — resolved dynamically
+            label = project_label()
         active_cls = ' class="active"' if key == active_primary else ''
         parts.append(f'                <li class="nav-item"><a href="{url}"{active_cls}>{label}</a></li>\n')
     parts.append('            </ul>\n        </nav>\n')

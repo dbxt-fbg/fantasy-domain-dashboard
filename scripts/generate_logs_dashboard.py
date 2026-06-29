@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from utils.config import load_config
 from utils.io import atomic_write as _atomic_write
 from utils.nav import generate_nav_menu
+from utils.project_name import project_label
 from database.schema import get_connection
 
 
@@ -24,8 +25,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <title>Agents and Logs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/dashboard.css?v=ff-logo-1">
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/dashboard.css?v=scoreboard-1">
     <script src="assets/dashboard.js?v=2.0" defer></script>
     <!-- toggleAgentLogs / toggleLog / triggerAgent live in assets/dashboard.js -->
 </head>
@@ -642,7 +643,7 @@ def _render_qa_agent_panel(n: int = 10) -> str:
             elif dec == "run" and status == "error":
                 bg, fg, tip = "#7f1d1d", "#fca5a5", "error"
             elif dec == "skip_state_hash":
-                bg, fg, tip = "#1e293b", "#94a3b8", "skipped: inputs unchanged"
+                bg, fg, tip = "#131c27", "#8194a6", "skipped: inputs unchanged"
             elif dec == "skip_upstream_failed":
                 bg, fg, tip = "#78350f", "#fcd34d", "skipped: upstream failed"
             elif dec == "skip_flaky":
@@ -650,7 +651,7 @@ def _render_qa_agent_panel(n: int = 10) -> str:
             elif dec == "defer_budget":
                 bg, fg, tip = "#1e3a8a", "#93c5fd", "deferred: over budget"
             else:
-                bg, fg, tip = "#334155", "#cbd5e1", dec
+                bg, fg, tip = "#1a2430", "#cdd9e5", dec
             # Hygiene checks list counts in `issues_count`; show inline.
             count_suffix = ""
             if source == "hygiene" and c.get("issues_count"):
@@ -806,7 +807,7 @@ def generate_logs_dashboard(config: dict, output_path: Path):
         },
         {
             'id': 'project-fantasy',
-            'name': 'Project: Fantasy Snapshot',
+            'name': f'{project_label()} Snapshot',
             'icon': '🎯',
             'schedule': _schedule_for('project_fantasy_snapshot', 'On demand (python3 scripts/sync_project_fantasy.py)'),
             'log_file': 'sync_project_fantasy.log',
@@ -1008,6 +1009,7 @@ def generate_logs_dashboard(config: dict, output_path: Path):
     # Close the agent-status grid and append the QA Agent history panel.
     content += "            </div>\n"  # closes .agent-status
     content += _render_qa_agent_panel()
+    content += "        </div>\n"  # closes .content
 
     # Write HTML file
     html = HTML_TEMPLATE.format(content=content)
