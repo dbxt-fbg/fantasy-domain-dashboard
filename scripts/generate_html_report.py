@@ -1067,7 +1067,7 @@ def _render_stories_sprint_block(sprint: dict, db_path: str, config: dict, *, is
     team_metrics_html = ''
     if is_active:
         team_cycle_time = get_team_cycle_time(db_path, sprint_id)
-        team_throughput = get_team_throughput(db_path, sprint_id, days=7)
+        team_throughput = get_team_throughput(db_path, sprint_id, days=7, config=config)
         team_pr_review_time = get_team_pr_review_time(db_path, days=30)
         commitment_accuracy = get_sprint_commitment_accuracy(db_path, sprint_id)
         # Flow metrics (team-wide, 30-day window — status history only spans
@@ -2188,6 +2188,7 @@ def _build_member_past_sprints_html(
             sprint_days = _sprint_length_days(s['start_date'], s['end_date'])
             sprint_throughput = get_developer_throughput(
                 db_path, s['sprint_id'], dev_id, days=max(sprint_days, 1),
+                config=config,
             )
             sp_throughput_per_week = (
                 (completed_sp / sprint_days) * 7 if sprint_days > 0 else 0
@@ -2497,7 +2498,7 @@ def generate_team_members_html(config: dict, output_path: Path):
         'review_metrics':  get_review_metrics_bulk(db_path, github_usernames, days=90),
         'cycle_time':      get_developer_cycle_time_bulk(db_path, sprint['sprint_id']),
         'cycle_per_point': get_developer_cycle_per_point_bulk(db_path, sprint['sprint_id']),
-        'throughput':      get_developer_throughput_bulk(db_path, sprint['sprint_id'], days=7),
+        'throughput':      get_developer_throughput_bulk(db_path, sprint['sprint_id'], days=7, config=config),
         'meetings':        get_one_on_one_meetings_bulk(db_path),
         'id_to_github':    id_to_github,
         'id_to_level':     id_to_level,
@@ -5786,7 +5787,7 @@ def generate_delivery_excellence_html(config: dict, output_path: Path):
     name_to_role, _ = _build_role_maps(config)
     flow = get_flow_efficiency(db_path, days=window, name_to_role=name_to_role)
     rework = get_rework_rate(db_path, days=window, name_to_role=name_to_role)
-    pred = get_predictability(db_path, sprint_prefix, num_sprints=12)
+    pred = get_predictability(db_path, sprint_prefix, num_sprints=12, config=config)
     flow_be, flow_fe = flow['by_role']['BE'], flow['by_role']['FE']
     rw_be, rw_fe = rework['by_role']['BE'], rework['by_role']['FE']
     pred_be, pred_fe = pred['by_role']['BE'], pred['by_role']['FE']

@@ -225,6 +225,62 @@ def available_working_days(db_path: str, account_id: str,
     return max(0, total - pto)
 
 
+def sprint_availability_factor(db_path: str, config: dict, sprint_id: int,
+                               win_end_override=None) -> float:
+    """Fraction of the team's working days actually available in a sprint.
+
+    = sum(available_working_days) / sum(total_working_days) across every
+    rostered engineer, over the sprint window (optionally clamped to
+    win_end_override, e.g. 'today' for an in-flight sprint). 1.0 when there's
+    no PTO, no roster, or no sprint dates — so capacity-normalized metrics
+    equal their raw values until PTO data exists.
+
+    This is the single multiplier Phase-4 normalization uses: a metric measured
+    over a window where the team was at 80% availability is divided by 0.8 to
+    express it per-available-capacity.
+    """
+    members = config.get('team_members', []) if config else []
+    account_ids = [m.get('jira_account_id') for m in members if m.get('jira_account_id')]
+    if not account_ids:
+        return 1.0
+
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "SELECT start_date, end_date FROM sprints WHERE sprint_id = ?",
+            (sprint_id,),
+        )
+        row = cursor.fetchone()
+    finally:
+        conn.close()
+    if not row or not row['start_date'] or not row['end_date']:
+        return 1.0
+
+    s = parse_iso_tz(row['start_date'])
+    e = parse_iso_tz(row['end_date'])
+    if not s or not e:
+        return 1.0
+    win_start, win_end = s.date(), e.date()
+    if win_end_override is not None:
+        wo = win_end_override.date() if isinstance(win_end_override, datetime) else win_end_override
+        win_end = min(win_end, wo)
+
+    total_wd = working_days_between(win_start, win_end)
+    if total_wd <= 0:
+        return 1.0
+    full_capacity = total_wd * len(account_ids)
+    available = sum(
+        available_working_days(db_path, acct, win_start, win_end)
+        for acct in account_ids
+    )
+    if full_capacity <= 0:
+        return 1.0
+    factor = available / full_capacity
+    # Guard against absurd values; never amplify by more than ~3x downstream.
+    return max(0.34, min(1.0, factor))
+
+
 def parse_iso_tz(value: str) -> Optional[datetime]:
     """Parse an ISO-ish timestamp from Jira/GitHub.
 
@@ -950,7 +1006,8 @@ def get_developer_cycle_time(db_path: str, sprint_id: int, developer_id: str) ->
         conn.close()
 
 
-def get_team_throughput(db_path: str, sprint_id: int, days: int = 7) -> float:
+def get_team_throughput(db_path: str, sprint_id: int, days: int = 7,
+                        config: dict = None) -> float:
     """
     Calculate team throughput (tickets completed per week).
 
@@ -958,6 +1015,11 @@ def get_team_throughput(db_path: str, sprint_id: int, days: int = 7) -> float:
         db_path: Path to database
         sprint_id: Sprint ID
         days: Number of days to calculate over (default 7)
+        config: Team roster. When supplied, throughput is expressed per
+            AVAILABLE capacity — the rate is divided by the team's PTO-adjusted
+            availability factor, so a week with half the team out reflects the
+            true per-head pace rather than looking like a slowdown. Omit (or no
+            PTO data) → factor 1.0 → unchanged.
 
     Returns:
         Tickets per period
@@ -1016,12 +1078,21 @@ def get_team_throughput(db_path: str, sprint_id: int, days: int = 7) -> float:
 
         # Calculate throughput normalized to the period
         throughput = (completed / elapsed) * days if elapsed > 0 else 0
-        return round(throughput, 1)
     finally:
         conn.close()
 
+    # Capacity-normalize: express per available head. Done outside the DB
+    # block so the factor lookup uses its own connection.
+    if config is not None:
+        factor = sprint_availability_factor(
+            db_path, config, sprint_id, win_end_override=datetime.now())
+        if factor > 0:
+            throughput = throughput / factor
+    return round(throughput, 1)
 
-def get_developer_throughput(db_path: str, sprint_id: int, developer_id: str, days: int = 7) -> float:
+
+def get_developer_throughput(db_path: str, sprint_id: int, developer_id: str,
+                             days: int = 7, config: dict = None) -> float:
     """
     Calculate developer throughput (tickets completed per week).
 
@@ -1030,6 +1101,9 @@ def get_developer_throughput(db_path: str, sprint_id: int, developer_id: str, da
         sprint_id: Sprint ID
         developer_id: Developer's Jira account ID
         days: Number of days to calculate over (default 7)
+        config: When supplied, normalize by THIS developer's PTO-adjusted
+            availability so someone out part of the sprint isn't shown as slow.
+            Omit (or no PTO) → unchanged.
 
     Returns:
         Tickets per period
@@ -1088,9 +1162,53 @@ def get_developer_throughput(db_path: str, sprint_id: int, developer_id: str, da
 
         completed = dict(cursor.fetchone())['completed']
         throughput = (completed / elapsed) * days if elapsed > 0 else 0
-        return round(throughput, 1)
     finally:
         conn.close()
+
+    # Normalize by the individual's availability over the elapsed window.
+    if config is not None:
+        factor = _developer_availability_factor(
+            db_path, sprint_id, developer_id, win_end_override=datetime.now())
+        if factor > 0:
+            throughput = throughput / factor
+    return round(throughput, 1)
+
+
+def _developer_availability_factor(db_path: str, sprint_id: int, account_id: str,
+                                   win_end_override=None) -> float:
+    """One engineer's available / total working days over a sprint window.
+
+    1.0 when the engineer has no PTO, or the sprint has no dates. Mirrors
+    sprint_availability_factor but for a single person (used for per-developer
+    normalization). Clamped to [0.34, 1.0] to avoid runaway amplification.
+    """
+    if not account_id:
+        return 1.0
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "SELECT start_date, end_date FROM sprints WHERE sprint_id = ?",
+            (sprint_id,),
+        )
+        row = cursor.fetchone()
+    finally:
+        conn.close()
+    if not row or not row['start_date'] or not row['end_date']:
+        return 1.0
+    s = parse_iso_tz(row['start_date'])
+    e = parse_iso_tz(row['end_date'])
+    if not s or not e:
+        return 1.0
+    win_start, win_end = s.date(), e.date()
+    if win_end_override is not None:
+        wo = win_end_override.date() if isinstance(win_end_override, datetime) else win_end_override
+        win_end = min(win_end, wo)
+    total_wd = working_days_between(win_start, win_end)
+    if total_wd <= 0:
+        return 1.0
+    avail = available_working_days(db_path, account_id, win_start, win_end)
+    return max(0.34, min(1.0, avail / total_wd))
 
 
 def get_team_pr_review_time(db_path: str, days: int = 30) -> Optional[float]:
@@ -1895,8 +2013,14 @@ def get_developer_cycle_per_point_bulk(db_path: str, sprint_id: int) -> Dict[str
     return out
 
 
-def get_developer_throughput_bulk(db_path: str, sprint_id: int, days: int = 7) -> Dict[str, float]:
-    """Return {developer_id → throughput per `days` window} in one query."""
+def get_developer_throughput_bulk(db_path: str, sprint_id: int, days: int = 7,
+                                  config: dict = None) -> Dict[str, float]:
+    """Return {developer_id → throughput per `days` window} in one query.
+
+    When `config` is supplied, each developer's rate is normalized by their own
+    PTO-adjusted availability (consistent with get_developer_throughput). No
+    PTO / no config → unchanged.
+    """
     from utils.statuses import CLOSED_STATUSES, sql_placeholders
     conn = get_connection(db_path)
     cursor = conn.cursor()
@@ -1931,9 +2055,16 @@ def get_developer_throughput_bulk(db_path: str, sprint_id: int, days: int = 7) -
         out: Dict[str, float] = {}
         for dev_id, completed in completed_per_dev.items():
             if elapsed > 0:
-                out[dev_id] = round((completed / elapsed) * days, 1)
+                rate = (completed / elapsed) * days
             else:
                 out[dev_id] = float(completed) if completed > 0 else 0.0
+                continue
+            if config is not None:
+                factor = _developer_availability_factor(
+                    db_path, sprint_id, dev_id, win_end_override=datetime.now())
+                if factor > 0:
+                    rate = rate / factor
+            out[dev_id] = round(rate, 1)
         return out
     finally:
         conn.close()
@@ -2199,7 +2330,8 @@ def get_rework_rate(db_path: str, days: int = 90,
         conn.close()
 
 
-def get_predictability(db_path: str, sprint_prefix: str, num_sprints: int = 8) -> Dict[str, Any]:
+def get_predictability(db_path: str, sprint_prefix: str, num_sprints: int = 8,
+                       config: dict = None) -> Dict[str, Any]:
     """Delivery predictability across recent CLOSED sprints.
 
     Two signals:
@@ -2208,7 +2340,14 @@ def get_predictability(db_path: str, sprint_prefix: str, num_sprints: int = 8) -
       * velocity stability — coefficient of variation (stdev/mean) of
         completed SP across sprints. LOWER is better; a steady team is more
         predictable than a high-but-erratic one.
-    Returns per-sprint rows plus the rollup so the page can chart the band.
+
+    When `config` (the roster) is supplied, the velocity-stability signal uses
+    CAPACITY-NORMALIZED completed SP — each sprint's completed SP is divided by
+    that sprint's PTO-adjusted availability factor — so a sprint where the team
+    was half-out reads as "lower capacity," not "erratic delivery." Say/Do is
+    left as raw completed-vs-committed (it's already a self-normalizing ratio).
+    No PTO / no config → unchanged. NOTE: enabling this changes the historical
+    velocity_cov numbers shown on the Delivery page.
     """
     conn = get_connection(db_path)
     cursor = conn.cursor()
@@ -2235,6 +2374,13 @@ def get_predictability(db_path: str, sprint_prefix: str, num_sprints: int = 8) -
         commit = get_sprint_commitment_accuracy(db_path, sid)
         # Completed SP for the sprint, from the latest snapshot.
         vel = get_team_velocity(db_path, sid)
+        # Capacity-normalized velocity for the stability signal: a low-
+        # availability sprint produces less, which is expected, not erratic.
+        norm_vel = vel or 0
+        if config is not None and norm_vel:
+            factor = sprint_availability_factor(db_path, config, sid)
+            if factor > 0:
+                norm_vel = norm_vel / factor
         # Sprint-track role from the trailing BE/FE suffix (M30.3 onward).
         name = s['sprint_name']
         role = 'BE' if name.rstrip().endswith(' BE') else 'FE' if name.rstrip().endswith(' FE') else 'none'
@@ -2246,6 +2392,7 @@ def get_predictability(db_path: str, sprint_prefix: str, num_sprints: int = 8) -
             'completed': commit.get('completed', 0),
             'accuracy': commit.get('accuracy', 0),
             'completed_sp': vel or 0,
+            'completed_sp_norm': round(norm_vel, 1),
         })
 
     rows.reverse()  # chronological for charting
@@ -2253,16 +2400,19 @@ def get_predictability(db_path: str, sprint_prefix: str, num_sprints: int = 8) -
     def _rollup(subset: list) -> Dict[str, Any]:
         accuracies = [r['accuracy'] for r in subset if r['planned']]
         sps = [r['completed_sp'] for r in subset if r['completed_sp']]
+        # Stability is measured on capacity-normalized velocity when available
+        # (falls back to raw when no PTO/config, so the key is always present).
+        sps_norm = [r.get('completed_sp_norm', r['completed_sp']) for r in subset if r['completed_sp']]
         say_do = round(sum(accuracies) / len(accuracies), 1) if accuracies else None
         cov = None
-        if len(sps) >= 2:
-            mean = sum(sps) / len(sps)
+        if len(sps_norm) >= 2:
+            mean = sum(sps_norm) / len(sps_norm)
             if mean > 0:
-                var = sum((x - mean) ** 2 for x in sps) / len(sps)
+                var = sum((x - mean) ** 2 for x in sps_norm) / len(sps_norm)
                 cov = round((var ** 0.5) / mean * 100, 1)
         return {
             'say_do_avg': say_do,
-            'velocity_cov_pct': cov,  # lower = steadier
+            'velocity_cov_pct': cov,  # lower = steadier (capacity-normalized)
             'velocity_mean': round(sum(sps) / len(sps), 1) if sps else None,
         }
 
