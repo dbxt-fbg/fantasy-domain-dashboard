@@ -1,13 +1,13 @@
 """
-Google Calendar collector for 1-on-1 meetings.
+Google Calendar collector for 1-on-1 meetings and engineer PTO.
 """
 
 import logging
 import pickle
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -39,6 +39,14 @@ class CalendarCollector:
         self.credentials_path = Path(config['database']['path']).parent.parent / "config" / "google_credentials.json"
         self.token_path = Path(config['database']['path']).parent.parent / "config" / "token.pickle"
         self.service = None
+
+        cal_cfg = config.get('calendar', {}) or {}
+        # Calendar 1-on-1s are read from ('primary' = the auth'd account's own).
+        self.meetings_calendar_id = cal_cfg.get('meetings_calendar_id') or 'primary'
+        # Shared calendar PTO is posted to. Empty disables PTO sync.
+        self.pto_calendar_id = cal_cfg.get('pto_calendar_id') or ''
+        self.pto_lookahead_days = int(cal_cfg.get('pto_lookahead_days', 120))
+        self.pto_lookback_days = int(cal_cfg.get('pto_lookback_days', 120))
 
     def authenticate(self):
         """Authenticate with Google Calendar API."""
@@ -81,7 +89,7 @@ class CalendarCollector:
 
             # Get all events (recurring definitions)
             events_result = self.service.events().list(
-                calendarId='primary',
+                calendarId=self.meetings_calendar_id,
                 timeMin=now,
                 timeMax=time_max,
                 singleEvents=False  # Get recurring event definitions
@@ -216,7 +224,7 @@ class CalendarCollector:
             time_max = (datetime.utcnow() + timedelta(days=30)).isoformat() + 'Z'
 
             instances = self.service.events().instances(
-                calendarId='primary',
+                calendarId=self.meetings_calendar_id,
                 eventId=event['id'],
                 timeMin=now,
                 timeMax=time_max,
@@ -342,5 +350,215 @@ class CalendarCollector:
                 _time.sleep(wait)
         raise RuntimeError(
             f"Calendar sync failed to persist {len(rows)} meetings after "
+            f"{len(backoffs)} attempts: {last_err}"
+        )
+
+    # ------------------------------------------------------------------ PTO
+
+    def collect_pto(self) -> None:
+        """Collect engineer PTO from the shared PTO calendar.
+
+        Reads all-day out-of-office / PTO events from the configured shared
+        calendar, matches each to a team member (by attendee email or by name
+        in the title), and stores one row per contiguous span in the `pto`
+        table. No-op when pto_calendar_id is unset.
+        """
+        if not self.pto_calendar_id:
+            logger.info("No pto_calendar_id configured — skipping PTO sync")
+            return
+
+        if not self.service:
+            self.authenticate()
+
+        logger.info("Starting PTO collection from calendar %s", self.pto_calendar_id)
+
+        time_min = (datetime.utcnow() - timedelta(days=self.pto_lookback_days)).isoformat() + 'Z'
+        time_max = (datetime.utcnow() + timedelta(days=self.pto_lookahead_days)).isoformat() + 'Z'
+
+        # singleEvents=True expands recurring definitions into concrete dated
+        # instances, which is what we want for PTO (each occurrence is a real
+        # day off). Paginate so a busy team calendar isn't truncated.
+        events: List[Dict] = []
+        page_token = None
+        try:
+            while True:
+                resp = self.service.events().list(
+                    calendarId=self.pto_calendar_id,
+                    timeMin=time_min,
+                    timeMax=time_max,
+                    singleEvents=True,
+                    orderBy='startTime',
+                    pageToken=page_token,
+                ).execute()
+                events.extend(resp.get('items', []))
+                page_token = resp.get('nextPageToken')
+                if not page_token:
+                    break
+        except HttpError as error:
+            logger.error("PTO calendar fetch failed: %s", error)
+            raise
+
+        logger.info("Found %d events on the PTO calendar", len(events))
+
+        rows = self._build_pto_rows(events)
+        logger.info("Identified %d PTO span(s) matched to team members", len(rows))
+        self._store_pto(rows)
+        logger.info("PTO collection complete")
+
+    def _match_member(self, event: Dict) -> Optional[Dict[str, Any]]:
+        """Match a calendar event to a team member.
+
+        Tries attendee emails first (most reliable), then falls back to a
+        team member's name appearing in the event title. Returns the matched
+        team member dict, or None.
+        """
+        # 1) Attendee email — match on the local-part / name tokens.
+        for attendee in event.get('attendees', []) or []:
+            email = (attendee.get('email') or '').lower()
+            if not email:
+                continue
+            for member in self.team_members:
+                parts = [p for p in member['name'].lower().split() if len(p) > 2]
+                if parts and all(p in email for p in parts):
+                    return member
+            # Looser: any single name token in the email local-part.
+            local = email.split('@')[0]
+            for member in self.team_members:
+                parts = [p for p in member['name'].lower().split() if len(p) > 2]
+                if any(p in local for p in parts):
+                    return member
+
+        # 2) Name in the event title.
+        summary = (event.get('summary') or '').lower()
+        for member in self.team_members:
+            parts = [p for p in member['name'].lower().split() if len(p) > 2]
+            if parts and all(p in summary for p in parts):
+                return member
+        return None
+
+    @staticmethod
+    def _looks_like_pto(event: Dict) -> bool:
+        """True when an event represents time off.
+
+        Google marks dedicated OOO events with eventType 'outOfOffice'. For
+        plain all-day events posted to a PTO calendar we also accept common
+        keywords so teams that just create a normal all-day event still work.
+        """
+        if event.get('eventType') == 'outOfOffice':
+            return True
+        # Only all-day events (date, not dateTime) count as PTO spans.
+        if 'date' not in (event.get('start') or {}):
+            return False
+        text = ((event.get('summary') or '') + ' ' + (event.get('description') or '')).lower()
+        keywords = ('pto', 'ooo', 'out of office', 'vacation', 'holiday',
+                    'leave', 'time off', 'off ')
+        return any(k in text for k in keywords)
+
+    def _build_pto_rows(self, events: List[Dict]) -> List[Tuple]:
+        """Turn matched all-day OOO events into pto table row tuples."""
+        now = datetime.now().isoformat()
+        rows = []
+        for event in events:
+            if not self._looks_like_pto(event):
+                continue
+            member = self._match_member(event)
+            if not member:
+                logger.debug("Unmatched PTO event: %s", event.get('summary'))
+                continue
+
+            start = event.get('start', {})
+            end = event.get('end', {})
+            # All-day events use 'date'; Google's end date is EXCLUSIVE, so a
+            # one-day PTO is start=2026-07-01 end=2026-07-02. Normalise end to
+            # an inclusive last day.
+            start_date = start.get('date')
+            end_date_excl = end.get('date')
+            if not start_date:
+                continue
+            try:
+                s = date.fromisoformat(start_date)
+                if end_date_excl:
+                    e = date.fromisoformat(end_date_excl) - timedelta(days=1)
+                else:
+                    e = s
+            except ValueError:
+                continue
+            if e < s:
+                e = s
+
+            rows.append((
+                member['name'],
+                member.get('jira_account_id'),
+                member.get('github_username'),
+                event.get('id'),
+                event.get('summary'),
+                s.isoformat(),
+                e.isoformat(),
+                float(self._count_working_days(s, e)),
+                'google_calendar',
+                now,
+            ))
+        return rows
+
+    @staticmethod
+    def _count_working_days(start: date, end: date) -> int:
+        """Inclusive Mon-Fri day count between two dates."""
+        if end < start:
+            return 0
+        days = 0
+        cur = start
+        while cur <= end:
+            if cur.weekday() < 5:
+                days += 1
+            cur += timedelta(days=1)
+        return days
+
+    def _store_pto(self, rows: List[Tuple]) -> None:
+        """Replace the PTO table contents with the freshly-synced spans.
+
+        Full replace (not upsert-merge) so cancelled/deleted PTO disappears.
+        Same retry budget as _store_meetings for DB-lock resilience.
+        """
+        backoffs = [5, 10, 20, 40, 60, 60]
+        last_err = None
+        for attempt, wait in enumerate(backoffs):
+            try:
+                conn = get_connection(self.db_path)
+                cursor = conn.cursor()
+                try:
+                    cursor.execute("DELETE FROM pto")
+                    if rows:
+                        cursor.executemany("""
+                            INSERT INTO pto (
+                                developer_name, jira_account_id, github_username,
+                                event_id, summary, start_date, end_date,
+                                day_count, source, last_synced_at
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ON CONFLICT(event_id) DO UPDATE SET
+                                developer_name = excluded.developer_name,
+                                jira_account_id = excluded.jira_account_id,
+                                github_username = excluded.github_username,
+                                summary = excluded.summary,
+                                start_date = excluded.start_date,
+                                end_date = excluded.end_date,
+                                day_count = excluded.day_count,
+                                source = excluded.source,
+                                last_synced_at = excluded.last_synced_at
+                        """, rows)
+                    conn.commit()
+                    logger.info("Stored %d PTO span(s) (attempt %d)", len(rows), attempt + 1)
+                    return
+                finally:
+                    conn.close()
+            except Exception as e:
+                last_err = e
+                logger.warning(
+                    "PTO DB write attempt %d failed (%s); retrying in %ds…",
+                    attempt + 1, e, wait,
+                )
+                import time as _time
+                _time.sleep(wait)
+        raise RuntimeError(
+            f"Calendar sync failed to persist {len(rows)} PTO spans after "
             f"{len(backoffs)} attempts: {last_err}"
         )

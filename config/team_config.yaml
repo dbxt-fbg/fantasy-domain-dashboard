@@ -23,6 +23,20 @@ jira:
   # full URL (not just a board id) because it embeds tenant-specific app GUIDs.
   structure_board_url: "https://betfanatics.atlassian.net/jira/apps/94d5de1a-112d-4549-bd03-5f910d5fd27b/880424a7-af14-4c77-b446-5ef9feee797a/structure/board/6464"
 
+# Google Calendar Configuration
+calendar:
+  # Calendar the calendar-sync agent reads recurring 1-on-1 meetings from.
+  # 'primary' = the authenticated account's own calendar.
+  meetings_calendar_id: "primary"
+  # Shared calendar everyone posts PTO / OOO to. The sync agent reads all-day
+  # out-of-office events here and matches them to team members by attendee
+  # email or by name in the event title. Leave blank to disable PTO sync.
+  pto_calendar_id: ""
+  # How far ahead (days) to pull PTO so upcoming-sprint capacity reflects it.
+  pto_lookahead_days: 120
+  # How far back (days) to keep PTO so closed-sprint metrics stay accurate.
+  pto_lookback_days: 120
+
 # GitHub Configuration
 github:
   organization: "fanatics-gaming"
