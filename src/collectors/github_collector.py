@@ -104,9 +104,111 @@ class GitHubCollector:
                 # Small delay to avoid rate limiting
                 time.sleep(0.5)
 
+            # Reconcile PRs that the DB still marks 'open' but GitHub no longer
+            # returns as open. A PR closed WITHOUT merging falls out of both the
+            # open-PR query (--state open) and the merged-PR query (--merged),
+            # so without this pass its stale 'open' row lives forever and the
+            # Repositories page shows a closed PR as open.
+            try:
+                self._reconcile_open_prs()
+            except Exception as e:
+                logger.error(f"Failed to reconcile open PRs: {e}", exc_info=True)
+
         except Exception as e:
             logger.error(f"Failed to collect GitHub metrics: {e}", exc_info=True)
             raise
+
+    def _reconcile_open_prs(self) -> None:
+        """Re-check every PR still marked 'open' in the DB against GitHub.
+
+        Catches PRs that were closed without merging (branch abandoned/deleted)
+        — those vanish from both collector queries, so their 'open' row would
+        otherwise never update. For each, we ask GitHub for the current state
+        and update state/closed_at/merged_at when it's no longer open.
+        """
+        conn = self._open_db()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT repository, pr_number FROM github_prs WHERE state = 'open'"
+            )
+            open_rows = [(r['repository'], r['pr_number']) for r in cursor.fetchall()]
+        finally:
+            conn.close()
+
+        if not open_rows:
+            return
+
+        logger.info(f"Reconciling {len(open_rows)} PR(s) still marked open in the DB")
+        reconciled = 0
+        for repository, pr_number in open_rows:
+            if not repository or repository == 'unknown':
+                continue
+            try:
+                result = subprocess.run(
+                    ['gh', 'pr', 'view', str(pr_number),
+                     '--repo', repository,
+                     '--json', 'state,closedAt,mergedAt'],
+                    capture_output=True, text=True, check=True,
+                )
+                data = json.loads(result.stdout)
+            except subprocess.CalledProcessError as e:
+                err = str(e.stderr or '')
+                # If GitHub says the PR no longer exists (repo archived, PR
+                # purged, or PRs disabled), it definitionally can't be open —
+                # mark it closed so the dashboard stops surfacing it. We only
+                # do this for clear not-found/disabled signals, NOT transient
+                # auth/rate-limit errors, so a live PR is never wrongly closed.
+                low = err.lower()
+                if ('not found' in low or '404' in low
+                        or 'pull requests are disabled' in low):
+                    logger.info(
+                        f"{repository}#{pr_number} no longer exists on GitHub "
+                        f"(archived/removed) — marking closed")
+                    self._mark_pr_state(repository, pr_number, 'closed')
+                    reconciled += 1
+                else:
+                    logger.warning(
+                        f"Could not re-check {repository}#{pr_number} "
+                        f"(transient — left as-is): {err}")
+                continue
+            except json.JSONDecodeError:
+                continue
+
+            gh_state = (data.get('state') or '').upper()
+            if gh_state == 'OPEN':
+                continue  # genuinely still open
+            # MERGED or CLOSED-without-merge — normalise to our lowercase states.
+            new_state = 'merged' if data.get('mergedAt') else 'closed'
+            self._mark_pr_state(
+                repository, pr_number, new_state,
+                merged_at=data.get('mergedAt'), closed_at=data.get('closedAt'),
+            )
+            reconciled += 1
+            time.sleep(0.2)  # gentle on the API
+
+        if reconciled:
+            logger.info(f"Reconciled {reconciled} stale-open PR(s) to closed/merged")
+
+    def _mark_pr_state(self, repository: str, pr_number: int, state: str,
+                       merged_at=None, closed_at=None) -> None:
+        """Update an existing PR row's terminal state. Only touches state +
+        timestamps; never resurrects a row that isn't already present."""
+        conn = self._open_db()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                """
+                UPDATE github_prs
+                   SET state = ?, merged_at = ?, closed_at = ?, last_updated_at = ?
+                 WHERE repository = ? AND pr_number = ?
+                """,
+                (state, merged_at, closed_at, datetime.now().isoformat(),
+                 repository, pr_number),
+            )
+            conn.commit()
+        finally:
+            conn.close()
 
     def _get_open_prs(self, username: str) -> List[GitHubPR]:
         """

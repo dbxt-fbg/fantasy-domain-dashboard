@@ -4,6 +4,12 @@ set -o pipefail
 # Team Member / GitHub PR Agent - refreshes PRs, reviews, comments.
 # Wired to crontab every 15 min.
 
+# cron runs with a minimal PATH that omits Homebrew, so the `gh` CLI
+# (/opt/homebrew/bin/gh) isn't found and every PR fetch + the stale-open
+# reconcile pass fails silently (the agent catches the error and still
+# exits 0). Prepend the dirs where gh actually lives.
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 LOG_DIR="$SCRIPT_DIR/../logs"
 LOG_FILE="$LOG_DIR/github_pr_agent.log"
