@@ -3306,3 +3306,194 @@ table.export-table { display: none !important; }
     font-size: var(--fs-sm);
     padding: var(--space-2) 0;
 }
+
+/* ----- Delivery Excellence -------------------------------------------- */
+/* Headline gauges + flow/rework/predictability readouts. Reuses scoreboard
+   tokens; tone classes (success/warning/danger/muted) drive accent color. */
+.excellence-gauges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+}
+.excellence-gauge {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+}
+.excellence-gauge.success { border-top-color: var(--success); }
+.excellence-gauge.warning { border-top-color: var(--warning); }
+.excellence-gauge.danger  { border-top-color: var(--danger); }
+.excellence-gauge.muted   { border-top-color: var(--text-faint); }
+.excellence-gauge-label {
+    font-family: var(--font-display);
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.excellence-gauge-value {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.05;
+    margin: var(--space-2) 0 var(--space-1);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+.excellence-gauge.success .excellence-gauge-value { color: var(--success); }
+.excellence-gauge.warning .excellence-gauge-value { color: var(--warning); }
+.excellence-gauge.danger  .excellence-gauge-value { color: var(--danger); }
+.excellence-gauge-sub { font-size: var(--fs-sm); color: var(--text-muted); }
+
+.section-note {
+    color: var(--text-muted);
+    font-size: var(--fs-md);
+    margin: calc(var(--space-3) * -1) 0 var(--space-4);
+    max-width: 70ch;
+}
+.excellence-callout {
+    background: var(--bg-surface-2);
+    border-left: 3px solid var(--brand);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    color: var(--text-secondary);
+    font-size: var(--fs-md);
+}
+
+/* Flow breakdown — horizontal bars of queue time by status */
+.excellence-flow { display: flex; flex-direction: column; gap: var(--space-2); }
+.excellence-flow-row { display: flex; align-items: center; gap: var(--space-3); }
+.excellence-flow-name {
+    width: 200px;
+    flex-shrink: 0;
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    text-align: right;
+}
+.excellence-flow-track {
+    flex: 1;
+    height: 14px;
+    background: var(--bg-surface-2);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+.excellence-flow-fill {
+    display: block;
+    height: 100%;
+    background: var(--warning);
+    border-radius: var(--radius-sm);
+}
+.excellence-flow-val {
+    width: 56px;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Rework hotspots */
+.excellence-hop-list { list-style: none; margin: 0; padding: 0; max-width: 560px; }
+.excellence-hop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
+}
+.excellence-hop-name { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--text-secondary); }
+
+/* Predictability trend — say/do bars with a 100% target marker */
+.excellence-trend { display: flex; flex-direction: column; gap: var(--space-2); }
+.excellence-trend-row { display: flex; align-items: center; gap: var(--space-3); }
+.excellence-trend-name {
+    width: 130px; flex-shrink: 0;
+    font-size: var(--fs-sm); color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+.excellence-trend-track {
+    position: relative;
+    flex: 1;
+    height: 16px;
+    background: var(--bg-surface-2);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+.excellence-trend-fill { display: block; height: 100%; border-radius: var(--radius-sm); }
+.excellence-trend-fill.success { background: var(--success); }
+.excellence-trend-fill.warning { background: var(--warning); }
+.excellence-trend-fill.danger  { background: var(--danger); }
+/* 100% target sits at 2/3 of the 0-150% track */
+.excellence-trend-target {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 66.6%;
+    width: 2px;
+    background: var(--brand);
+    opacity: 0.7;
+}
+.excellence-trend-val {
+    width: 52px; flex-shrink: 0;
+    font-variant-numeric: tabular-nums; font-weight: 700; color: var(--text-primary);
+}
+.excellence-trend-detail { width: 150px; flex-shrink: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* Delivery Excellence — BE/FE split elements */
+.excellence-gauge-split {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+}
+.excellence-split-chip {
+    font-family: var(--font-display);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+/* BE = emerald, FE = violet — same role colors used across the dashboard. */
+.excellence-split-chip.be { background: rgba(45, 212, 167, 0.15); color: var(--success); }
+.excellence-split-chip.fe { background: rgba(196, 181, 253, 0.15); color: #c4b5fd; }
+
+.excellence-track-compare {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+.excellence-track-line {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--fs-md);
+    color: var(--text-secondary);
+}
+.excellence-track-line strong {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    color: var(--text-primary);
+}
+.excellence-track-detail {
+    width: 100%;
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+}
+.excellence-trend-name { display: flex; align-items: center; gap: var(--space-2); }
