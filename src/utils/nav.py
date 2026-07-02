@@ -25,6 +25,7 @@ SECONDARY_NAV = [
     ('stories',       'team_dashboard.html', 'Stories'),
     ('story-points',  'story_points_dashboard.html', 'Story Points'),
     ('past-sprints',  'past_sprints_dashboard.html', 'Sprint Reports'),
+    ('capacity',      'capacity_planner.html', 'Capacity'),
     ('delivery-excellence', 'delivery_excellence_dashboard.html', 'Delivery'),
     ('pull-requests', 'pull_requests_dashboard.html', 'Repositories'),
     ('hygiene',       'hygiene_dashboard.html', 'Ticket Hygiene'),
