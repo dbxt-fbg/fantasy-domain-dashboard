@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacity Planner — Project: Final Fantasy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/dashboard.css?v=scoreboard-1">
+    <script src="assets/dashboard.js?v=gantt-open-stories-1" defer></script>
+    <style>
+        .header-links {
+            display: flex;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-8);
+            flex-wrap: wrap;
+            background: var(--bg-surface-2);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-links a {
+            color: var(--accent-text);
+            text-decoration: none;
+            font-size: var(--fs-base);
+            padding: var(--space-1) var(--space-3);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            background: var(--bg-surface);
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .header-links a:hover {
+            background: var(--bg-hover);
+            border-color: var(--brand);
+            color: var(--text-primary);
+        }
+
+        .planner-toolbar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin: var(--space-2) 0 var(--space-5);
+            flex-wrap: wrap;
+        }
+        .planner-toolbar .legend {
+            color: var(--text-muted);
+            font-size: var(--fs-base);
+            margin-left: auto;
+        }
+        .planner-btn {
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-3);
+            font-family: var(--font-sans);
+            font-size: var(--fs-base);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .planner-btn:hover { background: var(--bg-hover); border-color: var(--brand); color: var(--text-primary); }
+        .planner-btn.danger:hover { border-color: var(--danger); color: var(--danger-text); }
+
+        .planner-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            font-size: var(--fs-md);
+        }
+        .planner-table th,
+        .planner-table td {
+            padding: var(--space-2) var(--space-3);
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .planner-table thead th {
+            background: var(--bg-surface-2);
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: var(--fs-sm);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .planner-table tbody tr:hover { background: var(--bg-hover); }
+        .planner-table tbody tr:last-child td { border-bottom: none; }
+
+        .planner-table th.col-num,
+        .planner-table td.col-num { text-align: right; width: 90px; }
+        .planner-table th.col-bool,
+        .planner-table td.col-bool { text-align: center; width: 80px; }
+        .planner-table th.col-name,
+        .planner-table td.col-name { width: 200px; }
+        .planner-table td.col-name input { font-weight: 500; }
+
+        .planner-table input[type="text"],
+        .planner-table input[type="number"] {
+            width: 100%;
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: var(--space-1) var(--space-2);
+            font: inherit;
+            box-sizing: border-box;
+        }
+        .planner-table input[type="number"] { text-align: right; font-variant-numeric: tabular-nums; }
+        .planner-table input[type="text"]:hover,
+        .planner-table input[type="number"]:hover { border-color: var(--border-strong); }
+        .planner-table input[type="text"]:focus,
+        .planner-table input[type="number"]:focus {
+            outline: none;
+            border-color: var(--brand);
+            background: var(--bg-container);
+        }
+        .planner-table input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--brand);
+        }
+
+        .planner-table td.availability {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: var(--success);
+            width: 110px;
+        }
+        .planner-table td.availability.zero { color: var(--danger); }
+        .planner-table td.availability.partial { color: var(--warning); }
+
+        .planner-table tfoot td {
+            background: var(--bg-surface-2);
+            font-weight: 700;
+            color: var(--text-primary);
+            border-top: 2px solid var(--border-strong);
+            font-variant-numeric: tabular-nums;
+        }
+        .planner-table tfoot td.col-num { text-align: right; }
+
+        .group-title {
+            margin: var(--space-6) 0 var(--space-3);
+            font-family: var(--font-display);
+            font-size: var(--fs-md);
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--accent-text);
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-3);
+        }
+        .group-title:first-of-type { margin-top: var(--space-2); }
+        .group-title .group-count {
+            font-family: var(--font-sans);
+            font-size: var(--fs-sm);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-transform: none;
+            color: var(--text-muted);
+        }
+
+        .grand-total {
+            margin-top: var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-4);
+            padding: var(--space-4) var(--space-5);
+            background: var(--bg-surface-2);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--brand);
+            border-radius: var(--radius-lg);
+            flex-wrap: wrap;
+        }
+        .grand-total .label {
+            font-family: var(--font-display);
+            font-size: var(--fs-base);
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .grand-total .stats {
+            display: flex;
+            gap: var(--space-6);
+            flex-wrap: wrap;
+            font-variant-numeric: tabular-nums;
+        }
+        .grand-total .stat { font-size: var(--fs-base); color: var(--text-muted); }
+        .grand-total .stat b {
+            display: block;
+            font-family: var(--font-display);
+            font-size: var(--fs-xl);
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        .grand-total .stat.avail b { color: var(--success); }
+
+        .planner-help {
+            margin-top: var(--space-5);
+            padding: var(--space-4) var(--space-5);
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            color: var(--text-muted);
+            font-size: var(--fs-base);
+            line-height: 1.55;
+        }
+        .planner-help code {
+            background: var(--bg-container);
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: var(--fs-sm);
+        }
+
+        @media print {
+            @page { size: landscape; margin: 0.4in; }
+            body { background: #fff !important; color: #000 !important; }
+            .top-nav, .sub-nav, .header-links, .planner-toolbar, .planner-help { display: none !important; }
+            .container { max-width: 100% !important; padding: 0 !important; }
+            .section { background: #fff !important; }
+            .section-title { color: #000 !important; }
+            header h1, .subtitle { color: #000 !important; }
+            .planner-table { background: #fff !important; border-color: #999 !important; font-size: 11px; }
+            .planner-table thead th, .planner-table tfoot td { background: #eee !important; color: #000 !important; }
+            .planner-table td, .planner-table th { color: #000 !important; border-color: #ccc !important; }
+            .planner-table input { color: #000 !important; border-color: transparent !important; background: transparent !important; }
+            .planner-table td.availability { color: #000 !important; }
+            .group-title { color: #000 !important; margin: 14px 0 6px; }
+            .group-title .group-count { color: #333 !important; }
+            .grand-total { background: #eee !important; border-color: #999 !important; border-left-color: #999 !important; }
+            .grand-total .label, .grand-total .stat, .grand-total .stat b { color: #000 !important; }
+        }
+    </style>
+</head>
+<body class="page-project">
+    <div class="container">
+        <header>
+            <h1>📊 Capacity Planner</h1>
+            <div class="subtitle">Sprint capacity, on-call load, time-off, and availability</div>
+        </header>
+        <nav class="top-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="active">Project: Final Fantasy</a></li>
+                <li class="nav-item"><a href="logs_dashboard.html">Agents and Logs</a></li>
+            </ul>
+        </nav>
+        <nav class="sub-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="features.html">Features</a></li>
+                <li class="nav-item"><a href="readiness_dashboard.html">Readiness</a></li>
+                <li class="nav-item"><a href="epics_dashboard.html">Epics</a></li>
+                <li class="nav-item"><a href="team_dashboard.html">Stories</a></li>
+                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
+                <li class="nav-item"><a href="capacity_planner.html" class="active">Capacity</a></li>
+                <li class="nav-item"><a href="delivery_excellence_dashboard.html">Delivery</a></li>
+                <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
+                <li class="nav-item"><a href="hygiene_dashboard.html">Ticket Hygiene</a></li>
+                <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
+                <li class="nav-item"><a href="dependencies.html">Dependencies</a></li>
+                <li class="nav-item"><a href="mbr.html">MBR</a></li>
+            </ul>
+        </nav>
+        <div class="header-links">
+            <a href="https://www.fanaticsstartinglineup.com/sites/fanatics-betting-gaming/SitePageModern/6032/holiday-calendars" target="_blank" rel="noopener noreferrer">🏖️ Company Holidays</a>
+            <a href="https://calendar.google.com/calendar/u/0?cid=Y183ZGM4OWRlYzVlZGMyODE2ODkwMWUwNDBmNzJjOWViMmRmOGM3YjMwYjZiMmU5MGE3OTE4MzNjMTUyMmY3ZjQ4QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20" target="_blank" rel="noopener noreferrer">📅 PTO Calendar</a>
+        </div>
+        <div class="content">
+            <div class="section">
+                <div class="section-title">Team capacity for this sprint</div>
+
+                <div class="planner-toolbar">
+                    <button type="button" class="planner-btn" id="export-sheets-btn">📊 Export to Google Sheets</button>
+                    <button type="button" class="planner-btn" id="export-pdf-btn">📄 Export to PDF</button>
+                    <button type="button" class="planner-btn danger" id="reset-btn">🔄 Reset to defaults</button>
+                    <span class="legend">
+                        Primary on-call &minus;3 &nbsp;·&nbsp; Secondary on-call &minus;1 &nbsp;·&nbsp; Edits saved locally
+                    </span>
+                </div>
+
+                <div class="group-title">
+                    Backend <span class="group-count" id="backend-count"></span>
+                </div>
+                <table class="planner-table" data-group="backend">
+                    <thead>
+                        <tr>
+                            <th class="col-name">Name</th>
+                            <th class="col-num">Capacity</th>
+                            <th class="col-bool">Primary</th>
+                            <th class="col-bool">Secondary</th>
+                            <th class="col-num">Holidays</th>
+                            <th class="col-num">PTO</th>
+                            <th class="col-num">Spill</th>
+                            <th class="col-num">Planned</th>
+                            <th class="col-num">Availability</th>
+                        </tr>
+                    </thead>
+                    <tbody id="backend-tbody"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="col-name">Backend total</td>
+                            <td class="col-num" data-total="capacity">0</td>
+                            <td class="col-bool"></td>
+                            <td class="col-bool"></td>
+                            <td class="col-num" data-total="holidays">0</td>
+                            <td class="col-num" data-total="pto">0</td>
+                            <td class="col-num" data-total="spill">0</td>
+                            <td class="col-num" data-total="planned">0</td>
+                            <td class="col-num availability" data-total="availability">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="group-title">
+                    Frontend <span class="group-count" id="frontend-count"></span>
+                </div>
+                <table class="planner-table" data-group="frontend">
+                    <thead>
+                        <tr>
+                            <th class="col-name">Name</th>
+                            <th class="col-num">Capacity</th>
+                            <th class="col-bool">Primary</th>
+                            <th class="col-bool">Secondary</th>
+                            <th class="col-num">Holidays</th>
+                            <th class="col-num">PTO</th>
+                            <th class="col-num">Spill</th>
+                            <th class="col-num">Planned</th>
+                            <th class="col-num">Availability</th>
+                        </tr>
+                    </thead>
+                    <tbody id="frontend-tbody"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="col-name">Frontend total</td>
+                            <td class="col-num" data-total="capacity">0</td>
+                            <td class="col-bool"></td>
+                            <td class="col-bool"></td>
+                            <td class="col-num" data-total="holidays">0</td>
+                            <td class="col-num" data-total="pto">0</td>
+                            <td class="col-num" data-total="spill">0</td>
+                            <td class="col-num" data-total="planned">0</td>
+                            <td class="col-num availability" data-total="availability">0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="grand-total">
+                    <span class="label">All teams</span>
+                    <div class="stats">
+                        <span class="stat">Capacity <b id="grand-capacity">0</b></span>
+                        <span class="stat">Holidays <b id="grand-holidays">0</b></span>
+                        <span class="stat">PTO <b id="grand-pto">0</b></span>
+                        <span class="stat">Spill <b id="grand-spill">0</b></span>
+                        <span class="stat">Planned <b id="grand-planned">0</b></span>
+                        <span class="stat avail">Availability <b id="grand-availability">0</b></span>
+                    </div>
+                </div>
+
+                <div class="planner-help">
+                    <strong>How availability is calculated:</strong>
+                    <code>max(0, Capacity − Holidays − PTO − Spill − Planned − (Primary ? 3 : 0) − (Secondary ? 1 : 0))</code>
+                    <br>
+                    Edit any cell directly. Add or remove rows with the buttons above. All edits persist in your browser via <code>localStorage</code> &mdash; nothing is sent to a server.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'fantasy-dashboard.capacity-planner.v1';
+
+        // Fantasy engineering roster, split by role from config/team_config.yaml.
+        const DEFAULT_ROWS = [
+            { name: 'Brooks Taylor',   team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Josh Schaefer',   team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Kevin Paquette',  team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Liam Butler',     team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Michael Goodwin', team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Nigel Young',     team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Patrick Kilburn', team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Ryan Taylor',     team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Salmaan Khan',    team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Tanya Phanich',   team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Anushri Patel',   team: 'frontend', capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Jacob Tabak',     team: 'frontend', capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Jasmine Dacones', team: 'frontend', capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Kevin Jacob',     team: 'frontend', capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Paul Kang',       team: 'frontend', capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+            { name: 'Scott Schmitz',   team: 'frontend', capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
+        ];
+
+        // Canonical backend roster — used to assign a team to rows loaded from
+        // an older localStorage payload that predates the `team` field.
+        const BACKEND_NAMES = new Set(
+            DEFAULT_ROWS.filter(r => r.team === 'backend').map(r => r.name)
+        );
+        const GROUPS = ['backend', 'frontend'];
+
+        const PRIMARY_COST = 3;
+        const SECONDARY_COST = 1;
+
+        const tbodies = {
+            backend: document.getElementById('backend-tbody'),
+            frontend: document.getElementById('frontend-tbody'),
+        };
+        let rows = loadRows();
+
+        function loadRows() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return DEFAULT_ROWS.map(r => ({ ...r }));
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed) || parsed.length === 0) {
+                    return DEFAULT_ROWS.map(r => ({ ...r }));
+                }
+                return parsed.map(normalizeRow);
+            } catch (e) {
+                return DEFAULT_ROWS.map(r => ({ ...r }));
+            }
+        }
+
+        function normalizeRow(r) {
+            const name = typeof r.name === 'string' ? r.name : '';
+            const team = (r.team === 'backend' || r.team === 'frontend')
+                ? r.team
+                : (BACKEND_NAMES.has(name) ? 'backend' : 'frontend');
+            return {
+                name: name,
+                team: team,
+                capacity: Number(r.capacity) || 0,
+                primary: !!r.primary,
+                secondary: !!r.secondary,
+                holidays: Number(r.holidays) || 0,
+                pto: Number(r.pto) || 0,
+                spill: Number(r.spill) || 0,
+                planned: Number(r.planned) || 0,
+            };
+        }
+
+        function saveRows() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+            } catch (e) { /* quota or disabled storage — non-fatal */ }
+        }
+
+        function availability(row) {
+            const raw = row.capacity
+                - row.holidays
+                - row.pto
+                - row.spill
+                - row.planned
+                - (row.primary ? PRIMARY_COST : 0)
+                - (row.secondary ? SECONDARY_COST : 0);
+            return Math.max(0, raw);
+        }
+
+        function fmt(n) {
+            if (!isFinite(n)) return '0';
+            return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/\.?0+$/, '');
+        }
+
+        function render() {
+            GROUPS.forEach(g => { tbodies[g].innerHTML = ''; });
+            const counts = { backend: 0, frontend: 0 };
+            rows.forEach((row, i) => {
+                const g = row.team === 'backend' ? 'backend' : 'frontend';
+                tbodies[g].appendChild(buildRow(row, i));
+                counts[g]++;
+            });
+            document.getElementById('backend-count').textContent =
+                `${counts.backend} ${counts.backend === 1 ? 'engineer' : 'engineers'}`;
+            document.getElementById('frontend-count').textContent =
+                `${counts.frontend} ${counts.frontend === 1 ? 'engineer' : 'engineers'}`;
+            renderTotals();
+        }
+
+        function buildRow(row, index) {
+            const tr = document.createElement('tr');
+            tr.dataset.index = String(index);
+
+            tr.appendChild(cellInput('name', 'text', row.name, 'col-name'));
+            tr.appendChild(cellInput('capacity', 'number', row.capacity, 'col-num'));
+            tr.appendChild(cellCheckbox('primary', row.primary));
+            tr.appendChild(cellCheckbox('secondary', row.secondary));
+            tr.appendChild(cellInput('holidays', 'number', row.holidays, 'col-num'));
+            tr.appendChild(cellInput('pto', 'number', row.pto, 'col-num'));
+            tr.appendChild(cellInput('spill', 'number', row.spill, 'col-num'));
+            tr.appendChild(cellInput('planned', 'number', row.planned, 'col-num'));
+
+            const avail = document.createElement('td');
+            avail.className = 'availability';
+            tr.appendChild(avail);
+
+            updateRowAvailability(tr, row);
+            return tr;
+        }
+
+        function cellInput(field, type, value, cls) {
+            const td = document.createElement('td');
+            if (cls) td.className = cls;
+            const input = document.createElement('input');
+            input.type = type;
+            if (type === 'number') {
+                input.step = 'any';
+                input.min = '0';
+                input.value = value;
+            } else {
+                input.value = value;
+            }
+            input.addEventListener('input', e => {
+                const tr = td.parentElement;
+                const idx = Number(tr.dataset.index);
+                const row = rows[idx];
+                if (type === 'number') {
+                    const v = parseFloat(e.target.value);
+                    row[field] = isNaN(v) ? 0 : v;
+                } else {
+                    row[field] = e.target.value;
+                }
+                if (field !== 'name') updateRowAvailability(tr, row);
+                renderTotals();
+                saveRows();
+            });
+            td.appendChild(input);
+            return td;
+        }
+
+        function cellCheckbox(field, checked) {
+            const td = document.createElement('td');
+            td.className = 'col-bool';
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.checked = !!checked;
+            input.addEventListener('change', e => {
+                const tr = td.parentElement;
+                const idx = Number(tr.dataset.index);
+                const row = rows[idx];
+                row[field] = e.target.checked;
+                updateRowAvailability(tr, row);
+                renderTotals();
+                saveRows();
+            });
+            td.appendChild(input);
+            return td;
+        }
+
+        function updateRowAvailability(tr, row) {
+            const cell = tr.querySelector('td.availability');
+            const a = availability(row);
+            cell.textContent = fmt(a);
+            cell.classList.remove('zero', 'partial');
+            if (a === 0) cell.classList.add('zero');
+            else if (a < row.capacity * 0.5) cell.classList.add('partial');
+        }
+
+        const SUM_FIELDS = ['capacity', 'holidays', 'pto', 'spill', 'planned'];
+
+        function renderTotals() {
+            const grand = { capacity: 0, holidays: 0, pto: 0, spill: 0, planned: 0, availability: 0 };
+
+            GROUPS.forEach(group => {
+                const groupRows = rows.filter(r =>
+                    (r.team === 'backend' ? 'backend' : 'frontend') === group);
+                const tfoot = document.querySelector(`.planner-table[data-group="${group}"] tfoot`);
+                SUM_FIELDS.forEach(field => {
+                    const total = groupRows.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
+                    tfoot.querySelector(`[data-total="${field}"]`).textContent = fmt(total);
+                    grand[field] += total;
+                });
+                const groupAvail = groupRows.reduce((acc, r) => acc + availability(r), 0);
+                tfoot.querySelector('[data-total="availability"]').textContent = fmt(groupAvail);
+                grand.availability += groupAvail;
+            });
+
+            document.getElementById('grand-capacity').textContent = fmt(grand.capacity);
+            document.getElementById('grand-holidays').textContent = fmt(grand.holidays);
+            document.getElementById('grand-pto').textContent = fmt(grand.pto);
+            document.getElementById('grand-spill').textContent = fmt(grand.spill);
+            document.getElementById('grand-planned').textContent = fmt(grand.planned);
+            document.getElementById('grand-availability').textContent = fmt(grand.availability);
+        }
+
+        function csvCell(v) {
+            const s = String(v == null ? '' : v);
+            return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+        }
+
+        function buildCsv() {
+            const headers = ['Team', 'Name', 'Capacity', 'Primary', 'Secondary', 'Holidays', 'PTO', 'Spill', 'Planned', 'Availability'];
+            const lines = [headers.join(',')];
+            const sumRows = (rs, key) => rs.reduce((acc, r) => acc + (Number(r[key]) || 0), 0);
+
+            GROUPS.forEach(group => {
+                const groupRows = rows.filter(r =>
+                    (r.team === 'backend' ? 'backend' : 'frontend') === group);
+                const label = group === 'backend' ? 'Backend' : 'Frontend';
+                groupRows.forEach(r => {
+                    lines.push([
+                        label,
+                        csvCell(r.name),
+                        r.capacity,
+                        r.primary ? 'TRUE' : 'FALSE',
+                        r.secondary ? 'TRUE' : 'FALSE',
+                        r.holidays,
+                        r.pto,
+                        r.spill,
+                        r.planned,
+                        availability(r),
+                    ].join(','));
+                });
+                lines.push([
+                    label,
+                    `${label} total`,
+                    sumRows(groupRows, 'capacity'),
+                    '', '',
+                    sumRows(groupRows, 'holidays'),
+                    sumRows(groupRows, 'pto'),
+                    sumRows(groupRows, 'spill'),
+                    sumRows(groupRows, 'planned'),
+                    groupRows.reduce((acc, r) => acc + availability(r), 0),
+                ].join(','));
+            });
+
+            lines.push([
+                'All teams',
+                'Grand total',
+                sumRows(rows, 'capacity'),
+                '', '',
+                sumRows(rows, 'holidays'),
+                sumRows(rows, 'pto'),
+                sumRows(rows, 'spill'),
+                sumRows(rows, 'planned'),
+                rows.reduce((acc, r) => acc + availability(r), 0),
+            ].join(','));
+            return lines.join('\n');
+        }
+
+        function todayStamp() {
+            const d = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        }
+
+        document.getElementById('export-sheets-btn').addEventListener('click', () => {
+            const csv = buildCsv();
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `capacity-planner-${todayStamp()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            window.open('https://docs.google.com/spreadsheets/u/0/create', '_blank', 'noopener');
+            alert('CSV downloaded. A blank Google Sheet has been opened in a new tab — use File → Import → Upload to load the CSV into it.');
+        });
+
+        document.getElementById('export-pdf-btn').addEventListener('click', () => {
+            window.print();
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            if (!confirm('Are you sure? This will replace all rows with the default team list and lose any rows you added or names you edited.')) return;
+            rows = DEFAULT_ROWS.map(r => ({ ...r }));
+            saveRows();
+            render();
+        });
+
+        render();
+    </script>
+</body>
+</html>
