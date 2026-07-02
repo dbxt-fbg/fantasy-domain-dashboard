@@ -194,12 +194,474 @@
 
             <!-- Month picker -->
             <div class="mbr-month-nav">
-                <a href="#" class="mbr-month-chip active" data-mbr-month="may-2026">May 2026</a>
+                <a href="#" class="mbr-month-chip active" data-mbr-month="june-2026">June 2026</a>
+                <a href="#" class="mbr-month-chip" data-mbr-month="may-2026">May 2026</a>
                 <a href="#" class="mbr-month-chip" data-mbr-month="april-2026">April 2026</a>
             </div>
 
+            <!-- ============================== JUNE 2026 ============================== -->
+            <div class="mbr-month" data-mbr-month="june-2026">
+
+            <!-- Header -->
+            <div class="intro-banner">
+                <p style="font-weight: 600; font-size: 15px; margin-bottom: 6px; color: var(--text-primary);">
+                    Monthly Business Review — June 2026
+                </p>
+                <p style="color: var(--text-secondary); margin: 0;">
+                    <strong>Leaders:</strong> Tom Boettner, Liz Mackie &amp; Alex Congleton &nbsp;|&nbsp; <strong>Domain:</strong> Fantasy
+                </p>
+            </div>
+
+            <!-- Executive Summary -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📝 Executive Summary</h2>
+                <div class="intro-banner">
+                    <p style="color: var(--text-secondary); line-height: 1.7; margin: 0;">
+                        June was the month the cross-team dependency wall came down. The four CAT-owned features that were
+                        the top risk entering May — Universal Wallet (FEAT-8216), Payments MVP (FEAT-8217), Geolocation
+                        (FEAT-8511), and KYC &amp; Auth (FEAT-8865) — all reached <strong>Ready for Promotion / Completed</strong>
+                        in June, with the underlying PAY, MAGU, PROF, and GATE epics closing out around June 23. Trading
+                        Engineering Alpha (FEAT-8554) moved to Released as the VAMO ingestion/observability epics landed.
+                        <br><br>
+                        On the DFS side the team closed <strong>96 stories, bugs and tasks (140 SP)</strong> across M30.3 and
+                        M30.4, resolving <strong>22 FNTSY epics</strong> — Wallet Integration, Results Ingestion &amp; Settlement,
+                        Contest Leaderboards, FanCash Earn, InfoSec, the League Pages events endpoint, the Playmaker admin
+                        surface, and both M30.3 and M30.4 Fast Lane epics. Mobile front-end advanced heavily and is now the
+                        center of gravity: the My Picks feed, leaderboard bottom sheet, floating pickslip, player cards
+                        enriched from SDP, and the Event Page screen all progressed, and BE services began deploying to Cert.
+                        <br><br>
+                        Risk picture improved. RG &amp; Entry Limits (FEAT-8509) stepped back from Red (May) to Amber — the
+                        NATS UI work that had no owner now has a home in M31.1. The new Red is Event Page (FEAT-8853). M30.4,
+                        the milestone's final sprint, closed at only 34% SP completion (58.5 of 171) — a large slug of scope
+                        bled into M31.1, which is the thing to watch as the team enters M31 against the Alpha/Beta window.
+                        Two Fair Play placeholder epics were Abandoned as that work consolidated into FEAT-8876. M31.1 opened
+                        June 24.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Key Numbers -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📊 June at a Glance</h2>
+                <div class="metric-row">
+                    <div class="metric-mini">
+                        <div class="val">96</div>
+                        <div class="lbl">Stories/bugs/tasks closed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">140</div>
+                        <div class="lbl">Story points completed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">M30.3<br><span style="font-size:16px">M30.4</span></div>
+                        <div class="lbl">Sprints completed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">22</div>
+                        <div class="lbl">FNTSY epics moved to Done</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">4</div>
+                        <div class="lbl">CAT dependencies cleared</div>
+                    </div>
+                </div>
+
+                <p style="font-size: 12px; color: var(--text-faint); margin-top: 0;">
+                    * Closed counts cover M30.3 (May 27 – Jun 9) and M30.4 (Jun 10 – Jun 23), measured by each ticket's
+                    status at sprint close (BE + FE boards combined). M30.3 ended at 81.7 of 134.3 SP closed (61%); M30.4
+                    ended at 58.5 of 171 SP closed (34%) — the milestone's final sprint carried a large amount of scope
+                    into M31.1. "CAT dependencies cleared" = Universal Wallet, Payments MVP, Geolocation, and KYC &amp; Auth
+                    all reaching Ready for Promotion / Completed.
+                </p>
+
+                <!-- Work by workstream -->
+                <div style="margin-top: 16px;">
+                    <div class="workstream-row">
+                        <span class="workstream-name">Leaderboard &amp; My Picks Feed (FE)</span>
+                        <span class="workstream-count">12 stories</span>
+                        <span class="workstream-engineers">Kevin Jacob</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Fast Lane / Load &amp; Performance / Cert Deploys</span>
+                        <span class="workstream-count">11 stories</span>
+                        <span class="workstream-engineers">Patrick Kilburn</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Settlement Rules, Stake Limits &amp; OF Config (BE)</span>
+                        <span class="workstream-count">10 stories</span>
+                        <span class="workstream-engineers">Josh Schaefer</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Playmaker Admin (Contest Entry / Void / Edit Pick)</span>
+                        <span class="workstream-count">9 stories</span>
+                        <span class="workstream-engineers">Ryan Taylor</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Pickslip, Bottom Nav &amp; C4↔API Bidirectional (FE)</span>
+                        <span class="workstream-count">8 stories</span>
+                        <span class="workstream-engineers">Paul Kang</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">FanCash Earn/Burn &amp; OF Kafka Ingestion (BE)</span>
+                        <span class="workstream-count">8 stories</span>
+                        <span class="workstream-engineers">Liam Butler</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">My Picks Feed, Cards &amp; Cascade UI (FE)</span>
+                        <span class="workstream-count">7 stories</span>
+                        <span class="workstream-engineers">Scott Schmitz</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Event Page Screen &amp; Onboarding (iOS)</span>
+                        <span class="workstream-count">7 stories</span>
+                        <span class="workstream-engineers">Jasmine Dacones</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Playbook, Player Card History &amp; Monorepo (FE)</span>
+                        <span class="workstream-count">7 stories</span>
+                        <span class="workstream-engineers">Jacob Tabak</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Player Cards CMS &amp; SDP Enrichment (FE)</span>
+                        <span class="workstream-count">6 stories</span>
+                        <span class="workstream-engineers">Anushri Patel</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Gimme Picks &amp; Wallet clientRef (BE)</span>
+                        <span class="workstream-count">4 stories</span>
+                        <span class="workstream-engineers">Salmaan Khan</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">OF Fixture/Multiplier Ingestion &amp; RG Limit Counting</span>
+                        <span class="workstream-count">4 stories</span>
+                        <span class="workstream-engineers">Nigel Young</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Pickslip Validation &amp; UMB Deserialization (BE)</span>
+                        <span class="workstream-count">2 stories</span>
+                        <span class="workstream-engineers">Brooks Taylor</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Successes -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">✅ Successes</h2>
+                <div class="success-list">
+
+                    <div class="success-item">
+                        <div class="item-title">The CAT Dependency Wall Came Down</div>
+                        <div class="item-body">
+                            The four CAT-owned features that were the domain's top launch risk in April all reached
+                            Ready for Promotion / Completed in June:
+                            <ul>
+                                <li><strong>Universal Wallet (FEAT-8216)</strong> — PAY wallet/balances/transaction-history epics (PAY-5947/5948/5949/6257/6068) and mobile work (MAGU-8805) all Done ~Jun 23</li>
+                                <li><strong>Payments MVP (FEAT-8217)</strong> — payment methods deposit/withdraw complete</li>
+                                <li><strong>Geolocation (FEAT-8511)</strong> — GATE "Support DFS geo" (GATE-4644) and MAGU limits work closed; the May "watch MAGU/GATE" risk is retired</li>
+                                <li><strong>KYC &amp; Auth (FEAT-8865)</strong> — PROF DFS KYC Integration (PROF-5223) and SuperApp Login (PROF-5132) Done</li>
+                            </ul>
+                            This is the risk that opened the April MBR ("CAT not confident on Aug 5"). It is now effectively closed.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Wallet, Settlement &amp; Contest Epics Closed on the Fantasy Side</div>
+                        <div class="item-body">
+                            22 FNTSY epics reached Done in June, retiring most of the backend MVP spine:
+                            <ul>
+                                <li>Wallet Integration (FNTSY-161), Results Ingestion &amp; Settlement Jobs (FNTSY-236), Publish Contest Entries to Kafka (FNTSY-242)</li>
+                                <li>Contests: rules &amp; entry (FNTSY-168), Contest Leaderboards (FNTSY-169), Max Stake Calculation &amp; Validation (FNTSY-305)</li>
+                                <li>FanCash Earn Support (FNTSY-303) — FEAT-8507 now Released</li>
+                                <li>OddsFactory Ingestion Updates (FNTSY-508), Market Permissibility Configuration (FNTSY-310), Gimme Picks — All Sports (FNTSY-141)</li>
+                                <li>InfoSec Work (FNTSY-339) and the League Pages Events Endpoint (FNTSY-537)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Trading Engineering Alpha Released (FEAT-8554)</div>
+                        <div class="item-body">
+                            OddsFactory closed the Alpha requirements: DFS OddsFactory.Fantasy creation (VAMO-1383) and
+                            updates (VAMO-1392) plus Observability &amp; Performance (VAMO-1507) all landed. On the Fantasy
+                            side Liam Butler and Nigel Young ingested real OddsFactory Kafka topics for fixtures, markets,
+                            and multipliers and added Protovalidate on incoming OF messages — the domain is now consuming
+                            live trading data rather than a replay tool.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Mobile FE Is Now the Center of Gravity</div>
+                        <div class="item-body">
+                            The bulk of June's ticket volume was front-end, and the app is filling in screen by screen:
+                            <ul>
+                                <li>Leaderboard: domain models → connector → feed → mappers → bottom sheet, wired to a minted feedkey via C4 (Kevin Jacob)</li>
+                                <li>My Picks feed: collapsed/expanded cards, tabs, personalized list, minter &amp; contract mapping (Scott Schmitz)</li>
+                                <li>Floating minimized pickslip, MVP bottom nav, and C4↔API bidirectional communication with shared fantasy-contracts models (Paul Kang)</li>
+                                <li>Player cards enriched with SDP team colors/logos and event data, ALT-line stepper controls, performance-history chart (Anushri Patel, Jacob Tabak)</li>
+                                <li>Event Page screen, CMS entry, and navigation stood up (Jasmine Dacones)</li>
+                                <li>Playbook directory on home screen, quick links, Paparazzi snapshot testing, monorepo migration Part 1 (Jacob Tabak)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Fast Lane Reaches Cert; Load Testing Begins</div>
+                        <div class="item-body">
+                            Patrick Kilburn closed both the M30.3 and M30.4 Fast Lane epics (FNTSY-501, FNTSY-502):
+                            SLOs and monitors added for fantasy-jobs-worker, playmaker-fantasy-api, and fantasy-c4-api;
+                            FAST tests wired for fantasy-jobs-worker; <strong>all BE services deployed to Test and then to
+                            Cert</strong> (FNTSY-527, FNTSY-704); and the Load &amp; Performance track began — fantasy-api
+                            deployed to inf-dev-1, test accounts created, and the first load test run. This is the
+                            launch-readiness plumbing coming online ahead of the Alpha.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Playmaker Admin: Operational Controls Filled In</div>
+                        <div class="item-body">
+                            Ryan Taylor delivered the operational surface admins need to run live contests: contest-entry
+                            block/unblock, manual void (mid-game), edit-pick-result endpoint and frontend, the Contest
+                            Entries and Contest &amp; Leaderboard pages, plus FAST tests for editing entries/picks. Combined
+                            with May's REST migration, Playmaker is now a functional operations console.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">RG &amp; Entry-Limit Foundations Landed</div>
+                        <div class="item-body">
+                            Josh Schaefer and Nigel Young shipped the backend for responsible-gaming limits: max entry-fee
+                            validator, stake-limit app settings, max payout on accounts, stake factor on leagues, subdivision
+                            bans join table, authorization fields, DFS entry-count tracking for RG limits (FNTSY-685), and
+                            propagation of wager-alert-limit fields from the wallet API (FNTSY-790). This is what let
+                            FEAT-8509 step back from Red to Amber.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Challenges -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">⚠️ Challenges &amp; Risks</h2>
+                <div class="challenge-list">
+
+                    <div class="challenge-item">
+                        <div class="item-title">M30.4 Closed at 34% — Heavy Scope Roll-Into M31.1</div>
+                        <div class="item-body">
+                            M30.4 committed 171 SP but closed only 58.5 (34%), versus M30.3's 61%. The milestone's final
+                            sprint carried a large amount of unfinished scope into M31.1. Some of this is normal
+                            end-of-milestone behavior, but a 34% close rate right before the Alpha/Beta window is a
+                            planning signal, not just noise.
+                            <div class="placeholder-box" style="margin-top: 10px; text-align: left;">
+                                📌 <strong>Action Item:</strong> Rebaseline M31.1 committed scope against realistic FE
+                                capacity before mid-sprint, and confirm what carried over from M30.4 is intentionally
+                                re-committed rather than silently trailing.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Event Page (FEAT-8853) Flipped Red</div>
+                        <div class="item-body">
+                            Event Page is the new front-end Red. The Event Page screen, CMS entry, and navigation were
+                            stubbed in during M30.4 (Jasmine Dacones), but the feature as a whole is behind — it needs
+                            focused capacity in M31 to catch the other homepage/player-card screens that are Green. Watch
+                            it alongside Pickslip (FEAT-8867) and League Pages (FEAT-8879), both currently Amber.
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">RG &amp; Entry Limits: Amber, NATS UI Deferred to M31.1</div>
+                        <div class="item-body">
+                            FEAT-8509 improved from Red to Amber: the backend limit foundations shipped, and the NATS UI
+                            work that had no owner in May is now scheduled into M31.1. It isn't done — this is a
+                            public-launch dependency — but it has an owner and a slot now. The risk is execution in M31.1,
+                            not ownership.
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Two Fair Play Placeholder Epics Abandoned</div>
+                        <div class="item-body">
+                            FNTSY-799 (Fair Play — Entry Recalculation On Void) and FNTSY-800 (Fair Play — Settlement &amp;
+                            60% Guarantee Pool) were Abandoned as placeholders in June; the work consolidates into
+                            FEAT-8876 (FairPlay + Notifications &amp; Badging, now Committed). This is the same
+                            double-tracking pattern flagged in the May MBR — continue auditing placeholder epics against
+                            the FEAT that actually carries the work.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Cross-team Dependencies -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">🔗 Cross-Team Dependencies (End of June)</h2>
+                <table class="dep-table">
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>Feature / Work</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8216" target="_blank" class="ticket-key">FEAT-8216</a> Universal Balance / Unified Wallet</td>
+                            <td><span class="status-tracking">Ready for Promotion</span></td>
+                            <td>PAY + MAGU epics Done ~Jun 23. <em>Was At Risk in April.</em></td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8217" target="_blank" class="ticket-key">FEAT-8217</a> Payments MVP</td>
+                            <td><span class="status-tracking">Ready for Promotion</span></td>
+                            <td>Deposit/withdraw payment methods complete. <em>Was At Risk in April.</em></td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8511" target="_blank" class="ticket-key">FEAT-8511</a> Geolocation Support</td>
+                            <td><span class="status-tracking">Ready for Promotion</span></td>
+                            <td>GATE-4644 + MAGU limits Done. <em>Was Red in April, Green in May.</em></td>
+                        </tr>
+                        <tr>
+                            <td>CAT / PROF</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8865" target="_blank" class="ticket-key">FEAT-8865</a> DFS CAT KYC &amp; Auth</td>
+                            <td><span class="status-tracking">Ready for Promotion</span></td>
+                            <td>PROF DFS KYC (PROF-5223) + SuperApp Login (PROF-5132) Done.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT / GATE</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8509" target="_blank" class="ticket-key">FEAT-8509</a> RG &amp; Entry Limits</td>
+                            <td><span class="status-risk">Amber</span></td>
+                            <td>BE foundations shipped; NATS UI work scheduled into M31.1. <em>Was Red in May.</em></td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8600" target="_blank" class="ticket-key">FEAT-8600</a> App Switcher (Super App)</td>
+                            <td><span class="status-tracking">Green / M31</span></td>
+                            <td>PROF work complete; MAGU in progress; GATE foundational work abandoned/rescoped.</td>
+                        </tr>
+                        <tr>
+                            <td>OddsFactory</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8554" target="_blank" class="ticket-key">FEAT-8554</a> Trading Eng Reqs [Alpha]</td>
+                            <td><span class="status-tracking">Released</span></td>
+                            <td>VAMO creation/updates/observability epics Done.</td>
+                        </tr>
+                        <tr>
+                            <td>OddsFactory</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8902" target="_blank" class="ticket-key">FEAT-8902</a> Trading Eng Reqs [Beta]</td>
+                            <td><span class="status-tracking">In Progress / M31</span></td>
+                            <td>Beta scope, targeting M31 (decision carried from May).</td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8495" target="_blank" class="ticket-key">FEAT-8495</a> Payments Launch &amp; Cert</td>
+                            <td><span class="status-tracking">Green</span></td>
+                            <td>Now In Progress (was Prioritization). Slated M31.</td>
+                        </tr>
+                        <tr>
+                            <td>Sportsbook</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-7883" target="_blank" class="ticket-key">FEAT-7883</a> Bet-placement → wallet-transaction-api</td>
+                            <td><span class="status-open">Engineering Unpacking</span></td>
+                            <td>Tanya does not believe this is a concern for DFS.</td>
+                        </tr>
+                        <tr>
+                            <td>Sportsbook</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8991" target="_blank" class="ticket-key">FEAT-8991</a> RAD Prod Phase 1</td>
+                            <td><span class="status-tracking">In Progress</span></td>
+                            <td>Playmaker alternative being broken down here (noted 6/11).</td>
+                        </tr>
+                        <tr>
+                            <td>CAT (Future)</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8512" target="_blank" class="ticket-key">FEAT-8512</a> Tax &amp; Regulatory Reports</td>
+                            <td><span class="status-open">Discovery</span></td>
+                            <td>Slated M31. Needs requirements.</td>
+                        </tr>
+                        <tr>
+                            <td>Monterosa</td>
+                            <td>Free-to-Play Daily Streak</td>
+                            <td><span class="status-tracking">On Track</span></td>
+                            <td>Build targeting mid-July. NFL-season launch unchanged.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Appendix A: Sprint Demos -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">🎬 Appendix A: Sprint Demos</h2>
+                <table class="sprint-demo-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">Sprint</th>
+                            <th>Concepts Demoed</th>
+                            <th style="width: 120px;">Recording</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>M30.3<br><span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">May 27 – Jun 9</span></td>
+                            <td>
+                                Leaderboard feed end-to-end (C4 feedkey) · My Picks collapsed/expanded cards ·
+                                Real OddsFactory Kafka ingestion (fixtures/markets/multipliers) · Max stake &amp; entry-fee
+                                validators · Player cards from SDP · Fast Lane BE services to Test
+                            </td>
+                            <td>
+                                <span style="color: var(--text-faint); font-style: italic;">Add link</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>M30.4<br><span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">Jun 10 – Jun 23</span></td>
+                            <td>
+                                Universal Wallet / Payments / Geo / KYC clearing on the CAT side · Playmaker void &amp;
+                                edit-pick controls · Event Page screen · Player-card ALT-line stepper &amp; performance chart ·
+                                Monorepo migration Part 1 · BE services deployed to Cert · first load test
+                            </td>
+                            <td>
+                                <span style="color: var(--text-faint); font-style: italic;">Add link</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Appendix B: Hiring -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">👥 Appendix B: Hiring</h2>
+                <div class="placeholder-box">
+                    📌 <strong>Placeholder — fill in June hiring updates.</strong><br><br>
+                    Carry-forward from prior MBRs: Fantasy target was 20 roles; 17/20 hired. Add: any new starts in June,
+                    open requisitions still in pipeline, offers extended/accepted, departures.
+                </div>
+            </div>
+
+            <!-- Appendix C: Launch Metrics -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📈 Appendix C: Launch Metrics</h2>
+                <div class="placeholder-box">
+                    📌 <strong>Placeholder — pre-launch targets still being defined.</strong><br><br>
+                    No change since April/May. Targets for the August 2026 beta launch remain open with product and
+                    analytics. Carry forward to July MBR.
+                </div>
+            </div>
+
+            <!-- Appendix D: Incidents -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">🚨 Appendix D: Incidents &amp; On-Call</h2>
+                <div class="placeholder-box">
+                    📌 <strong>No production Fantasy service yet (pre-launch).</strong><br><br>
+                    Fast Lane SLOs, monitors, and runbooks are live and all BE services are now deploying to Cert, so the
+                    incident-detection plumbing is in place ahead of the Alpha. Note: Scott Schmitz was OOO Jun 7–14 (5 days)
+                    and Kevin Jacob OOO Jun 5 — reflected in M30.3/M30.4 capacity.
+                </div>
+            </div>
+
+            </div><!-- /june-2026 -->
+
             <!-- ============================== MAY 2026 ============================== -->
-            <div class="mbr-month" data-mbr-month="may-2026">
+            <div class="mbr-month" data-mbr-month="may-2026" style="display: none;">
 
             <!-- Header -->
             <div class="intro-banner">
@@ -1188,7 +1650,7 @@
         </div>
 
         <footer>
-            Generated by Engineering Management Dashboard · June 4, 2026
+            Generated by Engineering Management Dashboard · July 2, 2026
         </footer>
     </div>
     <script>
