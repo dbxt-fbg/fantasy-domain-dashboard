@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Burndown</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/dashboard.css?v=scoreboard-1">
+    <script src="assets/dashboard.js?v=gantt-open-stories-1" defer></script>
+    <style>
+        /* Page-specific overrides only — shared styles live in assets/dashboard.css */
+    </style>
+    <!-- Interactive handlers (toggleAccordion, sortTable, etc.) live in assets/dashboard.js -->
+</head>
+<body class="page-project">
+    <div class="container">
+        
+        <header>
+            <h1>🐛 Bug Burndown</h1>
+            <div class="subtitle">FNTSY M31.2 Sprint 2026.15 FE • Generated July 16, 2026 at 09:35</div>
+        </header>
+        <nav class="top-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="active">Project: Final Fantasy</a></li>
+                <li class="nav-item"><a href="logs_dashboard.html">Agents and Logs</a></li>
+            </ul>
+        </nav>
+        <nav class="sub-nav">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="features.html">Features</a></li>
+                <li class="nav-item"><a href="readiness_dashboard.html">Readiness</a></li>
+                <li class="nav-item"><a href="epics_dashboard.html">Epics</a></li>
+                <li class="nav-item"><a href="bugs_dashboard.html" class="active">Bug Burndown</a></li>
+                <li class="nav-item"><a href="team_dashboard.html">Stories</a></li>
+                <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
+                <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
+                <li class="nav-item"><a href="capacity_planner.html">Capacity</a></li>
+                <li class="nav-item"><a href="delivery_excellence_dashboard.html">Delivery</a></li>
+                <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
+                <li class="nav-item"><a href="hygiene_dashboard.html">Ticket Hygiene</a></li>
+                <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
+                <li class="nav-item"><a href="dependencies.html">Dependencies</a></li>
+                <li class="nav-item"><a href="mbr.html">MBR</a></li>
+            </ul>
+        </nav>
+        <div class="content">
+            <div class="intro-banner">
+                <p>All Project Fantasy bugs (front-end and back-end combined). The chart tracks
+                the count of still-open bugs across the project's history; the list below is the
+                full inventory. There is no front-end/back-end tag in the data yet, so bugs aren't split.</p>
+            </div>
+
+            <div class="section">
+                <div class="burndown-summary"><div class="burndown-summary-item"><div class="burndown-summary-label">Open now</div><div class="burndown-summary-value" style="color:#fb6a5f;">34</div><div class="burndown-summary-sub">not yet resolved</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">In progress</div><div class="burndown-summary-value" style="color:#38bdf8;">25</div><div class="burndown-summary-sub">being worked</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Resolved</div><div class="burndown-summary-value" style="color:#2dd4a7;">48</div><div class="burndown-summary-sub">Done / Closed / Released</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Peak backlog</div><div class="burndown-summary-value" style="color:#fbbf24;">45</div><div class="burndown-summary-sub">most open at once</div></div><div class="burndown-summary-item"><div class="burndown-summary-label">Total bugs</div><div class="burndown-summary-value">81</div><div class="burndown-summary-sub">all-time in project</div></div></div>
+                
+        <div class="chart-container">
+            <div class="chart-title">🔥 Bug Burndown — Open Bugs Over Time</div>
+            <div class="burndown-svg-wrap">
+                <svg viewBox="0 0 900 300" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 340px; display: block;">
+                    <line x1="48" y1="260.0" x2="880" y2="260.0" stroke="#243340" stroke-width="1" opacity="0.5" /><line x1="48" y1="212.0" x2="880" y2="212.0" stroke="#243340" stroke-width="1" opacity="0.5" /><line x1="48" y1="164.0" x2="880" y2="164.0" stroke="#243340" stroke-width="1" opacity="0.5" /><line x1="48" y1="116.0" x2="880" y2="116.0" stroke="#243340" stroke-width="1" opacity="0.5" /><line x1="48" y1="68.0" x2="880" y2="68.0" stroke="#243340" stroke-width="1" opacity="0.5" /><line x1="48" y1="20.0" x2="880" y2="20.0" stroke="#243340" stroke-width="1" opacity="0.5" />
+                    <text x="40" y="264.0" text-anchor="end" fill="#8194a6" font-size="11">0</text><text x="40" y="216.0" text-anchor="end" fill="#8194a6" font-size="11">9</text><text x="40" y="168.0" text-anchor="end" fill="#8194a6" font-size="11">18</text><text x="40" y="120.0" text-anchor="end" fill="#8194a6" font-size="11">27</text><text x="40" y="72.0" text-anchor="end" fill="#8194a6" font-size="11">36</text><text x="40" y="24.0" text-anchor="end" fill="#8194a6" font-size="11">45</text>
+                    <text x="48.0" y="280" text-anchor="middle" fill="#8194a6" font-size="11">Apr 03</text><text x="216.0" y="280" text-anchor="middle" fill="#8194a6" font-size="11">Apr 24</text><text x="384.0" y="280" text-anchor="middle" fill="#8194a6" font-size="11">May 15</text><text x="544.0" y="280" text-anchor="middle" fill="#8194a6" font-size="11">Jun 04</text><text x="712.0" y="280" text-anchor="middle" fill="#8194a6" font-size="11">Jun 25</text><text x="880.0" y="280" text-anchor="middle" fill="#8194a6" font-size="11">Jul 16</text>
+                    <line x1="48" y1="20" x2="48" y2="260" stroke="#243340" stroke-width="1" />
+                    <line x1="48" y1="260" x2="880" y2="260" stroke="#243340" stroke-width="1" />
+                    <polygon fill="#fb6a5f" opacity="0.12" points="48.0,260.0 48.0,254.7 56.0,254.7 64.0,254.7 72.0,254.7 80.0,254.7 88.0,254.7 96.0,254.7 104.0,254.7 112.0,254.7 120.0,254.7 128.0,254.7 136.0,254.7 144.0,254.7 152.0,254.7 160.0,254.7 168.0,254.7 176.0,254.7 184.0,254.7 192.0,254.7 200.0,254.7 208.0,254.7 216.0,254.7 224.0,254.7 232.0,254.7 240.0,254.7 248.0,254.7 256.0,254.7 264.0,254.7 272.0,254.7 280.0,254.7 288.0,254.7 296.0,254.7 304.0,254.7 312.0,254.7 320.0,254.7 328.0,249.3 336.0,249.3 344.0,249.3 352.0,254.7 360.0,254.7 368.0,249.3 376.0,249.3 384.0,249.3 392.0,249.3 400.0,249.3 408.0,249.3 416.0,249.3 424.0,249.3 432.0,249.3 440.0,249.3 448.0,249.3 456.0,249.3 464.0,249.3 472.0,249.3 480.0,249.3 488.0,249.3 496.0,254.7 504.0,254.7 512.0,254.7 520.0,254.7 528.0,254.7 536.0,254.7 544.0,254.7 552.0,254.7 560.0,254.7 568.0,254.7 576.0,254.7 584.0,254.7 592.0,249.3 600.0,249.3 608.0,249.3 616.0,249.3 624.0,249.3 632.0,249.3 640.0,249.3 648.0,249.3 656.0,249.3 664.0,249.3 672.0,249.3 680.0,249.3 688.0,249.3 696.0,222.7 704.0,222.7 712.0,153.3 720.0,153.3 728.0,153.3 736.0,153.3 744.0,158.7 752.0,158.7 760.0,142.7 768.0,137.3 776.0,137.3 784.0,137.3 792.0,137.3 800.0,142.7 808.0,116.0 816.0,84.0 824.0,52.0 832.0,20.0 840.0,20.0 848.0,20.0 856.0,36.0 864.0,57.3 872.0,62.7 880.0,78.7 880.0,260.0" />
+                    <polyline fill="none" stroke="#fb6a5f" stroke-width="2.5" points="48.0,254.7 56.0,254.7 64.0,254.7 72.0,254.7 80.0,254.7 88.0,254.7 96.0,254.7 104.0,254.7 112.0,254.7 120.0,254.7 128.0,254.7 136.0,254.7 144.0,254.7 152.0,254.7 160.0,254.7 168.0,254.7 176.0,254.7 184.0,254.7 192.0,254.7 200.0,254.7 208.0,254.7 216.0,254.7 224.0,254.7 232.0,254.7 240.0,254.7 248.0,254.7 256.0,254.7 264.0,254.7 272.0,254.7 280.0,254.7 288.0,254.7 296.0,254.7 304.0,254.7 312.0,254.7 320.0,254.7 328.0,249.3 336.0,249.3 344.0,249.3 352.0,254.7 360.0,254.7 368.0,249.3 376.0,249.3 384.0,249.3 392.0,249.3 400.0,249.3 408.0,249.3 416.0,249.3 424.0,249.3 432.0,249.3 440.0,249.3 448.0,249.3 456.0,249.3 464.0,249.3 472.0,249.3 480.0,249.3 488.0,249.3 496.0,254.7 504.0,254.7 512.0,254.7 520.0,254.7 528.0,254.7 536.0,254.7 544.0,254.7 552.0,254.7 560.0,254.7 568.0,254.7 576.0,254.7 584.0,254.7 592.0,249.3 600.0,249.3 608.0,249.3 616.0,249.3 624.0,249.3 632.0,249.3 640.0,249.3 648.0,249.3 656.0,249.3 664.0,249.3 672.0,249.3 680.0,249.3 688.0,249.3 696.0,222.7 704.0,222.7 712.0,153.3 720.0,153.3 728.0,153.3 736.0,153.3 744.0,158.7 752.0,158.7 760.0,142.7 768.0,137.3 776.0,137.3 784.0,137.3 792.0,137.3 800.0,142.7 808.0,116.0 816.0,84.0 824.0,52.0 832.0,20.0 840.0,20.0 848.0,20.0 856.0,36.0 864.0,57.3 872.0,62.7 880.0,78.7" />
+                    <circle cx="880.0" cy="78.7" r="4" fill="#fb6a5f" stroke="#0f1620" stroke-width="1.5" />
+                </svg>
+            </div>
+            <div class="burndown-legend">
+                <div><span class="swatch swatch-solid" style="background:#fb6a5f;"></span>Open bugs (not yet Done / Closed / Resolved / Released)</div>
+            </div>
+        </div>
+    
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🐞 All Bugs (81)</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: -8px;">
+                    31 still open · 2 excluded (Duplicate/Abandoned) shown but not counted as open · 2 in a non-standard status (e.g. Not a Bug / Cannot reproduce) counted as still-open. Defaults to open/in-progress first — click a column to sort.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 0, 'number')">Key</th>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 1, 'string')">Summary</th>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 2, 'number')">Status</th>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'string')">Assignee</th>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 4, 'string')">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td data-sort="1078"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1078" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1078</a></td>
+                            <td>contest entries that are meant to settle arent settling</td>
+                            <td data-sort="0"><span class="status-badge open">To Do</span></td>
+                            <td>Tanya Phanich</td>
+                            <td>2026-07-15</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="940"><a href="https://betfanatics.atlassian.net/browse/FNTSY-940" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-940</a></td>
+                            <td>OddsFactory.Fantasy:  Half-stake selection results published as NotSet (silent result loss) — Domain/Fixture/ResultType.cs:53-61, Domain/StateAggregate.cs:222-228</td>
+                            <td data-sort="0"><span class="status-badge open">To Do</span></td>
+                            <td>Salmaan Khan</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="937"><a href="https://betfanatics.atlassian.net/browse/FNTSY-937" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-937</a></td>
+                            <td>OddsFactory.Fantasy:  Config-mutating API controllers are unauthenticated — Api/Controllers (MarketConfigController, DynamicMarginationConfigController, CompetitionConfigController)</td>
+                            <td data-sort="0"><span class="status-badge open">To Do</span></td>
+                            <td>Salmaan Khan</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="934"><a href="https://betfanatics.atlassian.net/browse/FNTSY-934" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-934</a></td>
+                            <td>fantasy-ingestion-worker:  optimalLine selection diverges from the documented spec and is order-dependent — service/PropositionGroupService.java (findOptimal, ~L151–165)</td>
+                            <td data-sort="0"><span class="status-badge open">To Do</span></td>
+                            <td>Liam Butler</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1081"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1081" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1081</a></td>
+                            <td>Add New Filters To The Player Cards Endpoint</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-15</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1080"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1080" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1080</a></td>
+                            <td>Persist the previously used email at login</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In code review</span></td>
+                            <td>Jasmine Dacones</td>
+                            <td>2026-07-15</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1079"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1079" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1079</a></td>
+                            <td>Batch The Proposition Result Process - fantasy-ingestion-worker</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-15</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1072"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1072" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1072</a></td>
+                            <td>Stuck unsettled entries continues to increase</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Kevin Paquette</td>
+                            <td>2026-07-15</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1070"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1070" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1070</a></td>
+                            <td>2 pick entry with one voided leg paying out as WIN with full multiplier</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Kevin Paquette</td>
+                            <td>2026-07-15</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1066"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1066" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1066</a></td>
+                            <td>Batch Proposition Updated Queries - fantasy-ingestion-worker</td>
+                            <td data-sort="1"><span class="status-badge in-progress">Testing in progress</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-14</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1065"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1065" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1065</a></td>
+                            <td>Lines don&#x27;t reset as expected</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Scott Schmitz</td>
+                            <td>2026-07-14</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1047"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1047" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1047</a></td>
+                            <td>Playmaker - Search by team &amp; player name missing across tables</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Ryan Taylor</td>
+                            <td>2026-07-13</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1033"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1033" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1033</a></td>
+                            <td>prod event ingestion does not look right</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Tanya Phanich</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1028"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1028" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1028</a></td>
+                            <td>Logged In State Not Persisting on App Relaunch</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In code review</span></td>
+                            <td>Jasmine Dacones</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1026"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1026" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1026</a></td>
+                            <td>Dolly in play events are showing not available on playmaker</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Tanya Phanich</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1020"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1020" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1020</a></td>
+                            <td> DFS C4 client is missing serializer registrations and view bindings for some card types</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In code review</span></td>
+                            <td>Anthony Porter</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1013"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1013" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1013</a></td>
+                            <td>Playmaker Fantasy missing some important filters</td>
+                            <td data-sort="1"><span class="status-badge in-progress">Ready for Testing</span></td>
+                            <td>Ryan Taylor</td>
+                            <td>2026-07-09</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1011"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1011" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1011</a></td>
+                            <td>PlayerCards not showing up for leagues</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Anthony Porter</td>
+                            <td>2026-07-09</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1002"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1002" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1002</a></td>
+                            <td>look into FAST test in TEST</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Patrick Kilburn</td>
+                            <td>2026-07-08</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="974"><a href="https://betfanatics.atlassian.net/browse/FNTSY-974" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-974</a></td>
+                            <td>Investigate SDP Player Not Found Error</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Brooks Taylor</td>
+                            <td>2026-07-07</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="973"><a href="https://betfanatics.atlassian.net/browse/FNTSY-973" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-973</a></td>
+                            <td>Investigate League ID Mapping</td>
+                            <td data-sort="1"><span class="status-badge in-progress">Testing in progress</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-07</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="967"><a href="https://betfanatics.atlassian.net/browse/FNTSY-967" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-967</a></td>
+                            <td>Fix GetPlayerCard API Latency</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Tanya Phanich</td>
+                            <td>2026-07-07</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="955"><a href="https://betfanatics.atlassian.net/browse/FNTSY-955" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-955</a></td>
+                            <td>OddsFactory.Fantasy:  Soccer Draw/Exactly characteristics published as PropositionType.NotSet (silent proposition-type loss) — Domain/Factories/PropositionContractFactory.cs:142-151</td>
+                            <td data-sort="1"><span class="status-badge in-progress">Ready for Testing</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-01</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="945"><a href="https://betfanatics.atlassian.net/browse/FNTSY-945" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-945</a></td>
+                            <td>fantasy-core-lib:  ContestEntryPendingCleanupJob cursor pagination skips PENDING rows that share a createdAt at a batch boundary — jobs/ContestEntryPendingCleanupJob.java:47-71</td>
+                            <td data-sort="1"><span class="status-badge in-progress">Ready for Testing</span></td>
+                            <td>Kevin Paquette</td>
+                            <td>2026-06-26</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="939"><a href="https://betfanatics.atlassian.net/browse/FNTSY-939" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-939</a></td>
+                            <td>fantasy-c4-api:  IDOR — unauthenticated personalized leaderboard feed never verifies contest-entry ownership — controllers/FeedController.kt:157-164, feeds/leaderboard/LeaderboardPageFeed.kt:34-43</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Kevin Jacob</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="935"><a href="https://betfanatics.atlassian.net/browse/FNTSY-935" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-935</a></td>
+                            <td>fantasy-ingestion-worker:  Create + optimal-line flow is not transactional, and the recompute swallows exceptions — service/PropositionService.java</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Liam Butler</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="932"><a href="https://betfanatics.atlassian.net/browse/FNTSY-932" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-932</a></td>
+                            <td>fantasy-ingestion-worker: SDP/external-id JSON listeners: likely deserializer↔converter type mismatch, and it&#x27;s untested — config/KafkaJsonConsumerConfig.java:21</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Patrick Kilburn</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="931"><a href="https://betfanatics.atlassian.net/browse/FNTSY-931" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-931</a></td>
+                            <td>fantasy-ingestion-worker: Actuator/management endpoints are completely unauthenticated — config/SecurityConfig.java:24</td>
+                            <td data-sort="1"><span class="status-badge in-progress">Ready for Testing</span></td>
+                            <td>Salmaan Khan</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="879"><a href="https://betfanatics.atlassian.net/browse/FNTSY-879" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-879</a></td>
+                            <td>[ALPHA] SDP (JSON) Kafka listener failures are silently dropped — no DLT/retry, unlike OddsFactory path</td>
+                            <td data-sort="1"><span class="status-badge in-progress">In Progress</span></td>
+                            <td>Brooks Taylor</td>
+                            <td>2026-06-23</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1025"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1025" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1025</a></td>
+                            <td>Fix premature dismissal when moving SEP bottom sheet back to original height</td>
+                            <td data-sort="2"><span class="status-badge in-progress">Cannot reproduce</span></td>
+                            <td>Jasmine Dacones</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="894"><a href="https://betfanatics.atlassian.net/browse/FNTSY-894" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-894</a></td>
+                            <td>[ALPHA] NATS bonus manager returning not found for fantasy leagues</td>
+                            <td data-sort="2"><span class="status-badge in-progress">Not a Bug</span></td>
+                            <td>Liam Butler</td>
+                            <td>2026-06-23</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1046"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1046" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1046</a></td>
+                            <td>fantasy-c4-api OOM crash-loop on prod-1 and cert-1: raise memory limit to 6Gi and pin JVM max heap</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Paul Kang</td>
+                            <td>2026-07-13</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1043"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1043" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1043</a></td>
+                            <td>NATS Fantasy PBT fields not updating when editing bonus</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Liam Butler</td>
+                            <td>2026-07-13</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1041"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1041" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1041</a></td>
+                            <td>Wallet Pill on Event Page opening bottom sheet behind event page sheet</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Kevin Jacob</td>
+                            <td>2026-07-13</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1040"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1040" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1040</a></td>
+                            <td>fantasy-api:  New FanCash FAST E2E test lacks @DisabledIf(isProd) guard → runs write ops against prod-1 DB and authorizes a real FanCash burn — integrationtests/FanCashContestEntriesEndpointTest.java:41</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Liam Butler</td>
+                            <td>2026-07-13</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1039"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1039" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1039</a></td>
+                            <td>fantasy-ingestion-worker: revert temporary proposition-consumer concurrency and externalize it</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-13</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1035"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1035" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1035</a></td>
+                            <td>Batch Player And Team Queries When Creating Propositions</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1034"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1034" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1034</a></td>
+                            <td>Update cert CMS views for SEP</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Jasmine Dacones</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1030"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1030" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1030</a></td>
+                            <td>Ingestion race condition with SDP and OF</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Brooks Taylor</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1029"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1029" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1029</a></td>
+                            <td>Improper formatting on contest leaderboard</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Scott Schmitz</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1024"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1024" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1024</a></td>
+                            <td>Refresh Indicator is Black on Black</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Scott Schmitz</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1022"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1022" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1022</a></td>
+                            <td>Add 1px bar for stat histogram when value is 0</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Jacob Tabak</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1021"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1021" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1021</a></td>
+                            <td>Completed event propositions are still showing availability AVAILABLE</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>—</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1018"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1018" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1018</a></td>
+                            <td>Investigate Batch Saving New Propositions</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1016"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1016" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1016</a></td>
+                            <td>My Picks not ordering events by timestamp</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Scott Schmitz</td>
+                            <td>2026-07-09</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1015"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1015" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1015</a></td>
+                            <td>Wallet doesnt immediately update after submitting picks</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Scott Schmitz</td>
+                            <td>2026-07-09</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1010"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1010" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1010</a></td>
+                            <td>Error state refresh button doesn&#x27;t work</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Scott Schmitz</td>
+                            <td>2026-07-09</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1009"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1009" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1009</a></td>
+                            <td>Fix performance history chart</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Jacob Tabak</td>
+                            <td>2026-07-09</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1008"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1008" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1008</a></td>
+                            <td>Fix quick link icons</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Jacob Tabak</td>
+                            <td>2026-07-09</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1003"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1003" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1003</a></td>
+                            <td>&quot;Explore now&quot; not navigating back to Home Page from Pick List</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Scott Schmitz</td>
+                            <td>2026-07-09</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="1001"><a href="https://betfanatics.atlassian.net/browse/FNTSY-1001" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-1001</a></td>
+                            <td>Indices can silently break on creation</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Brooks Taylor</td>
+                            <td>2026-07-08</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="999"><a href="https://betfanatics.atlassian.net/browse/FNTSY-999" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-999</a></td>
+                            <td>Fix inconsistent data across events on SEP</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Jasmine Dacones</td>
+                            <td>2026-07-08</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="998"><a href="https://betfanatics.atlassian.net/browse/FNTSY-998" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-998</a></td>
+                            <td>Replace hardcoded matchup in SEP with real event data</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Jasmine Dacones</td>
+                            <td>2026-07-08</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="997"><a href="https://betfanatics.atlassian.net/browse/FNTSY-997" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-997</a></td>
+                            <td>API Not Returning Completed Entries with Filters</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Liam Butler</td>
+                            <td>2026-07-08</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="984"><a href="https://betfanatics.atlassian.net/browse/FNTSY-984" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-984</a></td>
+                            <td>Fix Long Running findAllByMarketIdIn In Ingestion Worker</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-07-08</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="972"><a href="https://betfanatics.atlassian.net/browse/FNTSY-972" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-972</a></td>
+                            <td>fantasy-fancash-worker:  Post-deploy kafka-consumer-error gate queries a non-existent status:error tag → always passes, yet auto-rollback now trusts it — deploy/base/tests/metrics.yaml:52</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Liam Butler</td>
+                            <td>2026-07-07</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="971"><a href="https://betfanatics.atlassian.net/browse/FNTSY-971" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-971</a></td>
+                            <td>fantasy-api:  Max-payout liability cap is bypassable via the forgeable aggregate offer-token multiplier (PriceLockValidator does not cover it) — service/contestentry/MaxEntryFeeValidator.java:74-77</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Nigel Young</td>
+                            <td>2026-07-07</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="962"><a href="https://betfanatics.atlassian.net/browse/FNTSY-962" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-962</a></td>
+                            <td>fantasy-api:  Five new mutating FAST tests lack the @EnabledIf(isDevOrTestOrCert) guard and run write operations against the prod-1 DB — integrationtests/AppSettingsEndpointTest.java:158</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Patrick Kilburn</td>
+                            <td>2026-07-02</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="957"><a href="https://betfanatics.atlassian.net/browse/FNTSY-957" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-957</a></td>
+                            <td>fantasy-core-lib:  Voided-pick win recalculation leaves profitBoostedEntryPayout stale → PayoutTracker overstates boosted total — service/WinSettlementHandler.java:38-99, service/PayoutTrackerService.java:313-315</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Nigel Young</td>
+                            <td>2026-07-01</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="956"><a href="https://betfanatics.atlassian.net/browse/FNTSY-956" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-956</a></td>
+                            <td>fantasy-api:  FANCASH-funded contest entries debit the CASH wallet — FanCash burn path never wired into orchestrator — sideeffects/DebitWalletSideEffectRunner.java:50-51, service/ContestEntryService.java:66-89</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Ryan Taylor</td>
+                            <td>2026-07-01</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="952"><a href="https://betfanatics.atlassian.net/browse/FNTSY-952" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-952</a></td>
+                            <td>fantasy-c4-api:  SDS match-state connector busy-spins and leaks subscriptions on stream error — connectors/sds/SdsMatchStateConnector.kt:72-94</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Scott Schmitz</td>
+                            <td>2026-06-30</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="951"><a href="https://betfanatics.atlassian.net/browse/FNTSY-951" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-951</a></td>
+                            <td>Payout Tracker - line item amount/multiplier and empty leaderboard payout</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Salmaan Khan</td>
+                            <td>2026-06-30</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="946"><a href="https://betfanatics.atlassian.net/browse/FNTSY-946" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-946</a></td>
+                            <td>OddsFactory Topic Ingestion Delay Error</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-06-29</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="938"><a href="https://betfanatics.atlassian.net/browse/FNTSY-938" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-938</a></td>
+                            <td>fantasy-fancash-worker:  Non-idempotent EARN ledger publish — Kafka redelivery double-credits FanCash (random ledgerEntryId per call) — service/ContestEntryEnteredHandler.java:87</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Liam Butler</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="936"><a href="https://betfanatics.atlassian.net/browse/FNTSY-936" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-936</a></td>
+                            <td>fantasy-ingestion-worker:  Update flow overwrites trading fields with proto3 defaults when absent — service/PropositionService.java (~L245–262)</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Paul Kang</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="930"><a href="https://betfanatics.atlassian.net/browse/FNTSY-930" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-930</a></td>
+                            <td>fantasy-jobs-worker:  FAST tests connect to environment DBs (including prod-1) with ssl=false</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Patrick Kilburn</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="929"><a href="https://betfanatics.atlassian.net/browse/FNTSY-929" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-929</a></td>
+                            <td>fantasy-jobs-worker:  Promotion-token reconciliation: configured alert window (1h) contradicts the FAST test threshold (45 min)</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Patrick Kilburn</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="928"><a href="https://betfanatics.atlassian.net/browse/FNTSY-928" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-928</a></td>
+                            <td>fantasy-jobs-worker:  JaCoCo coverage gate is set to minimum 0 — i.e. disabled</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Kevin Paquette</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="927"><a href="https://betfanatics.atlassian.net/browse/FNTSY-927" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-927</a></td>
+                            <td>fantasy-jobs-worker:  The only integration test never runs in mvn test / mvn install</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Patrick Kilburn</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="926"><a href="https://betfanatics.atlassian.net/browse/FNTSY-926" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-926</a></td>
+                            <td>fantasy-jobs-worker: ContestEntryPendingCleanupRecurringConfig has no cron configured anywhere → likely startup failure</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Salmaan Khan</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="880"><a href="https://betfanatics.atlassian.net/browse/FNTSY-880" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-880</a></td>
+                            <td>[ALPHA] WalletClient.CLIENT_ID mismatch: code sends &quot;DFS_CONTESTS&quot; but CLAUDE.md documents &quot;FBG_SPORTSBOOK&quot;</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Tanya Phanich</td>
+                            <td>2026-06-23</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="878"><a href="https://betfanatics.atlassian.net/browse/FNTSY-878" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-878</a></td>
+                            <td>[ALPHA] SubdivisionCodeUtil.extractRegion Javadoc contradicts behavior (returns &quot;TN&quot;, not empty string) and is untested</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Brooks Taylor</td>
+                            <td>2026-06-23</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="877"><a href="https://betfanatics.atlassian.net/browse/FNTSY-877" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-877</a></td>
+                            <td>[ALPHA] mutating Playmaker endpoints do not publish AuditPublisher events</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Ryan Taylor</td>
+                            <td>2026-06-23</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="873"><a href="https://betfanatics.atlassian.net/browse/FNTSY-873" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-873</a></td>
+                            <td>[ALPHA] Fix SDP Event/Market Creation Error</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Josh Schaefer</td>
+                            <td>2026-06-22</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="780"><a href="https://betfanatics.atlassian.net/browse/FNTSY-780" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-780</a></td>
+                            <td>Playmaker App settings unable to scroll</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Ryan Taylor</td>
+                            <td>2026-06-10</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="705"><a href="https://betfanatics.atlassian.net/browse/FNTSY-705" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-705</a></td>
+                            <td>iOS app crashes when enabling biometrics for login</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Jasmine Dacones</td>
+                            <td>2026-06-02</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="530"><a href="https://betfanatics.atlassian.net/browse/FNTSY-530" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-530</a></td>
+                            <td>playmaker-fantasy-api: PATCH requests blocked by CORS on dev1 </td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Patrick Kilburn</td>
+                            <td>2026-05-13</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="479"><a href="https://betfanatics.atlassian.net/browse/FNTSY-479" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-479</a></td>
+                            <td>FAST Tests Fail on Rollback</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Patrick Kilburn</td>
+                            <td>2026-05-08</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="177"><a href="https://betfanatics.atlassian.net/browse/FNTSY-177" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-177</a></td>
+                            <td>Fantasy API Validates Proposition IDs before the Session Token</td>
+                            <td data-sort="3"><span class="status-badge done">Done</span></td>
+                            <td>Nigel Young</td>
+                            <td>2026-04-03</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="933"><a href="https://betfanatics.atlassian.net/browse/FNTSY-933" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-933</a></td>
+                            <td>fantasy-ingestion-worker:  JSON listeners have no DLT, no retry, and swallow every exception → silent message loss — all Sdp*UpdatedListener + ExternalIdMappingUpdatedListener</td>
+                            <td data-sort="4"><span class="status-badge in-progress">Duplicate</span></td>
+                            <td>—</td>
+                            <td>2026-06-25</td>
+                        </tr>
+        
+                        <tr>
+                            <td data-sort="874"><a href="https://betfanatics.atlassian.net/browse/FNTSY-874" target="_blank" style="color: #56cdf9; text-decoration: none; font-weight: 600;">FNTSY-874</a></td>
+                            <td>[ALPHA] Fix Proposition Topic Messages On Game Replay</td>
+                            <td data-sort="4"><span class="status-badge in-progress">Duplicate</span></td>
+                            <td>Brooks Taylor</td>
+                            <td>2026-06-22</td>
+                        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+
+            <footer>
+                Generated by Engineering Management Dashboard
+            </footer>
+        </div>
+    
+    </div>
+</body>
+</html>

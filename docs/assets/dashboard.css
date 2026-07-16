@@ -1793,6 +1793,84 @@ button.perf-metric-value.info    { color: var(--info); }
 .pr-age-stale   { color: var(--danger-text); }
 .pr-age-unknown { color: var(--text-faint); }
 
+/* ----- Expandable count cells (PR / Review activity tables) ----------- */
+.count-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    color: var(--accent-text);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-variant-numeric: tabular-nums;
+}
+.count-toggle:hover { text-decoration: underline; }
+.count-caret {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+}
+.count-toggle[aria-expanded="true"] .count-caret { transform: rotate(90deg); }
+
+.detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) var(--space-1);
+    background: var(--bg-surface-2);
+    border-radius: var(--radius-sm);
+}
+.detail-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--fs-sm);
+    border-radius: var(--radius-sm);
+}
+.detail-row:hover { background: rgba(255, 255, 255, 0.03); }
+.detail-row a {
+    color: var(--accent-text);
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.detail-row a:hover { text-decoration: underline; }
+.detail-repo {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    white-space: nowrap;
+}
+.detail-title {
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
+}
+.detail-meta { color: var(--text-faint); font-size: var(--fs-xs); margin-left: auto; white-space: nowrap; }
+.detail-state {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+}
+.detail-state-merged,
+.detail-state-approved            { background: var(--success-bg); color: var(--success-text); }
+.detail-state-open,
+.detail-state-commented           { background: var(--info-bg); color: var(--info-text); }
+.detail-state-closed,
+.detail-state-changes_requested,
+.detail-state-dismissed           { background: var(--danger-bg); color: var(--danger-text); }
+
 /* ----- Page themes ---------------------------------------------------
    Each primary nav tab gets its own accent palette by overriding a few
    design tokens on the <body>. Because buttons, nav pills, progress
