@@ -199,10 +199,486 @@
 
             <!-- Month picker -->
             <div class="mbr-month-nav">
-                <a href="#" class="mbr-month-chip active" data-mbr-month="june-2026">June 2026</a>
+                <a href="#" class="mbr-month-chip active" data-mbr-month="july-2026">July 2026</a>
+                <a href="#" class="mbr-month-chip" data-mbr-month="june-2026">June 2026</a>
                 <a href="#" class="mbr-month-chip" data-mbr-month="may-2026">May 2026</a>
                 <a href="#" class="mbr-month-chip" data-mbr-month="april-2026">April 2026</a>
             </div>
+
+            <!-- ============================== JULY 2026 ============================== -->
+            <div class="mbr-month" data-mbr-month="july-2026">
+
+            <!-- Header -->
+            <div class="intro-banner">
+                <p style="font-weight: 600; font-size: 15px; margin-bottom: 6px; color: var(--text-primary);">
+                    Monthly Business Review — July 2026
+                </p>
+                <p style="color: var(--text-secondary); margin: 0;">
+                    <strong>Leaders:</strong> Tom Boettner, Liz Mackie &amp; Alex Congleton &nbsp;|&nbsp; <strong>Domain:</strong> Fantasy
+                </p>
+            </div>
+
+            <!-- Executive Summary -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📝 Executive Summary</h2>
+                <div class="intro-banner">
+                    <p style="color: var(--text-secondary); line-height: 1.7; margin: 0;">
+                        July was the month the CAT dependencies stopped being "done" and became <strong>Released</strong>.
+                        Universal Wallet (FEAT-8216), Payments MVP (FEAT-8217), and Geolocation (FEAT-8511) all moved from
+                        Ready for Promotion to <strong>Released</strong> on July 31, and Trading Engineering Alpha
+                        (FEAT-8554) reached Released on July 24. Event Page (FEAT-8853) — the Red that opened the June
+                        MBR — advanced to <strong>Ready for Product Review</strong> on July 30. App Switcher (FEAT-8600)
+                        was <strong>Abandoned</strong> on July 30 as that concept was rescoped.
+                        <br><br>
+                        On the DFS side the team closed <strong>164 stories, bugs and tasks (146.5 SP)</strong> across
+                        M31.1 and M31.2, and <strong>11 FNTSY epics</strong> reached Done. Player Cards came together
+                        end-to-end (new GetPlayerCards BFF endpoint, expanded list view, doubles markets), the pick-slip
+                        gained realtime offers and PBT promo chips, Playmaker picked up full market-configuration
+                        management, and Fast Lane added post-deploy tests in Prod plus documented E2E user journeys.
+                        <br><br>
+                        The concern is throughput, and it is now a trend rather than a blip. <strong>M31.2 closed at 29%
+                        SP completion (50.0 of 170.0)</strong> — below M30.4's 34% and M31.1's 51%. Sprint scope grew over
+                        the same window (157 → 208 items), so the gap between committed and completed is widening, not
+                        closing. Bugs were <strong>40% of everything closed</strong> (65 of 164). Two dependencies remain
+                        open against the Beta window: RG &amp; Entry Limits (FEAT-8509, unchanged since July 21) and
+                        Trading Engineering Beta (FEAT-8902). Epic closure also slowed markedly — 11 in July against 22
+                        in June. M31.3 (Jul 23 – Aug 4) was still in flight at the time of writing.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Key Numbers -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📊 July at a Glance</h2>
+                <div class="metric-row">
+                    <div class="metric-mini">
+                        <div class="val">164</div>
+                        <div class="lbl">Stories/bugs/tasks closed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">146.5</div>
+                        <div class="lbl">Story points completed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">M31.1<br><span style="font-size:16px">M31.2</span></div>
+                        <div class="lbl">Sprints completed</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">11</div>
+                        <div class="lbl">FNTSY epics moved to Done</div>
+                    </div>
+                    <div class="metric-mini">
+                        <div class="val">4</div>
+                        <div class="lbl">Features reached Released</div>
+                    </div>
+                </div>
+
+                <p style="font-size: 12px; color: var(--text-faint); margin-top: 0;">
+                    * Closed counts cover M31.1 (Jun 24 – Jul 7) and M31.2 (Jul 8 – Jul 21), measured by each ticket's
+                    status at sprint close (BE + FE boards combined) — the same method as prior months. M31.1 ended at
+                    96.5 of 187.5 SP closed (51%); M31.2 ended at 50.0 of 170.0 SP closed (29%). Counts are de-duplicated
+                    by base ticket key: unlike M30.x, the M31.x sprints carry both a live row and a rolled-over
+                    <code>_s&lt;sprint&gt;</code> snapshot row for the same ticket, which inflates a naive row count by
+                    ~40%. "Features reached Released" = FEAT-8216, FEAT-8217, FEAT-8511 (all Jul 31) and FEAT-8554 (Jul 24).
+                    Epic count is measured from current Jira state rather than transition history — see the telemetry-gap
+                    note under Challenges.
+                </p>
+
+                <!-- Work by workstream -->
+                <div style="margin-top: 16px;">
+                    <div class="workstream-row">
+                        <span class="workstream-name">My Picks / Contest Details polish &amp; iOS alignment (FE)</span>
+                        <span class="workstream-count">21 stories</span>
+                        <span class="workstream-engineers">Scott Schmitz</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Pick-slip realtime offers, PBT promos &amp; state pick rules</span>
+                        <span class="workstream-count">17 stories</span>
+                        <span class="workstream-engineers">Paul Kang</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Fast Lane post-deploy tests &amp; E2E user journeys</span>
+                        <span class="workstream-count">14 stories</span>
+                        <span class="workstream-engineers">Patrick Kilburn</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Player Cards: GetPlayerCards BFF, list view &amp; doubles markets</span>
+                        <span class="workstream-count">13 stories</span>
+                        <span class="workstream-engineers">Anushri Patel</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Playmaker market configuration &amp; restrictions</span>
+                        <span class="workstream-count">12 stories</span>
+                        <span class="workstream-engineers">Ryan Taylor</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">League Pages, wallet pill &amp; CERT/PROD auth</span>
+                        <span class="workstream-count">12 stories</span>
+                        <span class="workstream-engineers">Kevin Jacob</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Settlement, stake limits &amp; OF config (BE)</span>
+                        <span class="workstream-count">11 stories</span>
+                        <span class="workstream-engineers">Josh Schaefer</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Event Page &amp; CMS navigation (FE)</span>
+                        <span class="workstream-count">11 stories</span>
+                        <span class="workstream-engineers">Jasmine Dacones</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Geolocation &amp; limits integration</span>
+                        <span class="workstream-count">9 stories</span>
+                        <span class="workstream-engineers">Tanya Phanich</span>
+                    </div>
+                    <div class="workstream-row">
+                        <span class="workstream-name">Gimme Picks &amp; wallet clientRef (BE)</span>
+                        <span class="workstream-count">8 stories</span>
+                        <span class="workstream-engineers">Salmaan Khan</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Successes -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">✅ Successes</h2>
+                <div class="success-list">
+
+                    <div class="success-item">
+                        <div class="item-title">Three CAT Features Reached Released — Not Just "Done"</div>
+                        <div class="item-body">
+                            June closed the CAT dependency wall at Ready for Promotion. July got them the rest of the way:
+                            <ul>
+                                <li><strong>Universal Wallet (FEAT-8216)</strong> — Released, July 31</li>
+                                <li><strong>Payments MVP (FEAT-8217)</strong> — Released, July 31</li>
+                                <li><strong>Geolocation (FEAT-8511)</strong> — Released, July 31</li>
+                            </ul>
+                            All three carry a Done resolution in Jira. This is the risk that opened the April MBR
+                            ("CAT not confident on Aug 5") reaching its terminal state with a week of margin before the
+                            August window.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Trading Engineering Alpha Released (FEAT-8554)</div>
+                        <div class="item-body">
+                            OddsFactory's Alpha requirements reached <strong>Released</strong> on July 24, closing the
+                            track that went dev-complete in June. The domain is consuming live trading data end-to-end.
+                            Beta (FEAT-8902) remains In Progress and is now the forward-looking OF dependency.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Event Page Stepped Down From Red</div>
+                        <div class="item-body">
+                            FEAT-8853 was flagged Red in the June MBR. By July 30 it had advanced to
+                            <strong>Ready for Product Review</strong> — i.e. ready for UAT. Jasmine Dacones carried the
+                            Event Page screen, CMS entry and navigation work; Anushri Patel's player-card list view landed
+                            on the same surface. The June Red is materially retired.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Player Cards Completed End-to-End</div>
+                        <div class="item-body">
+                            Anushri Patel closed the highest story-point load on the team (13 items, 22.0 SP): switching
+                            player cards to the new <strong>GetPlayerCards BFF endpoint</strong>, the expanded list view
+                            with last-5 detail and alt-lines, doubles markets, More/Less pick buttons, line/market display,
+                            and CMS configuration. The player card is now a finished component rather than a partial one.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Pick-slip Gained Realtime Offers and Promo Mechanics</div>
+                        <div class="item-body">
+                            Paul Kang delivered 17 items / 25.0 SP across the pick-slip: realtime offer streaming
+                            (including a remote-dev UMB broker cold-start fix), the more/less inverse toggle, estimated
+                            next-tier multiplier from the BE, PBT promo chip carousel, PBT availability on the pickslip
+                            stream, and enforcement of state-level pick minimums (3 picks in Colorado). This is the
+                            monetisation and compliance surface of the core betting flow.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Playmaker: Market Configuration Management</div>
+                        <div class="item-body">
+                            Ryan Taylor extended the admin console with the market-config layer: create/edit market
+                            configurations, a new market configuration table, create/delete restrictions, contest-template
+                            sorting by picks/max-entries/per-user, and an events-table tidy-up. He also caught that
+                            mutating Playmaker endpoints were not publishing AuditPublish events — an audit-trail gap
+                            found and fixed before launch rather than after.
+                        </div>
+                    </div>
+
+                    <div class="success-item">
+                        <div class="item-title">Fast Lane Reaches Prod Post-Deploy Testing</div>
+                        <div class="item-body">
+                            Patrick Kilburn moved launch-readiness plumbing from Cert into Prod: post-deploy tests for
+                            <strong>fantasy-jobs-worker</strong> and <strong>playmaker-fantasy-api</strong> in Prod, plus
+                            defined and documented E2E user journeys. He also flagged two real test-hygiene defects —
+                            five new mutating FAST tests missing their <code>@EnabledIf</code> guard, and
+                            fantasy-jobs-worker FAST tests connecting to environment databases — both of which would have
+                            been live-environment hazards.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Challenges -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">⚠️ Challenges &amp; Risks</h2>
+                <div class="challenge-list">
+
+                    <div class="challenge-item">
+                        <div class="item-title">M31.2 Closed at 29% — Third Consecutive Sprint Under 55%</div>
+                        <div class="item-body">
+                            The trend, not the single data point, is the issue:
+                            <ul>
+                                <li>M30.3 — 81.7 of 134.3 SP (<strong>61%</strong>)</li>
+                                <li>M30.4 — 58.5 of 171.0 SP (<strong>34%</strong>)</li>
+                                <li>M31.1 — 96.5 of 187.5 SP (<strong>51%</strong>)</li>
+                                <li>M31.2 — 50.0 of 170.0 SP (<strong>29%</strong>)</li>
+                            </ul>
+                            Sprint scope grew across the same window (157 → 208 items in M31.1 → M31.2) while completed
+                            SP nearly halved. June's action item was to rebaseline M31.1 against realistic FE capacity;
+                            M31.2's result suggests that did not happen, or did not hold.
+                            <div class="placeholder-box" style="margin-top: 10px; text-align: left;">
+                                📌 <strong>Action Item:</strong> Treat committed scope as a hard constraint for M31.3/M31.4
+                                rather than an aspiration. Establish the actual 4-sprint rolling completion rate
+                                (≈43% by SP) and plan the Beta window against that number, not against capacity.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Bugs Were 40% of Everything Closed</div>
+                        <div class="item-body">
+                            65 of the 164 items closed in July were Bugs, against 99 Stories — and 123 bugs sat in the
+                            two sprints in total. A rising bug share this close to a launch window competes directly with
+                            the remaining feature scope, and partly explains the SP completion rate: bug fixes consume
+                            sprint capacity while carrying few or no story points.
+                            <div class="placeholder-box" style="margin-top: 10px; text-align: left;">
+                                📌 <strong>Action Item:</strong> Separate bug capacity from feature capacity in M31.3+
+                                planning so the feature burn-down reflects reality.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Two Dependencies Still Open Against the Beta Window</div>
+                        <div class="item-body">
+                            <ul>
+                                <li><strong>RG &amp; Entry Limits (FEAT-8509)</strong> — still In Progress, last updated
+                                    July 21. It was Amber in June on the basis that NATS UI work was scheduled into M31.1;
+                                    that work has not closed, and the item has been static for two weeks.</li>
+                                <li><strong>Trading Engineering Beta (FEAT-8902)</strong> — In Progress, last updated
+                                    July 24. Alpha is Released; Beta is the remaining OF commitment for M31.</li>
+                            </ul>
+                            These are the only two live cross-team risks left, which is a much better position than April
+                            — but both are on the Beta critical path and neither moved in the back half of July.
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Epic Closure Slowed: 11 vs 22 in June</div>
+                        <div class="item-body">
+                            June retired most of the backend MVP spine (22 epics). July closed 11, and none of them after
+                            July 22. Some of this is expected — the big BE epics were already closed — but combined with
+                            the falling SP completion rate it suggests work is being carried rather than finished.
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Dependency Tracker Is Stale</div>
+                        <div class="item-body">
+                            <code>config/dependencies.yaml</code> — the source for the Dependencies dashboard — still
+                            lists FEAT-8216, FEAT-8217 and FEAT-8511 as <em>In Progress</em> when Jira has all three as
+                            <strong>Released</strong>, and it has no entry for FEAT-8865 or FEAT-8853. Its weekly notes
+                            were last touched on 6/11. The table below was rebuilt from live Jira rather than from the
+                            tracker.
+                            <div class="placeholder-box" style="margin-top: 10px; text-align: left;">
+                                📌 <strong>Action Item:</strong> Refresh <code>dependencies.yaml</code> statuses and notes,
+                                and add the two missing features, so the Dependencies page stops disagreeing with Jira.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="challenge-item">
+                        <div class="item-title">Metrics Telemetry Gap: July 23–28</div>
+                        <div class="item-body">
+                            An abrupt host power loss on July 22 at 13:47 truncated the metrics database mid-write and
+                            the collection pipeline was down until July 29 — a <strong>six-day hole (Jul 23–28)</strong>
+                            in <code>sprint_snapshots</code> and <code>ticket_status_history</code>. The database was
+                            recovered with no row loss, and the numbers in this MBR are unaffected: both M31.1 and M31.2
+                            closed <em>before</em> the gap, and the epic count is taken from current Jira state rather
+                            than transition history. What <em>is</em> affected is in-sprint trend data for M31.3 across
+                            that window, and any burn-up chart spanning it. Durability settings have since been hardened.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Cross-Team Dependencies -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">🔗 Cross-Team Dependencies (End of July)</h2>
+                <p style="font-size: 12px; color: var(--text-faint); margin-top: 0;">
+                    Statuses below are read from live Jira as of August 3, 2026 — not from
+                    <code>config/dependencies.yaml</code>, which is stale (see Challenges).
+                </p>
+                <table class="dep-table">
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>Feature / Work</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8216" target="_blank" class="ticket-key">FEAT-8216</a> Universal Balance / Unified Wallet</td>
+                            <td><span class="status-tracking">Released</span></td>
+                            <td>Released Jul 31. <em>Was Ready for Promotion in June; At Risk in April.</em></td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8217" target="_blank" class="ticket-key">FEAT-8217</a> Payments MVP</td>
+                            <td><span class="status-tracking">Released</span></td>
+                            <td>Released Jul 31. <em>Was At Risk in April.</em></td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8511" target="_blank" class="ticket-key">FEAT-8511</a> Geolocation Support</td>
+                            <td><span class="status-tracking">Released</span></td>
+                            <td>Released Jul 31. <em>Was Red in April, Green in May.</em></td>
+                        </tr>
+                        <tr>
+                            <td>CAT / PROF</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8865" target="_blank" class="ticket-key">FEAT-8865</a> DFS CAT KYC &amp; Auth</td>
+                            <td><span class="status-tracking">Ready for Promotion</span></td>
+                            <td>Unchanged since Jun 24. Not yet flipped to Released.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT / GATE</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8509" target="_blank" class="ticket-key">FEAT-8509</a> RG &amp; Entry Limits</td>
+                            <td><span class="status-risk">Amber</span></td>
+                            <td><strong>Static since Jul 21.</strong> NATS UI work slated for M31.1 has not closed. <em>Was Amber in June, Red in May.</em></td>
+                        </tr>
+                        <tr>
+                            <td>Fantasy</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8853" target="_blank" class="ticket-key">FEAT-8853</a> DFS: Event Page</td>
+                            <td><span class="status-tracking">Ready for Product Review</span></td>
+                            <td>Ready for UAT as of Jul 30. <em>Was Red in June.</em></td>
+                        </tr>
+                        <tr>
+                            <td>OddsFactory</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8554" target="_blank" class="ticket-key">FEAT-8554</a> Trading Eng Reqs [Alpha]</td>
+                            <td><span class="status-tracking">Released</span></td>
+                            <td>Released Jul 24.</td>
+                        </tr>
+                        <tr>
+                            <td>OddsFactory</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8902" target="_blank" class="ticket-key">FEAT-8902</a> Trading Eng Reqs [Beta]</td>
+                            <td><span class="status-risk">In Progress / M31</span></td>
+                            <td>Last updated Jul 24. Remaining OF commitment for the Beta window.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8600" target="_blank" class="ticket-key">FEAT-8600</a> App Switcher (Super App)</td>
+                            <td><span class="status-open">Abandoned</span></td>
+                            <td>Abandoned Jul 30 — concept rescoped. <em>Was Green / M31 in June.</em></td>
+                        </tr>
+                        <tr>
+                            <td>Sportsbook</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8991" target="_blank" class="ticket-key">FEAT-8991</a> RAD Prod Phase 1</td>
+                            <td><span class="status-tracking">Ready for Promotion</span></td>
+                            <td>Reached Ready for Promotion Jul 2.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8495" target="_blank" class="ticket-key">FEAT-8495</a> Payments Launch &amp; Cert</td>
+                            <td><span class="status-open">Needs refresh</span></td>
+                            <td>Tracker still shows Ready for Prioritization Review with no note since June — status not re-verified.</td>
+                        </tr>
+                        <tr>
+                            <td>Sportsbook</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-7883" target="_blank" class="ticket-key">FEAT-7883</a> Bet-placement → wallet-transaction-api</td>
+                            <td><span class="status-open">Engineering Unpacking</span></td>
+                            <td>Tanya does not believe this is a concern for DFS (noted 6/4).</td>
+                        </tr>
+                        <tr>
+                            <td>CAT (Future)</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-8512" target="_blank" class="ticket-key">FEAT-8512</a> Tax &amp; Regulatory Reports</td>
+                            <td><span class="status-open">Discovery</span></td>
+                            <td>Slated M31. Still needs requirements.</td>
+                        </tr>
+                        <tr>
+                            <td>CAT (Future)</td>
+                            <td><a href="https://betfanatics.atlassian.net/browse/FEAT-7243" target="_blank" class="ticket-key">FEAT-7243</a> Eligibility Service Part 1</td>
+                            <td><span class="status-open">Discovery</span></td>
+                            <td>Slated M31. Needs an engineering breakdown once requirements are final.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Appendix A: Sprint Demos -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">🎬 Appendix A: Sprint Demos</h2>
+                <table class="sprint-demo-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">Sprint</th>
+                            <th>Concepts Demoed</th>
+                            <th style="width: 120px;">Recording</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>M31.1<br><span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">Jun 24 – Jul 7</span></td>
+                            <td>
+                                Player cards on the new GetPlayerCards BFF endpoint · My Picks pull-to-refresh and
+                                contest-details buttons · Pick-slip realtime offers · Playmaker market configuration ·
+                                Fast Lane post-deploy tests in Prod · League Pages event switcher
+                            </td>
+                            <td>
+                                <span style="color: var(--text-faint); font-size: 12px;">Link TBD</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>M31.2<br><span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">Jul 8 – Jul 21</span></td>
+                            <td>
+                                Player Card list view expanded state (last-5 detail, alt-lines, doubles markets) ·
+                                PBT promo chip carousel on pick slip · Colorado 3-pick minimum enforcement ·
+                                Playmaker market restrictions &amp; audit events · Leagues page clean-up and polish ·
+                                Wallet pill on global + event header
+                            </td>
+                            <td>
+                                <span style="color: var(--text-faint); font-size: 12px;">Link TBD</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 12px; color: var(--text-faint);">
+                    Confluence demo pages for M31.1 / M31.2 were not available when this section was generated — add the
+                    links alongside the M30.3 / M30.4 entries in the June section.
+                </p>
+            </div>
+
+            <!-- Appendix B: Launch Metrics -->
+            <div class="section mbr-section">
+                <h2 class="section-title mbr-section-title">📈 Appendix B: Launch Metrics</h2>
+                <div class="placeholder-box">
+                    📌 <strong>Placeholder — pre-launch targets still being defined.</strong><br><br>
+                    No change since April/May/June. Targets for the August 2026 beta launch remain open with product and
+                    analytics. Now overdue: the launch window is the month after this review.
+                </div>
+            </div>
+
+            </div><!-- /july-2026 -->
 
             <!-- ============================== JUNE 2026 ============================== -->
             <div class="mbr-month" data-mbr-month="june-2026">
