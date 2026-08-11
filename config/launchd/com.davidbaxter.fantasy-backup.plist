@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.davidbaxter.fantasy-backup</string>
+
+    <!--
+      Nightly SQLite backup for Project Fantasy. Replaces the crontab entry
+      `0 2 * * * cd <repo> && python3 scripts/backup_db.py`.
+
+      Why the move off cron: cron does not run jobs it missed while the machine
+      was asleep or powered off. The 02:00 backup silently did not run on
+      2026-07-21 or 07-22, so when a power loss corrupted metrics.db on 07-22
+      the newest clean backup was from 07-20 — two days stale. launchd runs a
+      missed StartCalendarInterval job when the machine next wakes or boots,
+      which is the behaviour we actually want for an overnight backup on a
+      laptop that is routinely asleep at 02:00.
+    -->
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/davidbaxter/.pyenv/shims/python3</string>
+        <string>scripts/backup_db.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/davidbaxter/sync/claude/fantasy-domain-dashboard</string>
+
+    <!-- 02:00 local, daily. If the Mac is asleep or off at 02:00, launchd
+         fires the job on the next wake/boot rather than skipping the day. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key><integer>2</integer>
+        <key>Minute</key><integer>0</integer>
+    </dict>
+
+    <!-- Do not run on load: `launchctl load` happens at every login, and an
+         extra backup at login is harmless but noisy in the log. -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <!-- launchd appends, matching the `>> logs/backup_db.log` the cron entry
+         used, so the existing log history stays continuous. -->
+    <key>StandardOutPath</key>
+    <string>/Users/davidbaxter/sync/claude/fantasy-domain-dashboard/logs/backup_db.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/davidbaxter/sync/claude/fantasy-domain-dashboard/logs/backup_db.log</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+
+    <!-- Backing up ~20MB takes a second or two; if it somehow hangs, don't let
+         it sit forever holding a connection to the DB it is copying. -->
+    <key>ExitTimeOut</key>
+    <integer>300</integer>
+</dict>
+</plist>
