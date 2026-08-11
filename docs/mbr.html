@@ -701,32 +701,45 @@
                         <tr>
                             <td>M31.1<br><span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">Jun 24 – Jul 7</span></td>
                             <td>
-                                Player cards on the new GetPlayerCards BFF endpoint · My Picks pull-to-refresh and
-                                contest-details buttons · Pick-slip realtime offers · Playmaker market configuration ·
-                                Fast Lane post-deploy tests in Prod · League Pages event switcher
+                                End-to-end pick-slip creation and submission on iOS and Android, on live multiplier
+                                streams · Location restrictions blocking submission on invalid state or missing GPS ·
+                                Playmaker post-game void / unvoid and edit-pick-result (closing the epic) · Playmaker
+                                market-config page with league and market subdivision bans · Audit trail on all mutating
+                                Playmaker endpoints · My Picks metadata on GetMyEntries and adjusted multipliers for
+                                voided picks · Gimme-pick filtering at max threshold · Leaderboard states plus CSV
+                                export · Contest unsettlement / re-settlement DataDog dashboard · Events endpoint for
+                                League Pages
+                                <div style="font-size: 11px; color: var(--text-faint); margin-top: 6px;">
+                                    24:45 · Nigel Young, Ryan Taylor, Josh Schaefer, Kevin Paquette, Kevin Jacob,
+                                    Paul Kang, Scott Schmitz
+                                </div>
                             </td>
                             <td>
-                                <span style="color: var(--text-faint); font-size: 12px;">Link TBD</span>
+                                <a href="https://betfanatics.atlassian.net/wiki/spaces/T2D2/pages/3243835818/Fantasy+-+Sprint+Demos+-+M31.1" target="_blank" style="color: var(--accent-text);">View demo</a>
                             </td>
                         </tr>
                         <tr>
                             <td>M31.2<br><span style="font-size: 11px; font-weight: 400; color: var(--text-muted);">Jul 8 – Jul 21</span></td>
                             <td>
-                                Player Card list view expanded state (last-5 detail, alt-lines, doubles markets) ·
-                                PBT promo chip carousel on pick slip · Colorado 3-pick minimum enforcement ·
-                                Playmaker market restrictions &amp; audit events · Leagues page clean-up and polish ·
-                                Wallet pill on global + event header
+                                <strong>Ingestion worker optimised from 150–200ms to 20–40ms</strong>, so OddsFactory
+                                market suspensions reflect far faster · League ID mapping fix for missing OddsFactory
+                                IDs, plus a retroactive job correcting main-market-config IDs on existing propositions ·
+                                KYC restriction blocking picks from unverified users · New player-card filters on event
+                                status and timeframe · Contest-entries-by-ID RPC and get-leagues-by-ID endpoints ·
+                                League and Event pages with sport-specific period tabs and a working event switcher ·
+                                Playmaker quick wins: name / team / player search, colour coding, sortable fields,
+                                manual account refresh, events-table cleanup
+                                <div style="font-size: 11px; color: var(--text-faint); margin-top: 6px;">
+                                    18:29 · Josh Schaefer, Anthony Porter, Jasmine Dacones, Nigel Young,
+                                    Kevin Paquette, Ryan Taylor
+                                </div>
                             </td>
                             <td>
-                                <span style="color: var(--text-faint); font-size: 12px;">Link TBD</span>
+                                <a href="https://betfanatics.atlassian.net/wiki/spaces/T2D2/pages/3308914480/Fantasy+-+Sprint+Demos+-+M31.2" target="_blank" style="color: var(--accent-text);">View demo</a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <p style="font-size: 12px; color: var(--text-faint);">
-                    Confluence demo pages for M31.1 / M31.2 were not available when this section was generated — add the
-                    links alongside the M30.3 / M30.4 entries in the June section.
-                </p>
             </div>
 
             <!-- Appendix B: Launch Metrics -->
