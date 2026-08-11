@@ -44,7 +44,22 @@ python3 scripts/qa_review_agent.py     # reviews the *rendered* HTML like a huma
 
 # Deploy to GitHub Pages (copies reports/html/ → docs/, renames landing page):
 ./scripts/deploy_to_github_pages.sh "commit message"
+
+# Also publish to alveus (internal static host) — copies docs/ into the alveus
+# app folder; --push branches, commits and opens the auto-merging PR:
+./scripts/sync_to_alveus.sh          # copy + show what changed
+./scripts/sync_to_alveus.sh --push   # ...and open the PR
 ```
+
+Two publish targets, both fed from `docs/`:
+- **GitHub Pages** — `docs/` on `main`; the dashboard's Publish button does this
+  (commits `docs/` and pushes `HEAD:main`). Note this site is **publicly reachable**.
+- **alveus** — `apps/dbxt-fbg/fantasy-dashboard/` in `fanatics-gaming/alveus`, served
+  at `/dbxt-fbg/fantasy-dashboard/`, internal-only. A separate step
+  (`sync_to_alveus.sh`); the Publish button does *not* update it. The alveus copy is
+  static-only, so the four server-backed controls (`/api/ask`,
+  `/api/dependency-notes`, `/api/feature-work-status`, `/api/member`) are inert there,
+  exactly as on Pages.
 
 There is no unit-test suite. The `qa_agent.py` / `qa_review_agent.py` scripts are
 the de-facto verification layer — run them after changing collectors or generators.
