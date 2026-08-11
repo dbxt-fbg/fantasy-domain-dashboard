@@ -31,6 +31,8 @@ class GitHubCollector:
         self.team_members = config.get('team_members', [])
         self.lookback_days = config['collection'].get('github_pr_lookback_days', 90)
         self.db_path = config['database']['path']
+        # Populated by collect_pr_metrics; None means the reconcile never ran.
+        self.reconcile_summary: Optional[Dict[str, Any]] = None
 
     def _open_db(self):
         """Open a DB connection with a busy-wait timeout so parallel agents
@@ -109,17 +111,24 @@ class GitHubCollector:
             # open-PR query (--state open) and the merged-PR query (--merged),
             # so without this pass its stale 'open' row lives forever and the
             # Repositories page shows a closed PR as open.
+            # Surfaced on the instance so the agent can decide whether this run
+            # actually succeeded — see scripts/github_pr_agent.py.
             try:
-                self._reconcile_open_prs()
+                self.reconcile_summary = self._reconcile_open_prs()
             except Exception as e:
                 logger.error(f"Failed to reconcile open PRs: {e}", exc_info=True)
+                self.reconcile_summary = {'checked': 0, 'reconciled': 0,
+                                          'unreachable': 0, 'error': str(e)}
 
         except Exception as e:
             logger.error(f"Failed to collect GitHub metrics: {e}", exc_info=True)
             raise
 
-    def _reconcile_open_prs(self) -> None:
+    def _reconcile_open_prs(self) -> dict:
         """Re-check every PR still marked 'open' in the DB against GitHub.
+
+        Returns {'checked', 'reconciled', 'unreachable'} so the caller can tell
+        a real pass from one where GitHub was unreachable throughout.
 
         Catches PRs that were closed without merging (branch abandoned/deleted)
         — those vanish from both collector queries, so their 'open' row would
@@ -137,10 +146,16 @@ class GitHubCollector:
             conn.close()
 
         if not open_rows:
-            return
+            return {'checked': 0, 'reconciled': 0, 'unreachable': 0}
 
         logger.info(f"Reconciling {len(open_rows)} PR(s) still marked open in the DB")
         reconciled = 0
+        # Count re-checks we couldn't complete. Leaving a row alone on a
+        # transient error is right, but silently doing it for *every* row means
+        # the pass accomplished nothing — and the agent used to still report
+        # success. That's how fantasy-api#259/#103 sat wrong for 6 weeks with
+        # 1007 auth failures in the log. Counted here, judged by the caller.
+        unreachable = 0
         for repository, pr_number in open_rows:
             if not repository or repository == 'unknown':
                 continue
@@ -168,11 +183,13 @@ class GitHubCollector:
                     self._mark_pr_state(repository, pr_number, 'closed')
                     reconciled += 1
                 else:
+                    unreachable += 1
                     logger.warning(
                         f"Could not re-check {repository}#{pr_number} "
                         f"(transient — left as-is): {err}")
                 continue
             except json.JSONDecodeError:
+                unreachable += 1
                 continue
 
             gh_state = (data.get('state') or '').upper()
@@ -189,6 +206,16 @@ class GitHubCollector:
 
         if reconciled:
             logger.info(f"Reconciled {reconciled} stale-open PR(s) to closed/merged")
+        if unreachable:
+            logger.warning(
+                f"Could not reach GitHub for {unreachable} of {len(open_rows)} "
+                f"re-check(s) — those rows keep their current state"
+            )
+        return {
+            'checked': len(open_rows),
+            'reconciled': reconciled,
+            'unreachable': unreachable,
+        }
 
     def _mark_pr_state(self, repository: str, pr_number: int, state: str,
                        merged_at=None, closed_at=None) -> None:

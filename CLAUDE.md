@@ -136,7 +136,24 @@ preserved) by the server's write endpoints.
 - **`ticket_status_history` has ~55× duplicate rows** — always `SELECT DISTINCT`
   before computing time-in-status / flow metrics.
 - **GitHub collector only queries open+merged PRs**, so PRs closed-without-merge
-  go stale as `open`; `_reconcile_open_prs()` re-checks and fixes them.
+  go stale as `open`; `_reconcile_open_prs()` re-checks and fixes them. That pass
+  leaves a row alone on a transient `gh` error, which is right per-row but means
+  it can fail for *every* row and still return quietly — it did exactly that from
+  2026-06-26 (1007 auth failures, exit 0 each time) until someone noticed merged
+  PRs shown as open six weeks later. It now returns
+  `{checked, reconciled, unreachable}` and `github_pr_agent.py` exits 3 when
+  nothing was reachable. **A "completed successfully" line is not evidence the
+  reconcile worked — check the counts on it.**
+- **`github_pr_agent.py` takes >10 min** (a `gh search prs` per member, then a
+  `gh pr view` per open PR), longer than its 30-min cron interval allows for
+  safety, so it holds an flock on `data/.locks/github_pr_agent.lock`; a second
+  instance exits 0 without working. Don't schedule it more tightly.
+- **`gh` fails with 401/TLS errors from some execution contexts** (notably a
+  sandboxed shell, which the dashboard server inherits when launched from one)
+  while working fine from a normal shell and from cron. If the collector logs
+  `HTTP 401: Requires authentication` for every PR, suspect the environment, not
+  the credentials — `gh auth status` falls back to the keyring and passes even
+  with a scrubbed cron-like env.
 - **Rolled-over Story/Bug rows get a `_s<sprint>` suffix** in their closed sprint
   so `refresh_jira_data` doesn't evict them from the Sprint Report.
 - **Future-dated `dep-weekly-status` entries** are Jira date-picker typos: QA
@@ -159,9 +176,12 @@ preserved) by the server's write endpoints.
 
 ## Automation
 
-Cron drives `run_jira_collector_agent.sh` (every 15 min, work hours). Log
-rotation via `scripts/lib/rotate_log.sh`. `.claude/scheduled_tasks.json` is
-currently empty. Logs land in `logs/`.
+Cron drives `run_jira_collector_agent.sh` (every 15 min, work hours) and
+`github_pr_agent.py` (every 30 min, work hours — added 2026-08-11; it had never
+been scheduled, so PR state only refreshed by accident). Log rotation via
+`scripts/lib/rotate_log.sh`. `.claude/scheduled_tasks.json` is currently empty —
+`qa_agent` warns about several agents missing from it, which is about that file,
+not the crontab. Logs land in `logs/`.
 
 **The nightly backup is launchd, not cron** — see `config/launchd/README.md`.
 cron skips jobs it missed while the Mac was asleep, which is how the 02:00
