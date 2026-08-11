@@ -5253,8 +5253,13 @@ def generate_pull_requests_html(config: dict, output_path: Path):
 def generate_project_fantasy_html(output_path: Path):
     """Generate the Project: Fantasy roadmap page with a deliverable timeline.
 
-    Dates match the Fantasy launch phases roadmap. 'Q4 2026' and '2027' are
-    anchored to Oct 1 2026 and Jan 1 2027 for charting — rendered as "~" labels.
+    Dates match the Fantasy launch phases roadmap. The timeline currently ends at
+    Beta; markers past it were removed 2026-08-11.
+
+    A phase dated only by quarter or year is anchored to the first day of that
+    period for charting and flagged `approximate: True`, which renders its label
+    with a leading "~". No current phase needs that, but the handling is kept for
+    when one does.
     """
     from datetime import date, timedelta
 
@@ -5276,31 +5281,16 @@ def generate_project_fantasy_html(output_path: Path):
         {
             'name': 'Beta (external, friends & family)',
             'description': 'Account and pick-level functionality needed to put app in hands of real users for real testing',
-            'date_label': 'Aug 12, 2026',
-            'date': date(2026, 8, 12),
+            'date_label': 'Aug 26, 2026',
+            'date': date(2026, 8, 26),
             'approximate': False,
         },
-        {
-            'name': 'Install-base activation',
-            'description': 'Customer-ready app, with focus on functionality needed to activate existing FBG users',
-            'date_label': 'Sep 9, 2026',
-            'date': date(2026, 9, 9),
-            'approximate': False,
-        },
-        {
-            'name': 'Net-new customer acquisition',
-            'description': 'Additional functionality needed to start acquiring net new DFS-first users',
-            'date_label': 'Q4 2026',
-            'date': date(2026, 10, 1),
-            'approximate': True,
-        },
-        {
-            'name': 'Marketing push',
-            'description': '',
-            'date_label': '2027',
-            'date': date(2027, 1, 1),
-            'approximate': True,
-        },
+        # Post-Beta markers (Install-base activation Sep 9, Net-new customer
+        # acquisition ~Q4 2026, Marketing push ~2027) were removed 2026-08-11 —
+        # the timeline now ends at Beta. `approximate` is retained on the phase
+        # dicts because it was only ever True for those two quarter/year-dated
+        # entries; re-adding a phase dated by quarter or year should set it so
+        # the label renders with a "~".
     ]
 
     today = date.today()
@@ -5394,7 +5384,7 @@ def generate_project_fantasy_html(output_path: Path):
 {generate_nav_menu('project-fantasy')}
         <div class="content">
             <div class="intro-banner">
-                <p>Major deliverables for the Fantasy launch. Dates labelled with "~" are approximate (originally specified as a quarter or year).</p>
+                <p>Major deliverables for the Fantasy launch, through Beta.{' Dates labelled with "~" are approximate (originally specified as a quarter or year).' if any(p['approximate'] for p in phases) else ''}</p>
             </div>
 
             <!-- Timeline chart -->
