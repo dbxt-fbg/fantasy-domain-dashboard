@@ -429,6 +429,15 @@ def get_connection(db_path: str) -> sqlite3.Connection:
     conn.row_factory = sqlite3.Row  # Enable column access by name
     conn.execute("PRAGMA busy_timeout = 30000")
     conn.execute("PRAGMA journal_mode = WAL")
+    # Enabling WAL silently drops synchronous from FULL(2) to NORMAL(1) — this
+    # SQLite build sets SQLITE_DEFAULT_WAL_SYNCHRONOUS=1, so the downgrade is a
+    # side effect of the line above, not anything we asked for. Under NORMAL the
+    # WAL is not fsynced per commit, which is what let an abrupt power loss on
+    # 2026-07-22 leave metrics.db (and both QA DBs) physically shorter than the
+    # page count in its own header — "database disk image is malformed", and a
+    # 7-day outage. Restore FULL explicitly. Costs an fsync per commit; these
+    # are 15-minute batch collectors, so it does not matter.
+    conn.execute("PRAGMA synchronous = FULL")
     return conn
 
 

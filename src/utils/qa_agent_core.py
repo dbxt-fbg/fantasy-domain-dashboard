@@ -219,6 +219,10 @@ class HistoryStore:
         conn = sqlite3.connect(str(self.path))
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode = WAL")
+        # See the note in database.schema.get_connection: WAL mode silently
+        # lowers synchronous to NORMAL, which is how both QA history DBs were
+        # truncated by the 2026-07-22 power loss. Put it back to FULL.
+        conn.execute("PRAGMA synchronous = FULL")
         conn.execute("PRAGMA busy_timeout = 15000")
         try:
             yield conn
