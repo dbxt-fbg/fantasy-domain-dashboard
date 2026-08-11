@@ -1196,7 +1196,38 @@ def _run_publish_pipeline(job_id: str) -> None:
         _advance(3)
 
         # 5. git push
+        #
+        # We push HEAD:main from whatever branch the user happens to be on, so
+        # the push is only valid while origin/main is an ancestor of HEAD. If
+        # main advanced independently (another clone, a web edit, a second
+        # Publish from elsewhere) git rejects it as a non-fast-forward and the
+        # bare 'git push failed' gave no hint about what to do. Pre-flight the
+        # check so the UI can name the actual problem and the fix.
         _enter(4)
+        fetched = _git('fetch', 'origin', 'main', timeout=120)
+        if fetched.returncode != 0:
+            # Non-fatal: offline or transient. Fall through and let push decide.
+            logger.warning("publish %s: pre-push fetch failed: %s", job_id, (fetched.stderr or '').strip()[:300])
+        else:
+            ff = _git('merge-base', '--is-ancestor', 'origin/main', 'HEAD')
+            if ff.returncode != 0:
+                behind = _git('rev-list', '--count', 'HEAD..origin/main')
+                n = behind.stdout.strip() or '?'
+                _set(
+                    status='failed',
+                    error=(
+                        f'Cannot publish: origin/main has {n} commit(s) this branch '
+                        f'does not contain, so pushing would not be a fast-forward. '
+                        f'Reconcile first, e.g.:  git fetch origin && '
+                        f'git merge origin/main  — then Publish again.'
+                    ),
+                    log_tail=f'HEAD..origin/main = {n} commit(s)\n'
+                             + _git('log', '--oneline', 'HEAD..origin/main').stdout[-1500:],
+                    finished_at=_dt_now_iso(),
+                )
+                logger.error("publish %s: refusing non-fast-forward push (behind %s)", job_id, n)
+                return
+
         r = _git('push', 'origin', 'HEAD:main', timeout=300)
         if r.returncode != 0:
             _set(status='failed', error='git push failed', log_tail=(r.stderr or r.stdout)[-2000:], finished_at=_dt_now_iso())

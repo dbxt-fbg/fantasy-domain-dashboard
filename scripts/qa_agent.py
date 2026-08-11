@@ -24,6 +24,7 @@ Opt-out flags:
 import argparse
 import hashlib
 import os
+import sqlite3
 import subprocess
 import sys
 import time
@@ -45,6 +46,7 @@ from utils.statuses import (
 )
 from utils.qa_agent_core import (
     Check,
+    HISTORY_DB_PATH,
     HistoryStore,
     Planner,
     ProposalQueue,
@@ -632,6 +634,92 @@ class QAAgent:
         finally:
             conn.close()
 
+    def _integrity_targets(self):
+        """The SQLite files this agent is responsible for watching.
+
+        metrics.db is the dashboard's data; the two QA stores are this agent's
+        own memory. All three were truncated by the same power loss on
+        2026-07-22, so all three are worth checking.
+        """
+        return [
+            ("metrics.db", Path(self.db_path)),
+            ("qa_history.sqlite", Path(HISTORY_DB_PATH)),
+            ("qa_review_history.sqlite",
+             Path(HISTORY_DB_PATH).parent / "qa_review_history.sqlite"),
+        ]
+
+    def check_database_integrity(self):
+        """Run PRAGMA integrity_check on every SQLite file we depend on.
+
+        Why this exists: on 2026-07-22 a power loss truncated metrics.db and
+        both QA stores mid-write. Nothing checked integrity, so the failure was
+        only noticed 7 days later when a human ran a report — by which point the
+        nightly backups had also been failing for 6 days and the last clean one
+        predated the corruption. This check closes that window to one cron
+        interval (5 minutes).
+
+        Deliberately has no state_hash_fn: corruption is caused by events
+        *outside* the data (power loss, bad disk), so there is no input digest
+        that would predict it. It must run every time. It is cheap — a few
+        hundred ms for a healthy 17MB file.
+
+        On a malformed file, `sqlite3.connect()` succeeds but the first real
+        statement raises DatabaseError, so both paths are handled.
+        """
+        logger.info("Checking database integrity...")
+        all_ok = True
+
+        for label, path in self._integrity_targets():
+            if not path.exists():
+                self.add_issue(
+                    'critical',
+                    'Database Integrity',
+                    f"{label} is missing ({path})",
+                    "Restore from data/backups/ — see scripts/backup_db.py",
+                )
+                all_ok = False
+                continue
+
+            try:
+                # Opened read-write on purpose. A WAL-mode database needs to
+                # create its -shm file to be opened at all, so `mode=ro` fails
+                # with "unable to open database file" on a perfectly healthy DB
+                # whenever no -shm is present (e.g. after a clean shutdown) —
+                # a critical false alarm. quick_check does not modify data.
+                conn = sqlite3.connect(str(path), timeout=30)
+                try:
+                    # quick_check catches the same page-level damage as
+                    # integrity_check without the full index cross-verify, so
+                    # it stays cheap enough to run every 5 minutes.
+                    result = conn.execute("PRAGMA quick_check").fetchone()
+                finally:
+                    conn.close()
+            except sqlite3.DatabaseError as exc:
+                self.add_issue(
+                    'critical',
+                    'Database Integrity',
+                    f"{label} is unreadable: {exc}",
+                    f"Recover with: sqlite3 {path} '.recover' | sqlite3 {path}.recovered "
+                    f"— then verify and swap it in. Do NOT let backup_db.py overwrite "
+                    f"a good backup with this file.",
+                )
+                all_ok = False
+                continue
+
+            verdict = (result[0] if result else '') or ''
+            if verdict.strip().lower() != 'ok':
+                self.add_issue(
+                    'critical',
+                    'Database Integrity',
+                    f"{label} failed quick_check: {verdict[:200]}",
+                    f"Recover with: sqlite3 {path} '.recover' | sqlite3 {path}.recovered "
+                    f"— then verify and swap it in.",
+                )
+                all_ok = False
+
+        if all_ok:
+            self.check_passed()
+
     def check_temporal_consistency(self):
         """Validate time-based data consistency."""
         logger.info("Checking temporal consistency...")
@@ -685,47 +773,109 @@ class QAAgent:
         finally:
             conn.close()
 
-    def check_html_reports(self):
-        """Validate HTML reports are generated and don't contain template errors."""
-        logger.info("Checking HTML reports...")
+    # Pages that must exist and be regenerated regularly. Stale/size/template
+    # checks run only on these. (features.html, mbr.html, project_fantasy.html
+    # are generated too but validated for tag balance below, not for freshness.)
+    REQUIRED_REPORTS = [
+        'team_dashboard.html',
+        'story_points_dashboard.html',
+        'readiness_dashboard.html',
+        'delivery_excellence_dashboard.html',
+        'epics_dashboard.html',
+        'past_sprints_dashboard.html',
+        'pull_requests_dashboard.html',
+        'logs_dashboard.html',
+        'hygiene_dashboard.html',
+        'dependencies.html',
+        'stakeholders.html',
+    ]
 
-        report_dir = Path(__file__).parent.parent / "reports" / "html"
-        required_reports = [
-            'team_dashboard.html',
-            'story_points_dashboard.html',
-            'epics_dashboard.html',
-            'past_sprints_dashboard.html',
-            'pull_requests_dashboard.html',
-            'logs_dashboard.html'
-        ]
+    # HTML void elements — self-closing, never pushed onto the tag stack.
+    _VOID_TAGS = frozenset({
+        'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+        'link', 'meta', 'param', 'source', 'track', 'wbr',
+    })
 
-        for report_name in required_reports:
-            report_path = report_dir / report_name
+    @staticmethod
+    def _find_tag_imbalance(html: str):
+        """Return a short human description of the first tag-nesting fault, or
+        None if every non-void element is balanced.
 
-            # Check if file exists
-            if not report_path.exists():
-                self.add_issue(
-                    'warning',
-                    'HTML Reports',
-                    f"Missing report: {report_name}",
-                    "Run generate_html_report.py to regenerate reports",
-                    action={'type': 'regenerate_reports', 'scope': 'local'},
-                )
-                continue
+        A stray </div> or an unclosed <div> renders fine in browsers but breaks
+        layout subtly and is a reliable signal the generator's f-string nesting
+        drifted — exactly the class of bug that shipped before this check
+        existed. Uses stdlib HTMLParser; no dependency added.
+        """
+        from html.parser import HTMLParser
 
-            # Check file size (should be > 1KB)
-            file_size = report_path.stat().st_size
-            if file_size < 1024:
-                self.add_issue(
-                    'warning',
-                    'HTML Reports',
-                    f"{report_name} is suspiciously small ({file_size} bytes)",
-                    "Report may be empty or failed to generate properly",
-                    action={'type': 'regenerate_reports', 'scope': 'local'},
-                )
-                continue
+        class _Checker(HTMLParser):
+            def __init__(self):
+                super().__init__(convert_charrefs=True)
+                self.stack = []          # (tag, lineno)
+                self.fault = None        # first fault wins
+                self.void = QAAgent._VOID_TAGS
 
-            # Check page is not stale (collector runs every 15 min; allow 30 min before flagging)
+            def handle_starttag(self, tag, attrs):
+                if tag not in self.void:
+                    self.stack.append((tag, self.getpos()[0]))
+
+            def handle_endtag(self, tag):
+                if self.fault or tag in self.void:
+                    return
+                for i in range(len(self.stack) - 1, -1, -1):
+                    if self.stack[i][0] == tag:
+                        # Anything opened after this and not yet closed is unclosed.
+                        if i + 1 < len(self.stack):
+                            t, ln = self.stack[i + 1]
+                            self.fault = f"unclosed <{t}> (opened line {ln})"
+                        self.stack = self.stack[:i]
+                        return
+                # No matching open tag on the stack.
+                self.fault = f"stray </{tag}> at line {self.getpos()[0]}"
+
+        checker = _Checker()
+        try:
+            checker.feed(html)
+        except Exception as exc:  # malformed markup HTMLParser chokes on
+            return f"parse error: {exc}"
+        if checker.fault:
+            return checker.fault
+        if checker.stack:
+            t, ln = checker.stack[0]
+            return f"unclosed <{t}> (opened line {ln}, never closed)"
+        return None
+
+    def _validate_html_file(self, report_name, report_path, check_freshness):
+        """Run the full battery of checks on one HTML file. Returns True if the
+        file passed every applicable check, False if any issue was added.
+        """
+        # Check if file exists
+        if not report_path.exists():
+            self.add_issue(
+                'warning',
+                'HTML Reports',
+                f"Missing report: {report_name}",
+                "Run generate_html_report.py to regenerate reports",
+                action={'type': 'regenerate_reports', 'scope': 'local'},
+            )
+            return False
+
+        # Check file size (should be > 1KB)
+        file_size = report_path.stat().st_size
+        if file_size < 1024:
+            self.add_issue(
+                'warning',
+                'HTML Reports',
+                f"{report_name} is suspiciously small ({file_size} bytes)",
+                "Report may be empty or failed to generate properly",
+                action={'type': 'regenerate_reports', 'scope': 'local'},
+            )
+            return False
+
+        # Check page is not stale (collector runs every 15 min; allow 30 min
+        # before flagging). Only the canonical reports/html/ copies get this —
+        # docs/ is a publish target whose mtime tracks the last deploy.
+        if check_freshness:
             age_minutes = (datetime.now().timestamp() - report_path.stat().st_mtime) / 60
             if age_minutes > 30:
                 self.add_issue(
@@ -735,31 +885,81 @@ class QAAgent:
                     "run_jira_collector_agent.sh should regenerate HTML after each collection; check cron and logs",
                     action={'type': 'regenerate_reports', 'scope': 'local'},
                 )
-                continue
+                return False
 
-            # Check for template variable remnants or common errors
-            content = report_path.read_text()
+        content = report_path.read_text()
 
-            # Check for Python f-string remnants
-            # Only flag {variable} patterns, not ${variable} (JavaScript template literals)
-            if '{' in content and '}' in content:
-                import re
-                # Match {variable} but NOT ${variable} (JavaScript) or CSS values
-                # Look for {word} that's NOT preceded by $
-                suspicious_patterns = re.findall(r'(?<!\$)\{([a-z_][a-z0-9_]*)\}', content, re.IGNORECASE)
-                if suspicious_patterns:
-                    # Filter out common false positives (CSS, JS variables)
-                    filtered = [v for v in suspicious_patterns if not v.startswith('0x') and len(v) > 1]
-                    if filtered:
-                        self.add_issue(
-                            'critical',
-                            'HTML Reports',
-                            f"{report_name} contains unevaluated template variables: {', '.join(set(filtered[:5]))}",
-                            "Check generate_html_report.py for missing variable definitions",
-                            action={'type': 'regenerate_reports', 'scope': 'local'},
-                        )
-                        continue
+        # Check for Python f-string remnants
+        # Only flag {variable} patterns, not ${variable} (JavaScript template literals)
+        if '{' in content and '}' in content:
+            import re
+            # Match {variable} but NOT ${variable} (JavaScript) or CSS values
+            # Look for {word} that's NOT preceded by $
+            suspicious_patterns = re.findall(r'(?<!\$)\{([a-z_][a-z0-9_]*)\}', content, re.IGNORECASE)
+            if suspicious_patterns:
+                # Filter out common false positives (CSS, JS variables)
+                filtered = [v for v in suspicious_patterns if not v.startswith('0x') and len(v) > 1]
+                if filtered:
+                    self.add_issue(
+                        'critical',
+                        'HTML Reports',
+                        f"{report_name} contains unevaluated template variables: {', '.join(set(filtered[:5]))}",
+                        "Check generate_html_report.py for missing variable definitions",
+                        action={'type': 'regenerate_reports', 'scope': 'local'},
+                    )
+                    return False
 
+        # Check tag balance — stray/unclosed <div> etc. The generators build
+        # HTML by string concatenation, so an off-by-one closing tag slips
+        # through silently; this is the check that would have caught it.
+        imbalance = self._find_tag_imbalance(content)
+        if imbalance:
+            self.add_issue(
+                'critical',
+                'HTML Reports',
+                f"{report_name} has malformed HTML: {imbalance}",
+                "A generate_*.py template has unbalanced tags; fix the source and regenerate",
+                action={'type': 'regenerate_reports', 'scope': 'local'},
+            )
+            return False
+
+        return True
+
+    def check_html_reports(self):
+        """Validate HTML reports exist, are fresh, and contain well-formed markup.
+
+        Covers both the canonical reports/html/ build output and the published
+        docs/ copies (GitHub Pages) — both had the same stray-tag bug before,
+        and only the source was being checked.
+        """
+        logger.info("Checking HTML reports...")
+
+        repo_root = Path(__file__).parent.parent
+        report_dir = repo_root / "reports" / "html"
+
+        all_passed = True
+        for report_name in self.REQUIRED_REPORTS:
+            if not self._validate_html_file(report_name, report_dir / report_name, check_freshness=True):
+                all_passed = False
+
+        # Validate every other generated page in reports/html/ for tag balance
+        # too (no freshness gate — these aren't all on the 15-min cadence).
+        if report_dir.exists():
+            for path in sorted(report_dir.glob("*.html")):
+                if path.name in self.REQUIRED_REPORTS:
+                    continue
+                if not self._validate_html_file(path.name, path, check_freshness=False):
+                    all_passed = False
+
+        # Validate the published GitHub Pages copies. project_fantasy.html is
+        # published as index.html, so the set differs slightly from reports/html.
+        docs_dir = repo_root / "docs"
+        if docs_dir.exists():
+            for path in sorted(docs_dir.glob("*.html")):
+                if not self._validate_html_file(f"docs/{path.name}", path, check_freshness=False):
+                    all_passed = False
+
+        if all_passed:
             self.check_passed()
 
     def check_hygiene_tracking(self):
@@ -1403,18 +1603,21 @@ class QAAgent:
 
         mtime alone misses regenerations that touch the file but produce
         identical bytes; size catches those without forcing us to read+hash
-        every page on each QA pass.
+        every page on each QA pass. Covers both reports/html/ and the
+        published docs/ copies so a docs-only change re-triggers the check.
         """
-        html_dir = Path(__file__).parent.parent / "reports" / "html"
-        if not html_dir.exists():
-            return ""
+        repo_root = Path(__file__).parent.parent
         parts = []
-        for p in sorted(html_dir.glob("*.html")):
-            try:
-                st = p.stat()
-                parts.append(f"{p.name}:{st.st_mtime_ns}:{st.st_size}")
-            except Exception:
-                pass
+        for sub in ("reports/html", "docs"):
+            d = repo_root / sub
+            if not d.exists():
+                continue
+            for p in sorted(d.glob("*.html")):
+                try:
+                    st = p.stat()
+                    parts.append(f"{sub}/{p.name}:{st.st_mtime_ns}:{st.st_size}")
+                except Exception:
+                    pass
         return hashlib.sha1("|".join(parts).encode()).hexdigest()[:12]
 
     def _sh_scheduled_tasks(self) -> str:
@@ -1432,10 +1635,23 @@ class QAAgent:
         fails (root-cause-first reporting).
         """
         return [
+            # First, and everything data-reading hangs off it: if a DB file is
+            # malformed, every downstream check fails with the same opaque
+            # "database disk image is malformed" and the root cause is buried.
+            # No state_hash_fn — corruption comes from outside the data, so it
+            # must never be skipped as unchanged.
+            Check(
+                key="database_integrity",
+                invariant="every SQLite file we depend on passes quick_check",
+                fn=self.check_database_integrity,
+                estimated_cost_s=0.5,
+                tags=("fast", "database"),
+            ),
             Check(
                 key="sprint_data_quality",
                 invariant="every sprint has start/end dates and no future snapshots",
                 fn=self.check_sprint_data_quality,
+                depends_on=("database_integrity",),
                 state_hash_fn=self._sh_sprints,
                 estimated_cost_s=1.0,
                 tags=("fast", "sprints"),
@@ -1486,6 +1702,7 @@ class QAAgent:
                 key="temporal_consistency",
                 invariant="no timestamps are in the future",
                 fn=self.check_temporal_consistency,
+                depends_on=("database_integrity",),
                 state_hash_fn=self._sh_tickets,
                 estimated_cost_s=0.8,
                 tags=("fast",),
@@ -2326,8 +2543,29 @@ def main():
     try:
         config = load_config()
 
-        # Agent-runtime infrastructure
-        history = HistoryStore()
+        # Agent-runtime infrastructure.
+        #
+        # HistoryStore opens qa_history.sqlite. If *that* file is the corrupt
+        # one, this line raises before any check runs — which is exactly what
+        # happened on 2026-07-22: the agent died here for 7 days with a bare
+        # traceback, so check_database_integrity could never report the very
+        # problem it exists to catch. Fail with an actionable message instead,
+        # and name the file, because the traceback pointed at a PRAGMA in
+        # qa_agent_core rather than at the database.
+        try:
+            history = HistoryStore()
+        except sqlite3.DatabaseError as exc:
+            logger.error(
+                "QA agent cannot start: its history database is unreadable (%s): %s",
+                HISTORY_DB_PATH, exc,
+            )
+            logger.error(
+                "Recover with:  sqlite3 %s '.recover' > /tmp/qa_history.sql && "
+                "sqlite3 /tmp/qa_history.recovered.sqlite < /tmp/qa_history.sql  "
+                "— verify with PRAGMA integrity_check, then swap it in.",
+                HISTORY_DB_PATH,
+            )
+            return 2
         proposals = ProposalQueue(history)
 
         # Subcommands that short-circuit a normal run
@@ -2443,4 +2681,7 @@ def _git_sha_safe() -> str:
 
 
 if __name__ == "__main__":
-    main()
+    # Propagate main()'s return as the exit code so a corrupt history DB (2)
+    # is visible to cron/callers instead of looking like a clean run. main()
+    # otherwise returns None, which sys.exit maps to 0.
+    sys.exit(main())

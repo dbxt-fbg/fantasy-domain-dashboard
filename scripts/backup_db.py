@@ -43,16 +43,36 @@ def main():
 
     # Use online backup API. Opens a fresh connection (not WAL-shared) so we
     # don't interfere with anything the running agents are doing.
+    #
+    # src.backup() raises DatabaseError if the *source* is corrupt. Letting that
+    # propagate leaves behind the 0-byte file that connect() just created, which
+    # reads as "a backup happened" to anyone eyeballing data/backups/ — that is
+    # how a corrupt source went unnoticed for 7 days (2026-07-22 → 07-29). Catch
+    # it, delete the stub, and fail loudly with a nonzero exit instead.
+    copy_error = None
     src = sqlite3.connect(str(db_path))
     try:
         dst = sqlite3.connect(str(backup_path))
         try:
             # progress=None runs the copy in one call; it's 3–5MB of data.
             src.backup(dst)
+        except sqlite3.DatabaseError as exc:
+            copy_error = exc
         finally:
             dst.close()
     finally:
         src.close()
+
+    if copy_error is not None:
+        # Every connection above is closed, so the partial file (0 bytes, or a
+        # truncated copy if the source went bad mid-read) is safe to remove.
+        backup_path.unlink(missing_ok=True)
+        logger.error(
+            "Backup FAILED — source DB is unreadable (%s): %s. Partial backup "
+            "removed. Check the source with: sqlite3 %s 'PRAGMA integrity_check;'",
+            db_path, copy_error, db_path,
+        )
+        return 3
 
     size_kb = backup_path.stat().st_size // 1024
 
@@ -88,6 +108,19 @@ def main():
 
     if pruned:
         logger.info("Pruned %d backup(s) older than %d days", pruned, BACKUP_RETENTION_DAYS)
+
+    # Sweep stale SQLite sidecars. The online .backup + integrity_check above
+    # can leave a -wal/-shm pair next to a backup; once every connection here
+    # is closed they're stale (backups are never reopened except at restore),
+    # yet they accumulate (44 observed). Safe to drop all of them — this runs
+    # single-threaded after every connection above is closed.
+    swept = 0
+    for f in list(backup_dir.glob("metrics-*.db-wal")) + list(backup_dir.glob("metrics-*.db-shm")):
+        f.unlink(missing_ok=True)
+        swept += 1
+
+    if swept:
+        logger.info("Swept %d stale WAL/SHM sidecar(s)", swept)
 
     return 0
 
