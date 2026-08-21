@@ -31,7 +31,6 @@ SECONDARY_NAV = [
     ('pull-requests', 'pull_requests_dashboard.html', 'Repositories'),
     ('hygiene',       'hygiene_dashboard.html', 'Ticket Hygiene'),
     ('team',          'team.html', 'Team'),
-    ('stakeholders',  'stakeholders.html', 'Stakeholders'),
     ('dependencies',  'dependencies.html', 'Dependencies'),
     ('mbr',           'mbr.html', 'MBR'),
 ]

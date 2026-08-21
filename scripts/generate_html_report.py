@@ -119,7 +119,6 @@ _PAGE_THEME = {
     "bugs":            "page-project",
     "pull-requests":   "page-project",
     "past-sprints":    "page-project",
-    "stakeholders":    "page-project",
     "team":            "page-project",
     "dependencies":    "page-project",
     "mbr":             "page-project",
@@ -6348,147 +6347,6 @@ def generate_delivery_excellence_html(config: dict, output_path: Path):
 
 
 # ---------------------------------------------------------------------------
-# Stakeholders page (driven by config/stakeholders.yaml)
-# ---------------------------------------------------------------------------
-
-_STAKEHOLDER_COLORS = {
-    'indigo', 'teal', 'orange', 'purple', 'blue', 'pink', 'green', 'red', 'slate',
-}
-
-
-def _stakeholder_initials(name: str) -> str:
-    """Two-letter avatar from a person's name. 'Mary Jo Watson' → 'MW'."""
-    parts = [p for p in name.split() if p]
-    if not parts:
-        return '??'
-    if len(parts) == 1:
-        return parts[0][:2].upper()
-    return (parts[0][0] + parts[-1][0]).upper()
-
-
-def _render_stakeholder_card(person: dict) -> str:
-    """One name+title+role-tag chip card. Avatar color comes from the YAML."""
-    name = html.escape(person.get('name', ''))
-    title = html.escape(person.get('title', ''))
-    role_tag = html.escape(person.get('role_tag', '')) if person.get('role_tag') else ''
-    color_raw = (person.get('color') or 'indigo').strip()
-    # Whitelisted palette names get a CSS class; anything else is treated as a
-    # raw CSS color via inline style — keeps the YAML expressive without
-    # opening an XSS vector.
-    if color_raw in _STAKEHOLDER_COLORS:
-        avatar_class = f'stk-avatar {color_raw}'
-        avatar_style = ''
-    else:
-        avatar_class = 'stk-avatar'
-        avatar_style = f' style="background: {html.escape(color_raw)};"'
-
-    initials = _stakeholder_initials(person.get('name', ''))
-    tag_html = f'<span class="stk-tag">{role_tag}</span>' if role_tag else ''
-    return (
-        f'<div class="stk-card">'
-        f'<div class="{avatar_class}"{avatar_style}>{initials}</div>'
-        f'<div class="stk-info">'
-        f'<div class="stk-name">{name}</div>'
-        f'<div class="stk-title">{title}</div>'
-        f'{tag_html}'
-        f'</div>'
-        f'</div>'
-    )
-
-
-def _render_stakeholder_group(group: dict) -> str:
-    """One row in the matrix — label chip on the left, members on the right.
-
-    Supports both flat groups (members:) and nested (subgroups:).
-    """
-    label = html.escape(group.get('label', ''))
-
-    if group.get('subgroups'):
-        rows = []
-        for sub in group['subgroups']:
-            sub_label = html.escape(sub.get('label', ''))
-            cards = ''.join(_render_stakeholder_card(p) for p in sub.get('members', []))
-            rows.append(
-                f'<div class="stk-subgroup">'
-                f'<div class="stk-subgroup-label">{sub_label}</div>'
-                f'<div class="stk-members">{cards}</div>'
-                f'</div>'
-            )
-        body = f'<div class="stk-subgroups">{"".join(rows)}</div>'
-    else:
-        cards = ''.join(_render_stakeholder_card(p) for p in group.get('members', []))
-        body = f'<div class="stk-members">{cards}</div>'
-
-    return (
-        f'<div class="stk-group">'
-        f'<div class="stk-group-label">{label}</div>'
-        f'{body}'
-        f'</div>'
-    )
-
-
-def generate_stakeholders_html(config: dict, output_path: Path):
-    """Render the Stakeholders matrix from config/stakeholders.yaml.
-
-    The data lives in a separate YAML so the assistant can edit groups +
-    people in conversation ("add Foo to OSB", "move Bar from DSEA to Tech
-    Compliance") without touching code. Missing file → empty state.
-    """
-    import yaml as _yaml
-
-    repo_root = Path(config['database']['path']).parent.parent
-    stakeholders_path = repo_root / 'config' / 'stakeholders.yaml'
-
-    groups_html = ''
-    last_updated_label = ''
-    if stakeholders_path.exists():
-        with open(stakeholders_path) as f:
-            data = _yaml.safe_load(f) or {}
-        groups = data.get('groups', []) or []
-        groups_html = ''.join(_render_stakeholder_group(g) for g in groups)
-        try:
-            mtime = datetime.fromtimestamp(stakeholders_path.stat().st_mtime)
-            last_updated_label = mtime.strftime('%B %d, %Y at %H:%M')
-        except OSError:
-            pass
-    else:
-        groups_html = (
-            '<div class="empty-state">'
-            '<div class="icon">👥</div>'
-            '<div>No stakeholders configured. Edit <code>config/stakeholders.yaml</code> to populate this page.</div>'
-            '</div>'
-        )
-
-    content = f"""
-        <header>
-            <h1>👥 Stakeholders</h1>
-            <div class="subtitle">{project_label()} · Source: config/stakeholders.yaml{(" · Last edited " + last_updated_label) if last_updated_label else ""}</div>
-        </header>
-{generate_nav_menu('stakeholders')}
-        <div class="content stakeholders-page">
-            <div class="stakeholders-card">
-                <div class="stk-header">
-                    <span>👥</span>
-                    <span>Stakeholders</span>
-                </div>
-                {groups_html}
-            </div>
-            <footer>
-                Generated by Engineering Management Dashboard · {datetime.now().strftime('%B %d, %Y at %H:%M')}
-            </footer>
-        </div>
-    """
-
-    page = render_html(
-        title=f"Stakeholders — {project_label()}",
-        content=content,
-        body_class=_PAGE_THEME["stakeholders"],
-    )
-    _atomic_write(output_path, page)
-    print(f"✅ Stakeholders dashboard generated: {output_path}")
-
-
-# ---------------------------------------------------------------------------
 # Team page (driven by config/team_config.yaml)
 # ---------------------------------------------------------------------------
 
@@ -8070,9 +7928,6 @@ def main():
 
         # Generate pull requests report
         generate_pull_requests_html(config, report_dir / "pull_requests_dashboard.html")
-
-        # Stakeholders matrix (driven by config/stakeholders.yaml)
-        generate_stakeholders_html(config, report_dir / "stakeholders.html")
 
         # Team roster contact sheet (driven by config/team_config.yaml)
         generate_team_roster_html(config, report_dir / "team.html")

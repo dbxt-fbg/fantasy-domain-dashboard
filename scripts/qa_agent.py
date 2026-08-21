@@ -787,7 +787,6 @@ class QAAgent:
         'logs_dashboard.html',
         'hygiene_dashboard.html',
         'dependencies.html',
-        'stakeholders.html',
     ]
 
     # HTML void elements — self-closing, never pushed onto the tag stack.
