@@ -31,7 +31,7 @@ calendar:
   # Shared calendar everyone posts PTO / OOO to. The sync agent reads all-day
   # out-of-office events here and matches them to team members by attendee
   # email or by name in the event title. Leave blank to disable PTO sync.
-  pto_calendar_id: ""
+  pto_calendar_id: "c_7dc89dec5edc28168901e040f72c9eb2df8c7b30b6b2e90a791833c1522f7f48@group.calendar.google.com"
   # How far ahead (days) to pull PTO so upcoming-sprint capacity reflects it.
   pto_lookahead_days: 120
   # How far back (days) to keep PTO so closed-sprint metrics stay accurate.
@@ -47,104 +47,213 @@ github:
 # Discovered from Jira and GitHub
 team_members:
   - name: "Anushri Patel"
-    role: "FE"
+    role: "Engineer"
+    team: "FE"
     level: "Engineer III"
     jira_account_id: "712020:38773bfb-2311-4127-a8ce-cfc07d764443"
     github_username: "anushri-patel"  # Update if different
+    email: "anushri.patel@betfanatics.com"
+    slack_handle: "anushri_patel"
+    slack_user_id: "U0AMVNRA6BC"
 
   - name: "Brooks Taylor"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     jira_account_id: "638df2cc77acd224b34258e5"
     github_username: "BrooksAtFanatics"
     level: "Staff Engineer"
+    email: "brooks.taylor@betfanatics.com"
+    slack_handle: "brooks_taylor"
+    slack_user_id: "U04EFGCRZCY"
 
   - name: "Kevin Paquette"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     jira_account_id: "712020:fc94c716-4570-4f43-833e-ef4ef3598c58"
     github_username: "KevinPaquetteAtFanatics"
     level: "Staff Engineer"
+    email: "kevin.paquette@betfanatics.com"
+    slack_handle: "kevin_paquette"
+    slack_user_id: "U0AQ57VS4SK"
 
   - name: "Liam Butler"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     jira_account_id: "712020:ae26c2f0-9f3a-4e5c-8af3-35df5ec8c133"
     github_username: "liambfbg"
     level: "Engineer III"
+    email: "liam.butler@betfanatics.com"
+    slack_handle: "liam_butler"
+    slack_user_id: "U07AC1JJGJH"
 
   - name: "Michael Goodwin"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     level: "Principal Engineer"
     jira_account_id: "6372b409a593cb822e924296"
     github_username: "mjgoodwin"
+    email: "michael.goodwin@betfanatics.com"
+    slack_handle: "michael_goodwin"
+    slack_user_id: "U04AYT89H28"
+    active: false  # off the roster 2026-08-21; also removed from capacity_planner.html
 
   - name: "Nigel Young"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     jira_account_id: "712020:540ac79b-9902-4756-b67c-d157cc977b46"
     github_username: "NigelYoungAtFanatics"
     level: "Engineer III"
+    email: "nigel.young@betfanatics.com"
+    slack_handle: "nigel_young"
+    slack_user_id: "U0AQH0A129K"
 
   - name: "Patrick Kilburn"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     level: "Senior Staff Engineer"
     jira_account_id: "6400c3c50d9b61193c250165"
     github_username: "patrick-kilburn"
+    email: "patrick.kilburn@betfanatics.com"
+    slack_handle: "patrick_kilburn"
+    slack_user_id: "U04SSGHHKU0"
 
   - name: "Ryan Taylor"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     jira_account_id: "712020:efdfebfd-e03b-48f2-9c44-cd6eba377a92"
     github_username: "RyanTaylorAtFanatics"
     level: "Engineer II"
+    email: "ryan.taylor@betfanatics.com"
+    slack_handle: "ryan_taylor"
+    slack_user_id: "U0AQLM3BUG2"
 
   - name: "Scott Schmitz"
-    role: "FE"
+    role: "Engineer"
+    team: "FE"
     jira_account_id: "712020:4eb11e93-9714-4d39-a660-6207665464ed"
     github_username: "scott-schmitz-fbg"
     level: "Senior Engineer"
+    email: "scott.schmitz@betfanatics.com"
+    slack_handle: "scott_schmitz"
+    slack_user_id: "U0AQS937XA6"
 
   - name: "Tanya Phanich"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     jira_account_id: "62da9a2a5eeecd39350a6774"
     github_username: "tanya-pha"
     level: "Staff Engineer"
+    email: "tanya.phanich@betfanatics.com"
+    slack_handle: "tanya_phanich"
+    slack_user_id: "U03QZMBNZRP"
 
   - name: "Jacob Tabak"
-    role: "FE"
+    role: "Engineer"
+    team: "FE"
     jira_account_id: "712020:773185a3-dcc2-4492-8577-58463fce0327"
     github_username: "jacobtabak-bet"  # Update if different
+    email: "jacob.tabak@betfanatics.com"
+    slack_handle: "jacob_tabak"
+    slack_user_id: "U0ADDTJ7U69"
 
   - name: "Jasmine Dacones"
-    role: "FE"
+    role: "Engineer"
+    team: "FE"
     level: "Engineer III"
     jira_account_id: "712020:4cf3c3f9-1579-45e5-90e4-8941951a4fb2"
     github_username: "jasminedacones"  # Update if different
+    email: "jasmine.dacones@betfanatics.com"
+    slack_handle: "jasmine_dacones"
+    slack_user_id: "U0APFHESKB6"
 
   - name: "Josh Schaefer"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     jira_account_id: "712020:ac04afd5-13dd-401e-ab22-5fe00fd9d623"
     github_username: "JoshSchaeferAtFanatics"  # Update if different
     level: "Senior Engineer"
+    email: "josh.schaefer@betfanatics.com"
+    slack_handle: "josh_schaefer"
+    slack_user_id: "U0AQZR13KEV"
 
   - name: "Kevin Jacob"
-    role: "FE"
+    role: "Engineer"
+    team: "FE"
     level: "Staff Engineer"
     jira_account_id: "712020:5f5b45c8-656b-4c8c-81c6-1f36450485ec"
-    github_username: "kevin-jacob"  # Update if different
+    github_username: "kevinjacob-fbg"
+    email: "kevin.jacob@betfanatics.com"
+    slack_handle: "kevin_jacob"
+    slack_user_id: "U0B0NN7GJ6B"
 
   - name: "Paul Kang"
-    role: "FE"
+    role: "Engineer"
+    team: "FE"
     level: "Staff Engineer"
     jira_account_id: "712020:ed61f340-98fd-4c0b-9e5e-50e9f6e3f0a4"
-    github_username: "paul-kang"  # Update if different
+    github_username: "pkang-fanatics"
+    email: "paul.kang@betfanatics.com"
+    slack_handle: "paul_kang"
+    slack_user_id: "U0B10QD4F9B"
 
   - name: "Salmaan Khan"
-    role: "BE"
+    role: "Engineer"
+    team: "BE"
     jira_account_id: "712020:0effd921-c06c-4330-9818-aac83f8d04cf"
     github_username: "SalmaanKhanAtFanatics"  # Update if different
     level: "Engineer II"
+    email: "salmaan.khan@betfanatics.com"
+    slack_handle: "salmaan_khan"
+    slack_user_id: "U0AQE0W06M9"
+
+  # Product. Not engineers — 'Product' sits outside the BE/FE pair, so like
+  # 'EM' it groups on the Team page without touching any delivery metric.
+  # No GitHub account found for either in fanatics-gaming.
+  - name: "Jarod Rankin"
+    role: "Product Manager"
+    team: "Product"
+    email: "jarod.rankin@betfanatics.com"
+    slack_handle: "jarod_rankin"
+    slack_user_id: "U0AQJS7SCCE"
+
+  - name: "Tom Boettner"
+    role: "Product Manager"
+    team: "Product"
+    email: "tom.boettner@betfanatics.com"
+    slack_handle: "tom_boettner"
+    slack_user_id: "U03G9U0U79U"
 
 
   - name: "Anthony Porter"
     jira_account_id: "712020:df8179ca-5274-4b0d-a690-37a7bd84e4b9"
     # auto-added via jira_assignee
+
+
+  - name: "John Groves"
+    jira_account_id: "712020:7121d233-cb45-4ce7-b364-f89a9d7e3e1c"
+    # auto-added via jira_assignee
+
+
+  - name: "David Baxter"
+    # EM, but rostered with backend at his request (2026-08-21). Unlike the
+    # 'EM' role this previously carried, 'BE' *is* a metric bucket: his tickets
+    # and developer_snapshots now count toward the backend split on Stories,
+    # Story Points and the burndown. Set this back to "EM" to pull them out.
+    role: "Engineering Manager"
+    team: "BE"
+    jira_account_id: "63f90fdae2c4c692c9792821"
+    github_username: "dbxt-fbg"
+    email: "david.baxter@betfanatics.com"
+    slack_handle: "david_baxter"
+    slack_user_id: "U04R7A13R6X"
+
+  - name: "Chris He"
+    jira_account_id: "712020:dfd1731d-0200-4d4a-a893-6bfc920ca415"
+    # auto-added via jira_assignee
+
+
+  - name: "Tom Boettner"
+    # auto-added via calendar_1on1
 
 # Collection Settings
 collection:

@@ -4,41 +4,57 @@
 
 /* ----- Design tokens --------------------------------------------------- */
 :root {
-    /* Background & surface */
-    --bg-app: #0f172a;
-    --bg-container: #1e293b;
-    --bg-surface: #334155;
-    --bg-surface-2: #1e293b;
-    --bg-hover: #475569;
-    --bg-hover-strong: #64748b;
+    /* ---------------------------------------------------------------
+       Identity: "the night game under the floodlights."
+       Project Fantasy is a fantasy-SPORTS product, so the visual
+       language is the broadcast scoreboard / box score — cool field-
+       at-night charcoals, one luminous broadcast-cyan accent for the
+       chrome and the numbers that matter, and tabular figures. Gold
+       (--trophy) is reserved for the header nameplate only, so it
+       reads as a signature rather than a system color.
+       --------------------------------------------------------------- */
+
+    /* Background & surface — cooler & deeper than the old blue-slate */
+    --bg-app: #0a0e14;
+    --bg-container: #0f1620;
+    --bg-surface: #1a2430;
+    --bg-surface-2: #131c27;
+    --bg-hover: #25323f;
+    --bg-hover-strong: #34465a;
 
     /* Text */
-    --text-primary: #f1f5f9;
-    --text-secondary: #e2e8f0;
-    --text-muted: #94a3b8;
-    --text-faint: #64748b;
+    --text-primary: #f4f8fb;
+    --text-secondary: #cdd9e5;
+    --text-muted: #8194a6;
+    --text-faint: #566375;
 
-    /* Brand & state */
-    --brand: #6366f1;
-    --brand-hover: #818cf8;
-    --success: #10b981;
-    --success-strong: #059669;
-    --success-bg: #064e3b;
-    --success-text: #6ee7b7;
-    --warning: #f59e0b;
-    --warning-bg: #78350f;
+    /* Brand & state. Brand is broadcast cyan; semantic state colors
+       keep their meaning (they encode data, not decoration) but are
+       retuned for the deeper ground. */
+    --brand: #38bdf8;
+    --brand-hover: #7dd3fc;
+    --success: #2dd4a7;
+    --success-strong: #14b88a;
+    --success-bg: #07372c;
+    --success-text: #6ee7c3;
+    --warning: #fbbf24;
+    --warning-bg: #5a3a09;
     --warning-text: #fcd34d;
-    --danger: #ef4444;
-    --danger-bg: #7f1d1d;
-    --danger-text: #fca5a5;
-    --info: #3b82f6;
-    --info-bg: #1e3a8a;
-    --info-text: #93c5fd;
-    --accent-text: #60a5fa;
-    --border: #475569;
+    --danger: #fb6a5f;
+    --danger-bg: #5e1a17;
+    --danger-text: #fda4a0;
+    --info: #38bdf8;
+    --info-bg: #0c3a52;
+    --info-text: #9bdcfb;
+    --accent-text: #56cdf9;
+    --border: #243340;
+    --border-strong: #34465a;
+
+    /* Signature accent — used ONLY on the header nameplate. */
+    --trophy: #f4c860;
 
     /* Header gradient — pages override on <body> */
-    --header-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --header-gradient: linear-gradient(135deg, #0c3a52 0%, #0f1620 70%);
 
     /* Spacing scale */
     --space-1: 4px;
@@ -66,13 +82,33 @@
     --fs-3xl: 24px;
     --fs-4xl: 28px;
 
-    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-sans: 'Saira', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* Condensed athletic face for scoreboard-style display type. */
+    --font-display: 'Saira Condensed', 'Saira', 'Arial Narrow', sans-serif;
     --font-mono: 'Monaco', 'Menlo', 'Courier New', monospace;
+}
+
+/* Numbers are the point of a box score: line up every digit. */
+.metric-value, .perf-metric-value, .epic-sprint-stat, .epic-role-stat,
+th, td, .badge, .ticket-key, .stat-num, [class*="-sp"], [class*="-count"] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
 }
 
 /* ----- Reset / base ---------------------------------------------------- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
+/* Respect reduced-motion: drop smooth scroll, transitions, and the
+   floodlight wash for anyone who's asked the OS to keep things still. */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}
 body {
     font-family: var(--font-sans);
     background: var(--bg-app);
@@ -90,38 +126,67 @@ body {
 header {
     background: var(--header-gradient);
     color: white;
-    padding: calc(var(--space-8) * 1.25) var(--space-8) var(--space-8);
+    padding: calc(var(--space-8) * 1.25) var(--space-8) var(--space-6);
     position: relative;
     text-align: center;
+    overflow: hidden;
 }
+/* Floodlight wash — an off-center glow keyed to the page's brand hue,
+   like a stadium light spilling across the scoreboard. */
+header::before {
+    content: "";
+    position: absolute;
+    top: -60%;
+    left: 50%;
+    width: 80%;
+    height: 200%;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at 50% 0%,
+        color-mix(in srgb, var(--brand) 22%, transparent) 0%,
+        transparent 60%);
+    pointer-events: none;
+}
+/* The scoreboard nameplate — the one element this page is remembered by.
+   Condensed athletic caps over a luminous cyan rule, flanked by a single
+   gold championship tick at each end. */
 header h1 {
-    font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', serif;
-    font-size: 4.25rem;
-    margin: 0 auto var(--space-4);
-    font-weight: 900;
-    letter-spacing: 0.08em;
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5.5vw, 4rem);
+    margin: 0 auto var(--space-3);
+    font-weight: 800;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    line-height: 1;
-    color: #f8fafc;
-    text-shadow:
-        0 2px 0 rgba(0, 0, 0, 0.25),
-        0 4px 12px rgba(0, 0, 0, 0.5),
-        0 0 28px rgba(255, 255, 255, 0.08);
+    line-height: 0.95;
+    color: #ffffff;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
     display: inline-block;
-    padding: 0 var(--space-6) var(--space-3);
-    border-bottom: 3px solid rgba(248, 250, 252, 0.95);
+    padding: 0 calc(var(--space-6) + 14px) var(--space-3);
+    border-bottom: 2px solid var(--brand);
     position: relative;
+    z-index: 1;
 }
-header h1::first-letter {
-    font-size: 1.18em;
-    font-weight: 900;
+/* Gold end-ticks on the underline rule — the championship marker, the
+   only place gold appears in the whole system. */
+header h1::before,
+header h1::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    width: 10px;
+    height: 2px;
+    background: var(--trophy);
+    box-shadow: 0 0 8px var(--trophy);
 }
+header h1::before { left: 0; }
+header h1::after { right: 0; }
 header .subtitle {
-    opacity: 0.85;
-    font-size: var(--fs-md);
-    font-style: italic;
-    letter-spacing: 0.08em;
+    opacity: 0.92;
+    font-family: var(--font-display);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
+    color: var(--brand-hover);
     margin-top: var(--space-3);
     text-align: center;
 }
@@ -138,10 +203,10 @@ footer {
     border-top: 1px solid var(--border);
 }
 
-/* ----- Top navigation -------------------------------------------------- */
+/* ----- Top navigation — the scoreboard channel selector --------------- */
 .top-nav {
     background: var(--bg-surface);
-    border-bottom: 2px solid var(--border);
+    border-bottom: 1px solid var(--border-strong);
 }
 .nav-menu {
     list-style: none;
@@ -151,10 +216,13 @@ footer {
     display: block;
     color: var(--text-muted);
     text-decoration: none;
-    padding: 15px 25px;
-    font-weight: 500;
+    padding: 14px 24px;
+    font-family: var(--font-display);
+    font-weight: 600;
     font-size: var(--fs-md);
-    transition: background 0.2s, color 0.2s;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
     border-bottom: 3px solid transparent;
 }
 .nav-item a:hover {
@@ -163,7 +231,8 @@ footer {
 }
 .nav-item a.active {
     color: var(--text-primary);
-    background: var(--bg-hover);
+    background: var(--bg-hover);  /* fallback if color-mix unsupported */
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--brand) 12%, transparent));
     border-bottom-color: var(--brand);
 }
 
@@ -279,13 +348,28 @@ footer {
     margin-bottom: var(--space-10);
 }
 .section-title {
-    font-size: var(--fs-2xl);
-    font-weight: 600;
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: 700;
     margin-bottom: var(--space-5);
     color: var(--text-primary);
-    border-bottom: 2px solid var(--border);
+    border-bottom: 1px solid var(--border-strong);
     padding-bottom: var(--space-3);
-    letter-spacing: -0.01em;
+    padding-left: var(--space-3);
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    position: relative;
+}
+/* Cyan eyebrow tick — the scoreboard label marker. */
+.section-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--brand);
 }
 .section-title.is-collapsible {
     cursor: pointer;
@@ -321,13 +405,14 @@ footer {
     margin-bottom: var(--space-8);
 }
 .metric-card {
-    background: var(--bg-surface);
+    background: var(--bg-surface);  /* fallback if color-mix unsupported */
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--brand) 7%, transparent), transparent 40%),
+        var(--bg-surface);
     border-radius: var(--radius-lg);
     padding: var(--space-5);
+    border: 1px solid var(--border);
     border-left: 4px solid var(--brand);
-    border-top: none;
-    border-right: none;
-    border-bottom: none;
     text-align: left;
     color: inherit;
     font: inherit;
@@ -350,17 +435,21 @@ button.metric-card:focus-visible {
 .metric-card.info    { border-left-color: var(--info); }
 .metric-card.danger  { border-left-color: var(--danger); }
 .metric-label {
+    font-family: var(--font-display);
     font-size: var(--fs-sm);
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.1em;
+    font-weight: 600;
     margin-bottom: var(--space-2);
 }
 .metric-value {
-    font-size: var(--fs-3xl);
+    font-family: var(--font-display);
+    font-size: var(--fs-4xl);
     font-weight: 700;
     color: var(--text-primary);
-    line-height: 1.1;
+    line-height: 1;
+    letter-spacing: -0.01em;
 }
 .metric-subtext {
     font-size: var(--fs-md);
@@ -1704,39 +1793,121 @@ button.perf-metric-value.info    { color: var(--info); }
 .pr-age-stale   { color: var(--danger-text); }
 .pr-age-unknown { color: var(--text-faint); }
 
+/* ----- Expandable count cells (PR / Review activity tables) ----------- */
+.count-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    color: var(--accent-text);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-variant-numeric: tabular-nums;
+}
+.count-toggle:hover { text-decoration: underline; }
+.count-caret {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+}
+.count-toggle[aria-expanded="true"] .count-caret { transform: rotate(90deg); }
+
+.detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) var(--space-1);
+    background: var(--bg-surface-2);
+    border-radius: var(--radius-sm);
+}
+.detail-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--fs-sm);
+    border-radius: var(--radius-sm);
+}
+.detail-row:hover { background: rgba(255, 255, 255, 0.03); }
+.detail-row a {
+    color: var(--accent-text);
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.detail-row a:hover { text-decoration: underline; }
+.detail-repo {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    white-space: nowrap;
+}
+.detail-title {
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1;
+}
+.detail-meta { color: var(--text-faint); font-size: var(--fs-xs); margin-left: auto; white-space: nowrap; }
+.detail-state {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+}
+.detail-state-merged,
+.detail-state-approved            { background: var(--success-bg); color: var(--success-text); }
+.detail-state-open,
+.detail-state-commented           { background: var(--info-bg); color: var(--info-text); }
+.detail-state-closed,
+.detail-state-changes_requested,
+.detail-state-dismissed           { background: var(--danger-bg); color: var(--danger-text); }
+
 /* ----- Page themes ---------------------------------------------------
    Each primary nav tab gets its own accent palette by overriding a few
    design tokens on the <body>. Because buttons, nav pills, progress
    bars, and metric-card borders all reference `var(--brand)` etc., the
    whole surface re-tints automatically. */
 
-/* Project: Fantasy + its secondary tabs (Stories, Story Points, Epics,
-   Repositories) — indigo/violet. This is the original palette. */
+/* Each tab keeps its own accent (useful wayfinding), but they now read
+   as channels on one scoreboard rather than four different products:
+   every header sits on the same field-charcoal ground, lit by a
+   floodlight wash in the tab's hue (see header::before). */
+
+/* Project: Fantasy + its secondary tabs — broadcast cyan (the marquee). */
 body.page-project {
-    --brand: #6366f1;
-    --brand-hover: #818cf8;
-    --header-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --brand: #38bdf8;
+    --brand-hover: #7dd3fc;
+    --header-gradient: linear-gradient(150deg, #0c3a52 0%, #0f1620 68%);
 }
 
-/* Team Members — teal/emerald. Warmer, more people-focused. */
+/* Team Members — emerald. The roster channel. */
 body.page-team {
-    --brand: #0d9488;
-    --brand-hover: #14b8a6;
-    --header-gradient: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+    --brand: #2dd4a7;
+    --brand-hover: #5eead4;
+    --header-gradient: linear-gradient(150deg, #07372c 0%, #0f1620 68%);
 }
 
-/* Agents and Logs — amber/orange. Ops-console feel. */
+/* Agents and Logs — amber. The ops / play-by-play channel. */
 body.page-logs {
-    --brand: #ea580c;
-    --brand-hover: #fb923c;
-    --header-gradient: linear-gradient(135deg, #c2410c 0%, #f59e0b 100%);
+    --brand: #fbbf24;
+    --brand-hover: #fcd34d;
+    --header-gradient: linear-gradient(150deg, #4a3008 0%, #0f1620 68%);
 }
 
-/* ----- Hygiene page --------------------------------------------------- */
+/* ----- Hygiene page — the penalty / red-flag channel. ----------------- */
 body.page-hygiene {
     --brand: var(--danger);
-    --brand-hover: #f87171;
-    --header-gradient: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+    --brand-hover: #fda4a0;
+    --header-gradient: linear-gradient(150deg, #5e1a17 0%, #0f1620 68%);
 }
 .page-hygiene .metric-card {
     border-left-color: var(--danger);
@@ -1875,7 +2046,7 @@ body.page-hygiene {
 .log-line.success { color: var(--success-text); }
 .log-line.warning { color: #fbbf24; }
 .log-line.error   { color: #f87171; }
-.log-line.timestamp { color: #818cf8; }
+.log-line.timestamp { color: #7dd3fc; }
 .log-timestamp {
     color: var(--text-faint);
     margin-right: var(--space-3);
@@ -2557,10 +2728,12 @@ body.page-project .stakeholders-page .section { padding: 0; }
 }
 /* Phase-specific accents — keeps adjacent groups visually distinct without
    overriding the brand for the default state. */
-.launch-badge.alpha          { background: #6366f1; }
-.launch-badge.beta           { background: #3b82f6; }
-.launch-badge.public-launch  { background: #10b981; }
-.launch-badge.post-launch    { background: #8b5cf6; }
+/* Launch phases as a progression: deep cyan → bright cyan → emerald
+   (shipped) → trophy gold (post-launch / in market). */
+.launch-badge.alpha          { background: #0e7490; }
+.launch-badge.beta           { background: #38bdf8; color: #07212e; }
+.launch-badge.public-launch  { background: #2dd4a7; color: #07212e; }
+.launch-badge.post-launch    { background: var(--trophy); color: #2a1d02; }
 .launch-badge.unassigned     { background: var(--bg-hover-strong); color: var(--text-secondary); }
 .launch-group-counts { color: var(--text-muted); font-size: var(--fs-sm); flex: 1; }
 .launch-group-pct    { color: var(--text-primary); font-weight: 700; font-size: var(--fs-md); }
@@ -3093,3 +3266,312 @@ table.export-table { display: none !important; }
 @media print {
     table.export-table { display: none !important; }
 }
+
+/* ----- Readiness by Phase --------------------------------------------- */
+/* Decomposition readiness: how much of each launch phase is broken down
+   far enough to track/forecast. Reuses the scoreboard token system. */
+.readiness-phase-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+.readiness-phase {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+}
+.readiness-phase-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+.readiness-phase-name {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+}
+.readiness-phase-meta {
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+    font-variant-numeric: tabular-nums;
+}
+.readiness-gate {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 10px;
+    border-radius: 999px;
+}
+.readiness-gate.ready {
+    color: var(--success-text);
+    background: var(--success-bg);
+}
+.readiness-gate.not-ready {
+    color: var(--warning-text);
+    background: var(--warning-bg);
+}
+.readiness-pct {
+    margin-left: auto;
+    font-family: var(--font-display);
+    font-size: var(--fs-3xl);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.readiness-pct.success { color: var(--success); }
+.readiness-pct.warning { color: var(--warning); }
+.readiness-pct.danger  { color: var(--danger); }
+.readiness-pct.muted   { color: var(--text-faint); }
+
+.readiness-bar {
+    height: 8px;
+    background: var(--bg-surface-2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: var(--space-4) 0;
+}
+.readiness-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
+.readiness-bar-fill.success { background: var(--success); }
+.readiness-bar-fill.warning { background: var(--warning); }
+.readiness-bar-fill.danger  { background: var(--danger); }
+.readiness-bar-fill.muted   { background: var(--text-faint); }
+
+.readiness-worklists {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-4);
+}
+.readiness-worklist {
+    background: var(--bg-surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+}
+.readiness-worklist-head {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border);
+}
+.readiness-work-action { color: var(--warning-text); font-weight: 500; }
+.readiness-worklist ul { list-style: none; margin: 0; padding: 0; }
+.readiness-work-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+}
+.readiness-work-item + .readiness-work-item { border-top: 1px solid var(--bg-surface); }
+.readiness-work-summary {
+    flex: 1;
+    min-width: 0;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--fs-sm);
+}
+.readiness-clear {
+    color: var(--success-text);
+    font-size: var(--fs-sm);
+    padding: var(--space-2) 0;
+}
+
+/* ----- Delivery Excellence -------------------------------------------- */
+/* Headline gauges + flow/rework/predictability readouts. Reuses scoreboard
+   tokens; tone classes (success/warning/danger/muted) drive accent color. */
+.excellence-gauges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+}
+.excellence-gauge {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+}
+.excellence-gauge.success { border-top-color: var(--success); }
+.excellence-gauge.warning { border-top-color: var(--warning); }
+.excellence-gauge.danger  { border-top-color: var(--danger); }
+.excellence-gauge.muted   { border-top-color: var(--text-faint); }
+.excellence-gauge-label {
+    font-family: var(--font-display);
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.excellence-gauge-value {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.05;
+    margin: var(--space-2) 0 var(--space-1);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+.excellence-gauge.success .excellence-gauge-value { color: var(--success); }
+.excellence-gauge.warning .excellence-gauge-value { color: var(--warning); }
+.excellence-gauge.danger  .excellence-gauge-value { color: var(--danger); }
+.excellence-gauge-sub { font-size: var(--fs-sm); color: var(--text-muted); }
+
+.section-note {
+    color: var(--text-muted);
+    font-size: var(--fs-md);
+    margin: calc(var(--space-3) * -1) 0 var(--space-4);
+    max-width: 70ch;
+}
+.excellence-callout {
+    background: var(--bg-surface-2);
+    border-left: 3px solid var(--brand);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    color: var(--text-secondary);
+    font-size: var(--fs-md);
+}
+
+/* Flow breakdown — horizontal bars of queue time by status */
+.excellence-flow { display: flex; flex-direction: column; gap: var(--space-2); }
+.excellence-flow-row { display: flex; align-items: center; gap: var(--space-3); }
+.excellence-flow-name {
+    width: 200px;
+    flex-shrink: 0;
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    text-align: right;
+}
+.excellence-flow-track {
+    flex: 1;
+    height: 14px;
+    background: var(--bg-surface-2);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+.excellence-flow-fill {
+    display: block;
+    height: 100%;
+    background: var(--warning);
+    border-radius: var(--radius-sm);
+}
+.excellence-flow-val {
+    width: 56px;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Rework hotspots */
+.excellence-hop-list { list-style: none; margin: 0; padding: 0; max-width: 560px; }
+.excellence-hop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
+}
+.excellence-hop-name { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--text-secondary); }
+
+/* Predictability trend — say/do bars with a 100% target marker */
+.excellence-trend { display: flex; flex-direction: column; gap: var(--space-2); }
+.excellence-trend-row { display: flex; align-items: center; gap: var(--space-3); }
+.excellence-trend-name {
+    width: 130px; flex-shrink: 0;
+    font-size: var(--fs-sm); color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+.excellence-trend-track {
+    position: relative;
+    flex: 1;
+    height: 16px;
+    background: var(--bg-surface-2);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+.excellence-trend-fill { display: block; height: 100%; border-radius: var(--radius-sm); }
+.excellence-trend-fill.success { background: var(--success); }
+.excellence-trend-fill.warning { background: var(--warning); }
+.excellence-trend-fill.danger  { background: var(--danger); }
+/* 100% target sits at 2/3 of the 0-150% track */
+.excellence-trend-target {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 66.6%;
+    width: 2px;
+    background: var(--brand);
+    opacity: 0.7;
+}
+.excellence-trend-val {
+    width: 52px; flex-shrink: 0;
+    font-variant-numeric: tabular-nums; font-weight: 700; color: var(--text-primary);
+}
+.excellence-trend-detail { width: 150px; flex-shrink: 0; font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* Delivery Excellence — BE/FE split elements */
+.excellence-gauge-split {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+}
+.excellence-split-chip {
+    font-family: var(--font-display);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+/* BE = emerald, FE = violet — same role colors used across the dashboard. */
+.excellence-split-chip.be { background: rgba(45, 212, 167, 0.15); color: var(--success); }
+.excellence-split-chip.fe { background: rgba(196, 181, 253, 0.15); color: #c4b5fd; }
+
+.excellence-track-compare {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+.excellence-track-line {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--fs-md);
+    color: var(--text-secondary);
+}
+.excellence-track-line strong {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    color: var(--text-primary);
+}
+.excellence-track-detail {
+    width: 100%;
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+}
+.excellence-trend-name { display: flex; align-items: center; gap: var(--space-2); }

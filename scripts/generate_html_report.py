@@ -10,7 +10,7 @@ import sys
 import os
 from collections import Counter
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 
@@ -21,7 +21,6 @@ def _is_working_day(d) -> bool:
 
 def _working_days_between(start, end) -> int:
     """Count working days in the inclusive range [start, end]. 0 if end < start."""
-    from datetime import timedelta as _td
     if end < start:
         return 0
     days = 0
@@ -29,7 +28,7 @@ def _working_days_between(start, end) -> int:
     while cur <= end:
         if _is_working_day(cur):
             days += 1
-        cur += _td(days=1)
+        cur += timedelta(days=1)
     return days
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -77,10 +76,14 @@ from database.queries import (
     get_developer_throughput_bulk,
     get_team_pr_review_time,
     get_pr_approvals_by_developer,
+    get_prs_by_developer_detail,
+    get_bug_list,
+    get_bug_burndown,
     get_sprint_commitment_accuracy,
     get_pr_size_distribution,
     get_time_to_first_review,
     get_review_load_by_reviewer,
+    get_reviews_by_reviewer_detail,
     get_time_in_status,
     get_status_churn,
     get_blocked_time,
@@ -113,9 +116,11 @@ _PAGE_THEME = {
     "stories":         "page-project",
     "story-points":    "page-project",
     "epics":           "page-project",
+    "bugs":            "page-project",
     "pull-requests":   "page-project",
     "past-sprints":    "page-project",
     "stakeholders":    "page-project",
+    "team":            "page-project",
     "dependencies":    "page-project",
     "mbr":             "page-project",
     "team-members":    "page-team",
@@ -157,13 +162,12 @@ def _build_burndown_axes(start_date, end_date, today):
     (callable: date → x-index, snapping weekends back to the prior Friday),
     days_remaining (calendar days to end_date).
     """
-    from datetime import timedelta as _td
 
     total_calendar_days = max((end_date - start_date).days, 1)
     working_days = [
-        start_date + _td(days=i)
+        start_date + timedelta(days=i)
         for i in range(total_calendar_days + 1)
-        if _is_working_day(start_date + _td(days=i))
+        if _is_working_day(start_date + timedelta(days=i))
     ]
     wd_index = {d: i for i, d in enumerate(working_days)}
     wd_total = max(len(working_days) - 1, 1)
@@ -173,7 +177,7 @@ def _build_burndown_axes(start_date, end_date, today):
             return wd_index[d]
         cur = d
         while cur >= start_date:
-            cur -= _td(days=1)
+            cur -= timedelta(days=1)
             if cur in wd_index:
                 return wd_index[cur]
         return 0
@@ -348,7 +352,13 @@ def _render_burndown_chart(
 
 
 def _build_role_maps(config: dict) -> tuple[dict[str, str], dict[str, str]]:
-    """Return (name_to_role, name_to_role) dicts for quick ticket filtering.
+    """Return (name_to_role, id_to_role) dicts for quick ticket filtering.
+
+    Keyed off `team` (the FE/BE squad), NOT `role` — since 2026-08-21 `role`
+    holds the job function ('Engineer', 'Engineering Manager', 'Product
+    Manager') and `team` holds the squad. Anything that isn't BE/FE (e.g. a
+    'Product' team) falls through to the 'other' bucket in
+    _partition_tickets_by_role, exactly as an unmapped assignee does.
 
     Returns:
         name_to_role  — display_name → 'BE' | 'FE'
@@ -357,7 +367,7 @@ def _build_role_maps(config: dict) -> tuple[dict[str, str], dict[str, str]]:
     name_to_role: dict[str, str] = {}
     id_to_role: dict[str, str] = {}
     for member in config.get('team_members', []):
-        role = member.get('role')
+        role = member.get('team')
         if not role:
             continue
         name = member.get('name', '')
@@ -665,7 +675,6 @@ def _team_capacity_fractions(db_path: str, config: dict, working_days: list) -> 
     # Build per-account set of off-days within the window.
     valid = set(account_ids)
     off_by_day: dict = {}
-    from datetime import timedelta as _td
     for sp in spans:
         acct = sp.get('jira_account_id')
         if acct not in valid:
@@ -678,7 +687,7 @@ def _team_capacity_fractions(db_path: str, config: dict, working_days: list) -> 
         while cur <= last:
             if cur.weekday() < 5:
                 off_by_day.setdefault(cur, set()).add(acct)
-            cur += _td(days=1)
+            cur += timedelta(days=1)
 
     if not off_by_day:
         return None  # PTO existed but none of it belongs to this roster
@@ -703,8 +712,6 @@ def _render_stories_burndown_html(sprint: dict, db_path: str, *, config: dict = 
     burndown = get_sprint_burndown(db_path, sprint['sprint_id'])
     if not burndown:
         return ''
-
-    from datetime import timedelta
 
     start_date = parse_iso_tz(sprint['start_date']).date()
     end_date = parse_iso_tz(sprint['end_date']).date()
@@ -1851,10 +1858,12 @@ def _build_member_card_html(dev, config, db_path, sprint,
             """
 
     # Append a "Next Sprint" section for the role-matched upcoming sprint.
+    # Sprints are split BE/FE, so this matches on `team`, not the job-function
+    # `role`.
     dev_role = None
     for member in config.get('team_members', []):
         if member.get('jira_account_id') == dev_id:
-            dev_role = member.get('role')
+            dev_role = member.get('team')
             break
     card += _build_member_next_sprint_html(
         db_path, dev_id, config['jira']['sprint_prefix'], dev_role,
@@ -2394,8 +2403,9 @@ def generate_team_members_html(config: dict, output_path: Path):
     # any data (current or historical).
     nav_devs = list(developers)
 
-    # Build name → role map from config for BE/FE pill grouping
-    dev_role_map = {m['name']: m.get('role', 'BE') for m in config.get('team_members', [])}
+    # Build name → squad map from config for BE/FE pill grouping. Reads `team`,
+    # not the job-function `role` — see _build_role_maps.
+    dev_role_map = {m['name']: m.get('team', 'BE') for m in config.get('team_members', [])}
 
     def _render_page(active_dev_name, card_html, page_title):
         header = f"""
@@ -3380,7 +3390,6 @@ def _render_epics_per_sprint_line_chart(sprints, epics_by_sprint, *, exclude_com
         return ''
 
     import re as _re
-    from datetime import timedelta as _td
 
     def _milestone_key(short_label):
         """Slot label only (e.g. "M30.3") so concurrent FE/BE Jira sprints
@@ -3450,7 +3459,7 @@ def _render_epics_per_sprint_line_chart(sprints, epics_by_sprint, *, exclude_com
     for p in points:
         start = parse_iso_tz(p['start_date']).date()
         end = parse_iso_tz(p['end_date']).date()
-        mid = start + _td(days=(end - start).days / 2)
+        mid = start + timedelta(days=(end - start).days / 2)
         sprint_spans.append((start, end, mid))
 
     seq_start = sprint_spans[0][0]
@@ -3634,6 +3643,251 @@ def _render_epics_per_sprint_line_chart(sprints, epics_by_sprint, *, exclude_com
                             Dashed tails = projected sprints.{legend_note}
                         </p>
 """
+
+
+def _render_bug_burndown_chart(series: list) -> str:
+    """Render the cumulative open-bug-count line chart as an inline SVG.
+
+    `series` is get_bug_burndown()'s output: [{date, open}, ...] ascending.
+    Unlike the sprint burndowns there's no fixed end-date or ideal line — this
+    is a running backlog count over the whole project history, so we draw a
+    single filled area + line with date ticks along the x-axis.
+    """
+    if not series:
+        return (
+            '<div class="chart-container"><div class="chart-title">🔥 Bug Burndown</div>'
+            '<div style="color:var(--text-muted); font-style:italic; padding:24px 4px;">'
+            'No bug history yet.</div></div>'
+        )
+
+    svg_w, svg_h = 900, 300
+    pad_l, pad_r, pad_t, pad_b = 48, 20, 20, 40
+    inner_w = svg_w - pad_l - pad_r
+    inner_h = svg_h - pad_t - pad_b
+
+    n = len(series)
+    max_open = max((d['open'] for d in series), default=0)
+    # Round the y-axis top up to a clean-ish number so ticks read nicely.
+    y_top = max(5, ((max_open + 4) // 5) * 5)
+
+    def x_at(i):
+        return pad_l + (i / max(n - 1, 1)) * inner_w
+
+    def y_at(v):
+        return pad_t + inner_h - (v / y_top) * inner_h
+
+    # Y grid + labels (5 ticks).
+    y_ticks = []
+    for k in range(6):
+        val = round(y_top * k / 5)
+        y_ticks.append((y_at(val), val))
+    grid_svg = ''.join(
+        f'<line x1="{pad_l}" y1="{y:.1f}" x2="{svg_w - pad_r}" y2="{y:.1f}" '
+        f'stroke="#243340" stroke-width="1" opacity="0.5" />'
+        for y, _ in y_ticks
+    )
+    y_label_svg = ''.join(
+        f'<text x="{pad_l - 8}" y="{y + 4:.1f}" text-anchor="end" fill="#8194a6" font-size="11">{lbl}</text>'
+        for y, lbl in y_ticks
+    )
+
+    # X ticks: ~6 evenly spaced dates, labelled "Mon DD".
+    x_label_svg = ''
+    tick_count = min(6, n)
+    if tick_count > 1:
+        for k in range(tick_count):
+            idx = round(k * (n - 1) / (tick_count - 1))
+            d = parse_iso_tz(series[idx]['date'])
+            lbl = d.strftime('%b %d') if d else series[idx]['date']
+            x = x_at(idx)
+            x_label_svg += (
+                f'<text x="{x:.1f}" y="{svg_h - pad_b + 20}" text-anchor="middle" '
+                f'fill="#8194a6" font-size="11">{lbl}</text>'
+            )
+
+    line_pts = ' '.join(f'{x_at(i):.1f},{y_at(d["open"]):.1f}' for i, d in enumerate(series))
+    # Area path = line then down to the baseline and back.
+    baseline_y = y_at(0)
+    area_pts = (
+        f'{pad_l:.1f},{baseline_y:.1f} ' + line_pts +
+        f' {x_at(n - 1):.1f},{baseline_y:.1f}'
+    )
+
+    latest = series[-1]['open']
+    latest_dot = (
+        f'<circle cx="{x_at(n - 1):.1f}" cy="{y_at(latest):.1f}" r="4" '
+        f'fill="#fb6a5f" stroke="#0f1620" stroke-width="1.5" />'
+    )
+
+    return f"""
+        <div class="chart-container">
+            <div class="chart-title">🔥 Bug Burndown — Open Bugs Over Time</div>
+            <div class="burndown-svg-wrap">
+                <svg viewBox="0 0 {svg_w} {svg_h}" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 340px; display: block;">
+                    {grid_svg}
+                    {y_label_svg}
+                    {x_label_svg}
+                    <line x1="{pad_l}" y1="{pad_t}" x2="{pad_l}" y2="{svg_h - pad_b}" stroke="#243340" stroke-width="1" />
+                    <line x1="{pad_l}" y1="{svg_h - pad_b}" x2="{svg_w - pad_r}" y2="{svg_h - pad_b}" stroke="#243340" stroke-width="1" />
+                    <polygon fill="#fb6a5f" opacity="0.12" points="{area_pts}" />
+                    <polyline fill="none" stroke="#fb6a5f" stroke-width="2.5" points="{line_pts}" />
+                    {latest_dot}
+                </svg>
+            </div>
+            <div class="burndown-legend">
+                <div><span class="swatch swatch-solid" style="background:#fb6a5f;"></span>Open bugs (not yet Done / Closed / Resolved / Released)</div>
+            </div>
+        </div>
+    """
+
+
+def generate_bugs_html(config: dict, output_path: Path):
+    """Generate the Bug Burndown dashboard: a cumulative open-bug-count chart on
+    top (like the epics burndown) and a comprehensive bug list below.
+
+    Scope is all FNTSY bugs, front-end and back-end combined — there is no
+    FE/BE field in the data today (the epics page's [BE]/[FE] summary-prefix
+    convention isn't applied to bugs), so the split isn't rendered. When bugs
+    start carrying a component/label/prefix, group `bugs` here by that key.
+    """
+    db_path = config['database']['path']
+    sprint_prefix = config['jira']['sprint_prefix']
+
+    sprint = get_current_sprint(db_path, sprint_prefix)
+    sprint_label = fmt_sprint_long(sprint['sprint_name']) if sprint else 'Project Fantasy'
+
+    bugs = get_bug_list(db_path)
+    burndown = get_bug_burndown(db_path)
+
+    # Bucket counts for the summary cards. Excluded (Duplicate/Abandoned) is
+    # shown separately and kept out of the "open"/"total-active" tallies.
+    open_count = sum(1 for b in bugs if b['bucket'] == 'open')
+    in_prog_count = sum(1 for b in bugs if b['bucket'] == 'in_progress')
+    closed_count = sum(1 for b in bugs if b['bucket'] == 'closed')
+    excluded_count = sum(1 for b in bugs if b['bucket'] == 'excluded')
+    unknown_count = sum(1 for b in bugs if b['bucket'] == 'unknown')
+    active_open = open_count + in_prog_count + unknown_count  # everything not terminal
+    total_bugs = len(bugs)
+
+    peak_open = max((d['open'] for d in burndown), default=0)
+    current_open = burndown[-1]['open'] if burndown else active_open
+
+    summary_cards = [
+        ('Open now', str(current_open), 'not yet resolved', '#fb6a5f'),
+        ('In progress', str(in_prog_count), 'being worked', '#38bdf8'),
+        ('Resolved', str(closed_count), 'Done / Closed / Released', '#2dd4a7'),
+        ('Peak backlog', str(peak_open), 'most open at once', '#fbbf24'),
+        ('Total bugs', str(total_bugs), 'all-time in project', None),
+    ]
+    summary_html = ''
+    for label, value, sub, color in summary_cards:
+        color_attr = f' style="color:{color};"' if color else ''
+        summary_html += (
+            f'<div class="burndown-summary-item">'
+            f'<div class="burndown-summary-label">{label}</div>'
+            f'<div class="burndown-summary-value"{color_attr}>{value}</div>'
+            f'<div class="burndown-summary-sub">{sub}</div>'
+            f'</div>'
+        )
+
+    chart_svg = _render_bug_burndown_chart(burndown)
+
+    # Comprehensive list, newest first. Open/in-progress bubble to the top of
+    # their created-order within a bucket sort so attention items lead.
+    bucket_rank = {'open': 0, 'in_progress': 1, 'unknown': 2, 'closed': 3, 'excluded': 4}
+    bugs_sorted = sorted(bugs, key=lambda b: (bucket_rank.get(b['bucket'], 5),))
+    badge_class = {'open': 'open', 'in_progress': 'in-progress', 'closed': 'done'}
+
+    rows_html = ''
+    for b in bugs_sorted:
+        url = b['ticket_url'] or ''
+        key_cell = (
+            f'<a href="{html.escape(url)}" target="_blank" '
+            f'style="color: #56cdf9; text-decoration: none; font-weight: 600;">'
+            f'{html.escape(b["ticket_key"])}</a>'
+            if url else html.escape(b['ticket_key'])
+        )
+        badge = badge_class.get(b['bucket'], 'in-progress')
+        created = (b['created_at'] or '')[:10]
+        assignee = b['assignee_display_name'] or '—'
+        # Sort hints: Key by its numeric part (so FNTSY-940 < FNTSY-1078 rather
+        # than lexically), Status by workflow order (open → closed) not A–Z.
+        try:
+            key_sort = int(b['ticket_key'].rsplit('-', 1)[-1])
+        except (ValueError, IndexError):
+            key_sort = 0
+        status_sort = bucket_rank.get(b['bucket'], 5)
+        rows_html += f"""
+                        <tr>
+                            <td data-sort="{key_sort}">{key_cell}</td>
+                            <td>{html.escape(b['summary'] or '')}</td>
+                            <td data-sort="{status_sort}"><span class="status-badge {badge}">{html.escape(b['status'] or '')}</span></td>
+                            <td>{html.escape(assignee)}</td>
+                            <td>{html.escape(created)}</td>
+                        </tr>
+        """
+
+    excluded_note = (
+        f' · {excluded_count} excluded (Duplicate/Abandoned) shown but not counted as open'
+        if excluded_count else ''
+    )
+    unknown_note = (
+        f' · {unknown_count} in an unrecognized status counted as still-open'
+        if unknown_count else ''
+    )
+
+    content = f"""
+        <header>
+            <h1>🐛 Bug Burndown</h1>
+            <div class="subtitle">{sprint_label} • Generated {datetime.now().strftime('%B %d, %Y at %H:%M')}</div>
+        </header>
+{generate_nav_menu('bugs')}
+        <div class="content">
+            <div class="intro-banner">
+                <p>All Project Fantasy bugs (front-end and back-end combined). The chart tracks
+                the count of still-open bugs across the project's history; the list below is the
+                full inventory. There is no front-end/back-end tag in the data yet, so bugs aren't split.</p>
+            </div>
+
+            <div class="section">
+                <div class="burndown-summary">{summary_html}</div>
+                {chart_svg}
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🐞 All Bugs ({total_bugs})</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: -8px;">
+                    {active_open} still open{excluded_note}{unknown_note}. Defaults to open/in-progress first — click a column to sort.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 0, 'number')">Key</th>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 1, 'string')">Summary</th>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 2, 'number')">Status</th>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 3, 'string')">Assignee</th>
+                            <th class="sortable" onclick="sortTable(this.closest('table'), 4, 'string')">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows_html if rows_html else '<tr><td colspan="5" style="color:var(--text-muted); font-style:italic;">No bugs found.</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer>
+                Generated by Engineering Management Dashboard
+            </footer>
+        </div>
+    """
+
+    rendered = render_html(
+        title="Bug Burndown",
+        content=content,
+        body_class=_PAGE_THEME["bugs"],
+    )
+    _atomic_write(output_path, rendered)
+    print(f"✅ Bug burndown dashboard generated: {output_path}")
 
 
 def generate_epics_html(config: dict, output_path: Path):
@@ -4897,8 +5151,10 @@ def generate_pull_requests_html(config: dict, output_path: Path):
     pr_size_dist = get_pr_size_distribution(db_path, days=30)
     team_pr_review_time = get_team_pr_review_time(db_path, days=30)
     pr_approvals = get_pr_approvals_by_developer(db_path, days=30)
+    pr_detail = get_prs_by_developer_detail(db_path, days=30)
     first_review = get_time_to_first_review(db_path, days=30)
     review_load = get_review_load_by_reviewer(db_path, days=30)
+    review_detail = get_reviews_by_reviewer_detail(db_path, days=30)
     size_vs_merge = get_pr_size_vs_merge_time(db_path, days=30)
 
     # Fetch open PRs grouped by repo
@@ -5153,6 +5409,9 @@ def generate_pull_requests_html(config: dict, output_path: Path):
             <!-- PR Activity by Developer -->
             <div class="section">
                 <h2 class="section-title">👤 PR Activity by Developer (Last 30 Days)</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-top: -8px;">
+                    Click a developer's <strong>PRs Created</strong> count to expand the list of their PRs.
+                </p>
                 <table>
                     <thead>
                         <tr>
@@ -5167,22 +5426,56 @@ def generate_pull_requests_html(config: dict, output_path: Path):
 
     # pr_approvals is actually a list of dicts with PR activity
     if pr_approvals:
-        for dev_pr in pr_approvals:
+        for idx, dev_pr in enumerate(pr_approvals):
             github_username = dev_pr.get('author_github_username', 'Unknown')
             pr_count = dev_pr.get('pr_count', 0)
             merged_count = dev_pr.get('merged_count', 0)
             avg_hours = dev_pr.get('avg_hours_to_merge')
 
             avg_hours_str = f"{avg_hours:.1f}h" if avg_hours else "N/A"
+            panel_id = f"pr-dev-{idx}"
+            dev_prs = pr_detail.get(github_username, [])
+
+            if dev_prs:
+                count_cell = (
+                    f'<button type="button" class="count-toggle" '
+                    f'onclick="toggleAccordion(\'{panel_id}\')" '
+                    f'aria-controls="{panel_id}" aria-expanded="false">'
+                    f'{pr_count} <span class="count-caret">▸</span></button>'
+                )
+            else:
+                count_cell = str(pr_count)
 
             content += f"""
                         <tr>
-                            <td><strong>{github_username}</strong></td>
-                            <td>{pr_count}</td>
+                            <td><strong>{html.escape(github_username)}</strong></td>
+                            <td>{count_cell}</td>
                             <td>{merged_count}</td>
                             <td>{avg_hours_str}</td>
                         </tr>
             """
+
+            if dev_prs:
+                pr_items = ''
+                for pr in dev_prs:
+                    url = pr['pr_url'] or f"https://github.com/{pr['repository']}/pull/{pr['pr_number']}"
+                    repo_short = pr['repository'].split('/', 1)[1] if '/' in (pr['repository'] or '') else (pr['repository'] or '')
+                    state = (pr['state'] or '').lower()
+                    pr_items += f"""
+                                    <div class="detail-row">
+                                        <a href="{html.escape(url)}" target="_blank">#{pr['pr_number']}</a>
+                                        <span class="detail-repo">{html.escape(repo_short)}</span>
+                                        <span class="detail-title">{html.escape(pr['title'] or '(no title)')}</span>
+                                        <span class="detail-state detail-state-{html.escape(state)}">{html.escape(state or 'unknown')}</span>
+                                    </div>
+                    """
+                content += f"""
+                        <tr id="{panel_id}" class="accordion-panel" style="display: none;">
+                            <td colspan="4">
+                                <div class="detail-list">{pr_items}</div>
+                            </td>
+                        </tr>
+                """
 
     content += """
                     </tbody>
@@ -5194,6 +5487,7 @@ def generate_pull_requests_html(config: dict, output_path: Path):
                 <h2 class="section-title">🔍 Review Activity by Reviewer (Last 30 Days)</h2>
                 <p style="color: var(--text-muted); font-size: 13px; margin-top: -8px;">
                     Who carries review load. A lopsided share concentrates context (and risk) in a few reviewers.
+                    Click a reviewer's <strong>Reviews</strong> count to expand the list of reviews.
                 </p>
                 <table>
                     <thead>
@@ -5211,11 +5505,24 @@ def generate_pull_requests_html(config: dict, output_path: Path):
     """
 
     if review_load:
-        for rv in review_load:
+        for idx, rv in enumerate(review_load):
+            panel_id = f"rv-{idx}"
+            rv_reviews = review_detail.get(rv['reviewer'], [])
+
+            if rv_reviews:
+                reviews_cell = (
+                    f'<button type="button" class="count-toggle" '
+                    f'onclick="toggleAccordion(\'{panel_id}\')" '
+                    f'aria-controls="{panel_id}" aria-expanded="false">'
+                    f'{rv["reviews"]} <span class="count-caret">▸</span></button>'
+                )
+            else:
+                reviews_cell = str(rv['reviews'])
+
             content += f"""
                         <tr>
-                            <td><strong>{rv['reviewer']}</strong></td>
-                            <td>{rv['reviews']}</td>
+                            <td><strong>{html.escape(rv['reviewer'])}</strong></td>
+                            <td>{reviews_cell}</td>
                             <td>{rv['prs_reviewed']}</td>
                             <td>{rv['approved']}</td>
                             <td>{rv['changes_requested']}</td>
@@ -5223,6 +5530,31 @@ def generate_pull_requests_html(config: dict, output_path: Path):
                             <td>{rv['share_pct']:.0f}%</td>
                         </tr>
             """
+
+            if rv_reviews:
+                review_items = ''
+                for r in rv_reviews:
+                    url = r['pr_url'] or f"https://github.com/{r['repository']}/pull/{r['pr_number']}"
+                    repo_short = r['repository'].split('/', 1)[1] if '/' in (r['repository'] or '') else (r['repository'] or '')
+                    state = (r['state'] or '').lower()
+                    when = (r['submitted_at'] or '')[:10]
+                    inline = r['inline_comment_count'] or 0
+                    inline_label = f" · {inline} inline" if inline else ''
+                    review_items += f"""
+                                    <div class="detail-row">
+                                        <a href="{html.escape(url)}" target="_blank">#{r['pr_number']}</a>
+                                        <span class="detail-repo">{html.escape(repo_short)}</span>
+                                        <span class="detail-state detail-state-{html.escape(state)}">{html.escape(state or 'unknown')}</span>
+                                        <span class="detail-meta">{html.escape(when)}{inline_label}</span>
+                                    </div>
+                    """
+                content += f"""
+                        <tr id="{panel_id}" class="accordion-panel" style="display: none;">
+                            <td colspan="7">
+                                <div class="detail-list">{review_items}</div>
+                            </td>
+                        </tr>
+                """
     else:
         content += """
                         <tr><td colspan="7" style="color: var(--text-muted); font-style: italic;">No review activity in the last 30 days.</td></tr>
@@ -5240,13 +5572,13 @@ def generate_pull_requests_html(config: dict, output_path: Path):
     """
 
     # Write HTML file
-    html = render_html(
+    rendered = render_html(
         title=f"Repositories - {fmt_sprint_long(sprint['sprint_name'])}",
         content=content,
         body_class=_PAGE_THEME["pull-requests"],
     )
 
-    _atomic_write(output_path, html)
+    _atomic_write(output_path, rendered)
     print(f"✅ Repositories dashboard generated: {output_path}")
 
 
@@ -6157,6 +6489,261 @@ def generate_stakeholders_html(config: dict, output_path: Path):
 
 
 # ---------------------------------------------------------------------------
+# Team page (driven by config/team_config.yaml)
+# ---------------------------------------------------------------------------
+
+def _team_roster_members(config: dict) -> list:
+    """The active roster, alphabetical.
+
+    A member is listed when they carry a `team` — the entries marked
+    `# auto-added via jira_assignee` are Jira assignees picked up automatically
+    and have none — and are not explicitly `active: false`.
+    """
+    members = [
+        m for m in (config.get('team_members') or [])
+        if m.get('team') and m.get('active') is not False
+    ]
+    return sorted(members, key=lambda m: m.get('name', ''))
+
+
+def _roster_initials(name: str) -> str:
+    """First + last initial, for members with no avatar image."""
+    parts = [p for p in (name or '').split() if p]
+    if not parts:
+        return '?'
+    return (parts[0][0] + (parts[-1][0] if len(parts) > 1 else '')).upper()
+
+
+def _render_roster_avatar(member: dict, avatar_dir: Path) -> str:
+    """Avatar cell — the stored image if we have one, else an initials disc.
+
+    Images are pulled from GitHub (Slack's API exposes no profile image
+    through our integration) and stored under assets/avatars/ rather than
+    hot-linked, so the page also renders on alveus and offline. Members whose
+    GitHub account only has an auto-generated identicon get initials instead —
+    an identicon is noise, not a likeness.
+    """
+    name = member.get('name', '')
+    github = member.get('github_username') or ''
+    img = avatar_dir / f'{github}.jpg' if github else None
+    if img and img.exists():
+        return (
+            f'<img class="roster-avatar" src="assets/avatars/{html.escape(github)}.jpg" '
+            f'alt="" loading="lazy" width="32" height="32">'
+        )
+    return (
+        f'<span class="roster-initials" aria-hidden="true">'
+        f'{html.escape(_roster_initials(name))}</span>'
+    )
+
+
+def _render_roster_row(member: dict, avatar_dir: Path) -> str:
+    """One table row: avatar, name, role, email, Slack handle, GitHub handle."""
+    name = html.escape(member.get('name', ''))
+    # Job function ('Engineer', 'Engineering Manager', 'Product Manager') —
+    # the squad lives in `team` and is the table heading.
+    role = member.get('role') or ''
+    role_cell = (
+        html.escape(role) if role else '<span class="roster-missing">—</span>'
+    )
+    email = member.get('email') or ''
+    slack = member.get('slack_handle') or ''
+    github = member.get('github_username') or ''
+    dash = '<span class="roster-missing">—</span>'
+
+    email_cell = (
+        f'<a href="mailto:{html.escape(email)}">{html.escape(email)}</a>'
+        if email else dash
+    )
+
+    # app_redirect opens a DM with that user — it needs the member ID, not the
+    # handle, so a member without a stored id degrades to plain text.
+    slack_id = member.get('slack_user_id') or ''
+    if slack and slack_id:
+        slack_cell = (
+            f'<a href="https://slack.com/app_redirect?channel={html.escape(slack_id)}" '
+            f'target="_blank" rel="noopener" '
+            f'title="Send {name} a direct message on Slack">@{html.escape(slack)}</a>'
+        )
+    elif slack:
+        slack_cell = f'@{html.escape(slack)}'
+    else:
+        slack_cell = dash
+
+    if github:
+        github_cell = (
+            f'<a href="https://github.com/{html.escape(github)}" '
+            f'target="_blank" rel="noopener">{html.escape(github)}</a>'
+        )
+        # Flag handles we could not tie to the org — their PR activity is
+        # silently absent from the Repositories tab, which otherwise just
+        # looks like someone who never opens PRs.
+        if member.get('github_username_verified') is False:
+            github_cell += (
+                '<span class="roster-flag" title="Not a member of the '
+                'fanatics-gaming org and no PRs on record — likely the wrong '
+                'account. PR activity for this person is missing from the '
+                'Repositories tab.">unverified</span>'
+            )
+    else:
+        github_cell = dash
+
+    # data-sort keeps sorting on the bare handle — the GitHub cell can carry an
+    # "unverified" chip, whose text would otherwise land in the sort key.
+    return (
+        '<tr>'
+        f'<td class="roster-avatar-cell">{_render_roster_avatar(member, avatar_dir)}</td>'
+        f'<td class="roster-name">{name}</td>'
+        f'<td class="roster-role">{role_cell}</td>'
+        f'<td>{email_cell}</td>'
+        f'<td class="roster-handle" data-sort="{html.escape(slack)}">{slack_cell}</td>'
+        f'<td class="roster-handle" data-sort="{html.escape(github)}">{github_cell}</td>'
+        '</tr>'
+    )
+
+
+# One table per team, in this order. Anything with a team outside this list
+# still gets its own table at the end rather than being dropped.
+_ROSTER_GROUPS = (
+    ('BE',      '⚙️ Backend'),
+    ('FE',      '🖥️ Frontend'),
+    ('PRODUCT', '🧭 Product'),
+)
+
+
+def _render_roster_table(members: list, avatar_dir: Path) -> str:
+    """One squad's table. Each table sorts independently — sortTable resolves
+    the table from the clicked header, so several on a page don't interfere."""
+    return (
+        '<table class="roster-table">'
+        '<thead><tr>'
+        # Avatar column carries no data, so it gets no sort handle — which
+        # is why the sortable indices below start at 1.
+        '<th class="roster-avatar-cell"></th>'
+        + ''.join(
+            f'<th class="sortable" onclick="sortTable(this.closest(\'table\'), '
+            f'{idx}, \'string\')">{label}</th>'
+            for idx, label in enumerate(
+                ('Name', 'Role', 'Email', 'Slack', 'GitHub'), start=1
+            )
+        )
+        + '</tr></thead>'
+        + f'<tbody>{"".join(_render_roster_row(m, avatar_dir) for m in members)}</tbody>'
+        '</table>'
+    )
+
+
+def generate_team_roster_html(config: dict, output_path: Path):
+    """Render the Team tab — contact details for the active roster."""
+    members = _team_roster_members(config)
+    avatar_dir = output_path.parent / 'assets' / 'avatars'
+
+    by_squad: dict[str, list] = {}
+    for m in members:
+        by_squad.setdefault((m.get('team') or '').strip().upper(), []).append(m)
+
+    ordered = [(key, label) for key, label in _ROSTER_GROUPS if by_squad.get(key)]
+    known = {key for key, _ in _ROSTER_GROUPS}
+    ordered += [(k, f'👤 {k.title()}') for k in sorted(by_squad) if k and k not in known]
+
+    if members:
+        body = ''.join(
+            '<div class="chart-container">'
+            f'<div class="chart-title">{label} <span class="roster-count">'
+            f'{len(by_squad[key])}</span></div>'
+            f'{_render_roster_table(by_squad[key], avatar_dir)}'
+            '</div>'
+            for key, label in ordered
+        )
+    else:
+        body = (
+            '<div class="chart-container">'
+            '<div class="empty-state">'
+            '<div class="icon">👥</div>'
+            '<div>No active team members configured. Add them under '
+            '<code>team_members</code> in <code>config/team_config.yaml</code>.</div>'
+            '</div></div>'
+        )
+
+    content = f"""
+        <header>
+            <h1>👥 Team</h1>
+            <div class="subtitle">{project_label()} · {len(members)} active · Source: config/team_config.yaml</div>
+        </header>
+{generate_nav_menu('team')}
+        <div class="content">
+            <style>
+                /* Page-specific overrides only — shared styles live in assets/dashboard.css */
+                .roster-table td {{ vertical-align: middle; }}
+                /* Unclassed <a> falls back to the browser's default blue, which
+                   is unreadable on the dark surface — match the cyan the rest
+                   of the dashboard uses for links. */
+                .roster-table a {{
+                    color: var(--accent-text);
+                    text-decoration: none;
+                    font-weight: 600;
+                }}
+                .roster-table a:hover {{ text-decoration: underline; }}
+                .roster-name {{ color: var(--text-primary); font-weight: 600; white-space: nowrap; }}
+                .roster-handle {{ font-family: var(--font-mono, ui-monospace, monospace); }}
+                .roster-missing {{ color: var(--text-muted); }}
+                .roster-role {{ white-space: nowrap; }}
+                /* Squad is the table heading now, so it's no longer a column. */
+                .roster-count {{
+                    color: var(--text-muted);
+                    font-family: var(--font-sans);
+                    font-size: var(--fs-sm);
+                    font-weight: 500;
+                    margin-left: var(--space-2);
+                }}
+                .roster-avatar-cell {{ width: 48px; padding-right: 0; }}
+                .roster-avatar, .roster-initials {{
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    border: 1px solid var(--border);
+                }}
+                .roster-avatar {{ object-fit: cover; display: block; }}
+                .roster-initials {{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: var(--bg-hover);
+                    color: var(--text-secondary);
+                    font-size: var(--fs-xs);
+                    font-weight: 700;
+                    box-sizing: border-box;
+                }}
+                .roster-flag {{
+                    display: inline-block;
+                    margin-left: var(--space-2);
+                    padding: 1px 6px;
+                    border: 1px solid var(--warning, #d9a441);
+                    border-radius: var(--radius-sm, 4px);
+                    color: var(--warning, #d9a441);
+                    font-size: var(--fs-xs, 11px);
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    cursor: help;
+                }}
+            </style>
+            {body}
+            <footer>
+                Generated by Engineering Management Dashboard · {datetime.now().strftime('%B %d, %Y at %H:%M')}
+            </footer>
+        </div>
+    """
+
+    page = render_html(
+        title=f"Team — {project_label()}",
+        content=content,
+        body_class=_PAGE_THEME["team"],
+    )
+    _atomic_write(output_path, page)
+    print(f"✅ Team page generated: {output_path}")
+
+
+# ---------------------------------------------------------------------------
 # Dependencies page (driven by config/dependencies.yaml)
 # ---------------------------------------------------------------------------
 
@@ -6721,6 +7308,30 @@ def _render_member_edit_modal():
 # Snapshot rendering helpers for Project: Fantasy
 # ---------------------------------------------------------------------------
 
+def _status_bar(counts, total):
+    """Render a stacked bar showing done / in_flight / discovery / dropped."""
+    if total <= 0:
+        return '<div class="status-bar"></div>'
+    order = [
+        ('done', 'Done', 'var(--success)'),
+        ('in_flight', 'In Flight', 'var(--info)'),
+        ('discovery', 'Discovery', 'var(--text-muted)'),
+        ('dropped', 'Dropped', 'var(--danger)'),
+        ('other', 'Other', 'var(--text-faint)'),
+    ]
+    segments = []
+    for bucket, label, color in order:
+        c = counts.get(bucket, 0)
+        if c <= 0:
+            continue
+        pct = (c / total) * 100
+        segments.append(
+            f'<div class="status-bar-seg" style="width: {pct:.1f}%; background: {color};" '
+            f'title="{label}: {c} ({pct:.0f}%)"></div>'
+        )
+    return f'<div class="status-bar">{"".join(segments)}</div>'
+
+
 def _render_project_fantasy_snapshot():
     """Render the data-driven sections of the Project: Fantasy page.
 
@@ -6798,29 +7409,6 @@ def _render_project_fantasy_snapshot():
 
     # ---- Summary counts with status breakdown bars ------------------------
     summary = snap.get('summary', {}) or {}
-
-    def _status_bar(counts, total):
-        """Render a stacked bar showing done / in_flight / discovery / dropped."""
-        if total <= 0:
-            return '<div class="status-bar"></div>'
-        order = [
-            ('done', 'Done', 'var(--success)'),
-            ('in_flight', 'In Flight', 'var(--info)'),
-            ('discovery', 'Discovery', 'var(--text-muted)'),
-            ('dropped', 'Dropped', 'var(--danger)'),
-            ('other', 'Other', 'var(--text-faint)'),
-        ]
-        segments = []
-        for bucket, label, color in order:
-            c = counts.get(bucket, 0)
-            if c <= 0:
-                continue
-            pct = (c / total) * 100
-            segments.append(
-                f'<div class="status-bar-seg" style="width: {pct:.1f}%; background: {color};" '
-                f'title="{label}: {c} ({pct:.0f}%)"></div>'
-            )
-        return f'<div class="status-bar">{"".join(segments)}</div>'
 
     features_total = summary.get('features_total', 0)
     epics_total = summary.get('epics_total', 0)
@@ -7019,29 +7607,6 @@ def _render_feature_lists():
             open_epics_by_feature[parent_key] = open_epics_by_feature.get(parent_key, 0) + 1
 
     parts = []
-
-    def _status_bar(counts, total):
-        """Render a stacked bar showing done / in_flight / discovery / dropped."""
-        if total <= 0:
-            return '<div class="status-bar"></div>'
-        order = [
-            ('done', 'Done', 'var(--success)'),
-            ('in_flight', 'In Flight', 'var(--info)'),
-            ('discovery', 'Discovery', 'var(--text-muted)'),
-            ('dropped', 'Dropped', 'var(--danger)'),
-            ('other', 'Other', 'var(--text-faint)'),
-        ]
-        segments = []
-        for bucket, label, color in order:
-            c = counts.get(bucket, 0)
-            if c <= 0:
-                continue
-            pct = (c / total) * 100
-            segments.append(
-                f'<div class="status-bar-seg" style="width: {pct:.1f}%; background: {color};" '
-                f'title="{label}: {c} ({pct:.0f}%)"></div>'
-            )
-        return f'<div class="status-bar">{"".join(segments)}</div>'
 
     # ---- Feature roster grouped by Launch (collapsible) -------------------
     # Features carry a Jira "Launch" custom field with values Alpha / Beta /
@@ -7435,30 +8000,36 @@ def _url_quote(value: str) -> str:
     return _q(value, safe='')
 
 
-def refresh_mbr_nav(mbr_path: Path) -> None:
-    """Replace the two <nav> blocks in mbr.html with the canonical nav menu.
+def refresh_static_page_nav(page_path: Path, active_page: str) -> None:
+    """Splice the canonical nav menu into a hand-authored page.
 
-    The MBR page is editorial — its body is hand-curated narrative for the
-    previous month. But its top + sub nav must stay in sync with the rest of
-    the dashboard, so we splice in the output of generate_nav_menu('mbr')
-    every time we regenerate.
+    Some pages (mbr.html, capacity_planner.html) have editorial/hand-curated
+    bodies that this generator doesn't produce, but their top + sub nav must
+    stay in sync with everything else — otherwise a newly-added tab is missing
+    only from those pages. This rewrites the two <nav> blocks with the output
+    of generate_nav_menu(active_page).
 
     Idempotent: if the file is already in canonical shape, this is a no-op.
     """
     import re
-    if not mbr_path.exists():
+    if not page_path.exists():
         return
-    text = mbr_path.read_text()
+    text = page_path.read_text()
     # Match the two consecutive <nav>…</nav> blocks (top-nav + sub-nav).
     pattern = re.compile(
         r"        <nav class=\"top-nav\">.*?</nav>\s*<nav class=\"sub-nav\">.*?</nav>",
         re.DOTALL,
     )
-    canonical = generate_nav_menu('mbr')
+    canonical = generate_nav_menu(active_page)
     new_text, n = pattern.subn(canonical.rstrip(), text, count=1)
     if n and new_text != text:
-        _atomic_write(mbr_path, new_text)
-        print(f"✅ MBR nav refreshed: {mbr_path}")
+        _atomic_write(page_path, new_text)
+        print(f"✅ Nav refreshed: {page_path}")
+
+
+def refresh_mbr_nav(mbr_path: Path) -> None:
+    """Back-compat wrapper — see refresh_static_page_nav."""
+    refresh_static_page_nav(mbr_path, 'mbr')
 
 
 def main():
@@ -7488,6 +8059,9 @@ def main():
         # Generate epics report
         generate_epics_html(config, report_dir / "epics_dashboard.html")
 
+        # Generate bug burndown report
+        generate_bugs_html(config, report_dir / "bugs_dashboard.html")
+
         # Generate past sprint reports
         generate_past_sprints_html(config, report_dir / "past_sprints_dashboard.html")
 
@@ -7500,12 +8074,17 @@ def main():
         # Stakeholders matrix (driven by config/stakeholders.yaml)
         generate_stakeholders_html(config, report_dir / "stakeholders.html")
 
+        # Team roster contact sheet (driven by config/team_config.yaml)
+        generate_team_roster_html(config, report_dir / "team.html")
+
         # Dependencies dashboard (driven by config/dependencies.yaml)
         generate_dependencies_html(config, report_dir / "dependencies.html")
 
-        # MBR is hand-authored, but its nav must stay in sync with everything
-        # else (incl. the dynamic "Project: {Name}" label), so splice it in.
-        refresh_mbr_nav(report_dir / "mbr.html")
+        # MBR and the capacity planner are hand-authored, but their nav must
+        # stay in sync with everything else (incl. the dynamic "Project: {Name}"
+        # label and any newly-added tabs), so splice the canonical nav in.
+        refresh_static_page_nav(report_dir / "mbr.html", 'mbr')
+        refresh_static_page_nav(report_dir / "capacity_planner.html", 'capacity')
 
         print(f"\n✅ HTML reports generated in {report_dir}")
         return 0

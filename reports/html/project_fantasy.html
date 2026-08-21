@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project: Fantasy</title>
+    <title>Project: Final Fantasy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/dashboard.css?v=gantt-open-stories-1">
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/dashboard.css?v=scoreboard-1">
     <script src="assets/dashboard.js?v=gantt-open-stories-1" defer></script>
     <style>
         /* Page-specific overrides only — shared styles live in assets/dashboard.css */
@@ -18,24 +18,29 @@
     <div class="container">
         
         <header>
-            <h1>🎯 Project: Fantasy</h1>
-            <div class="subtitle">Launch roadmap • Generated June 15, 2026 at 10:04</div>
+            <h1>🎯 Project: Final Fantasy</h1>
+            <div class="subtitle">Launch roadmap • Generated August 21, 2026 at 12:10</div>
         </header>
         <nav class="top-nav">
             <ul class="nav-menu">
-                <li class="nav-item"><a href="project_fantasy.html" class="active">Project: Fantasy</a></li>
+                <li class="nav-item"><a href="project_fantasy.html" class="active">Project: Final Fantasy</a></li>
                 <li class="nav-item"><a href="logs_dashboard.html">Agents and Logs</a></li>
             </ul>
         </nav>
         <nav class="sub-nav">
             <ul class="nav-menu">
                 <li class="nav-item"><a href="features.html">Features</a></li>
+                <li class="nav-item"><a href="readiness_dashboard.html">Readiness</a></li>
                 <li class="nav-item"><a href="epics_dashboard.html">Epics</a></li>
+                <li class="nav-item"><a href="bugs_dashboard.html">Bug Burndown</a></li>
                 <li class="nav-item"><a href="team_dashboard.html">Stories</a></li>
                 <li class="nav-item"><a href="story_points_dashboard.html">Story Points</a></li>
                 <li class="nav-item"><a href="past_sprints_dashboard.html">Sprint Reports</a></li>
+                <li class="nav-item"><a href="capacity_planner.html">Capacity</a></li>
+                <li class="nav-item"><a href="delivery_excellence_dashboard.html">Delivery</a></li>
                 <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
                 <li class="nav-item"><a href="hygiene_dashboard.html">Ticket Hygiene</a></li>
+                <li class="nav-item"><a href="team.html">Team</a></li>
                 <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
                 <li class="nav-item"><a href="dependencies.html">Dependencies</a></li>
                 <li class="nav-item"><a href="mbr.html">MBR</a></li>
@@ -43,7 +48,7 @@
         </nav>
         <div class="content">
             <div class="intro-banner">
-                <p>Major deliverables for the Fantasy launch. Dates labelled with "~" are approximate (originally specified as a quarter or year).</p>
+                <p>Major deliverables for the Fantasy launch, through Beta.</p>
             </div>
 
             <!-- Timeline chart -->
@@ -52,10 +57,10 @@
                     <div class="chart-title">📅 Deliverable Timeline</div>
                     <div class="roadmap-svg-wrap">
                         <svg viewBox="0 0 1100 300" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 320px; display: block;">
-                            <line x1="40.0" y1="183.0" x2="40.0" y2="195.0" stroke="#475569" stroke-width="1" /><text x="40.0" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Jun</text><line x1="174.2" y1="183.0" x2="174.2" y2="195.0" stroke="#475569" stroke-width="1" /><text x="174.2" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Jul</text><line x1="312.9" y1="183.0" x2="312.9" y2="195.0" stroke="#475569" stroke-width="1" /><text x="312.9" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Aug</text><line x1="451.6" y1="183.0" x2="451.6" y2="195.0" stroke="#475569" stroke-width="1" /><text x="451.6" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Sep</text><line x1="585.8" y1="183.0" x2="585.8" y2="195.0" stroke="#475569" stroke-width="1" /><text x="585.8" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Oct</text><line x1="724.5" y1="183.0" x2="724.5" y2="195.0" stroke="#475569" stroke-width="1" /><text x="724.5" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Nov</text><line x1="858.7" y1="183.0" x2="858.7" y2="195.0" stroke="#475569" stroke-width="1" /><text x="858.7" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Dec</text><line x1="997.4" y1="183.0" x2="997.4" y2="195.0" stroke="#475569" stroke-width="1" /><text x="997.4" y="211.0" text-anchor="middle" fill="#94a3b8" font-size="10">Jan 2027</text>
-                            <line x1="40" y1="189.0" x2="1060" y2="189.0" stroke="#475569" stroke-width="3" /><line x1="40" y1="189.0" x2="102.6" y2="189.0" stroke="#6366f1" stroke-width="3" />
-                            <line x1="169.7" y1="88" x2="169.7" y2="189.0" stroke="#6366f1" stroke-width="2"  /><circle cx="169.7" cy="189.0" r="5" fill="#6366f1" stroke="#1e293b" stroke-width="2" /><text x="169.7" y="82" text-anchor="middle" fill="#6366f1" font-size="11" font-weight="600">Alpha (internal build)</text><text x="169.7" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">Jun 30, 2026</text><line x1="236.8" y1="106" x2="236.8" y2="189.0" stroke="#3b82f6" stroke-width="2"  /><circle cx="236.8" cy="189.0" r="5" fill="#3b82f6" stroke="#1e293b" stroke-width="2" /><text x="236.8" y="100" text-anchor="middle" fill="#3b82f6" font-size="11" font-weight="600">Fanatics Fest (internal build)</text><text x="236.8" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">Jul 15, 2026</text><line x1="362.1" y1="124" x2="362.1" y2="189.0" stroke="#10b981" stroke-width="2"  /><circle cx="362.1" cy="189.0" r="5" fill="#10b981" stroke="#1e293b" stroke-width="2" /><text x="362.1" y="118" text-anchor="middle" fill="#10b981" font-size="11" font-weight="600">Beta (external, friends & family)</text><text x="362.1" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">Aug 12, 2026</text><line x1="487.4" y1="88" x2="487.4" y2="189.0" stroke="#f59e0b" stroke-width="2"  /><circle cx="487.4" cy="189.0" r="5" fill="#f59e0b" stroke="#1e293b" stroke-width="2" /><text x="487.4" y="82" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="600">Install-base activation</text><text x="487.4" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">Sep 9, 2026</text><line x1="585.8" y1="106" x2="585.8" y2="189.0" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3" /><circle cx="585.8" cy="189.0" r="5" fill="#ef4444" stroke="#1e293b" stroke-width="2" /><text x="585.8" y="100" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="600">Net-new customer acquisition</text><text x="585.8" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">~Q4 2026</text><line x1="997.4" y1="124" x2="997.4" y2="189.0" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,3" /><circle cx="997.4" cy="189.0" r="5" fill="#8b5cf6" stroke="#1e293b" stroke-width="2" /><text x="997.4" y="118" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="600">Marketing push</text><text x="997.4" y="177.0" text-anchor="middle" fill="#cbd5e1" font-size="10">~2027</text>
-                            <line x1="102.6" y1="70" x2="102.6" y2="240" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.8" /><text x="102.6" y="280" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="600">Today · Jun 15, 2026</text>
+                            <line x1="220.0" y1="183.0" x2="220.0" y2="195.0" stroke="#243340" stroke-width="1" /><text x="220.0" y="211.0" text-anchor="middle" fill="#8194a6" font-size="10">Jul</text><line x1="592.0" y1="183.0" x2="592.0" y2="195.0" stroke="#243340" stroke-width="1" /><text x="592.0" y="211.0" text-anchor="middle" fill="#8194a6" font-size="10">Aug</text><line x1="964.0" y1="183.0" x2="964.0" y2="195.0" stroke="#243340" stroke-width="1" /><text x="964.0" y="211.0" text-anchor="middle" fill="#8194a6" font-size="10">Sep</text>
+                            <line x1="40" y1="189.0" x2="1060" y2="189.0" stroke="#243340" stroke-width="3" /><line x1="40" y1="189.0" x2="832.0" y2="189.0" stroke="#38bdf8" stroke-width="3" />
+                            <line x1="208.0" y1="88" x2="208.0" y2="189.0" stroke="#38bdf8" stroke-width="2"  /><circle cx="208.0" cy="189.0" r="5" fill="#38bdf8" stroke="#0f1620" stroke-width="2" /><text x="208.0" y="82" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="600">Alpha (internal build)</text><text x="208.0" y="177.0" text-anchor="middle" fill="#cdd9e5" font-size="10">Jun 30, 2026</text><line x1="388.0" y1="106" x2="388.0" y2="189.0" stroke="#2dd4a7" stroke-width="2"  /><circle cx="388.0" cy="189.0" r="5" fill="#2dd4a7" stroke="#0f1620" stroke-width="2" /><text x="388.0" y="100" text-anchor="middle" fill="#2dd4a7" font-size="11" font-weight="600">Fanatics Fest (internal build)</text><text x="388.0" y="177.0" text-anchor="middle" fill="#cdd9e5" font-size="10">Jul 15, 2026</text><line x1="892.0" y1="124" x2="892.0" y2="189.0" stroke="#fbbf24" stroke-width="2"  /><circle cx="892.0" cy="189.0" r="5" fill="#fbbf24" stroke="#0f1620" stroke-width="2" /><text x="892.0" y="118" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Beta (external, friends & family)</text><text x="892.0" y="177.0" text-anchor="middle" fill="#cdd9e5" font-size="10">Aug 26, 2026</text>
+                            <line x1="832.0" y1="70" x2="832.0" y2="240" stroke="#56cdf9" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.8" /><text x="832.0" y="280" text-anchor="middle" fill="#56cdf9" font-size="11" font-weight="600">Today · Aug 21, 2026</text>
                         </svg>
                     </div>
                 </div>
@@ -79,7 +84,7 @@
                             <td>Focus on core functionality to access app, make picks, enter contests, and settle picks</td>
                             <td style="text-align: right;">
                                 <div>Jun 30, 2026</div>
-                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 15d</span></div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-faint);">52d ago</span></div>
                             </td>
                         </tr>
         
@@ -88,7 +93,7 @@
                             <td>Additional functionality and some polish to show users at Fanatics Fest</td>
                             <td style="text-align: right;">
                                 <div>Jul 15, 2026</div>
-                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 30d</span></div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-faint);">37d ago</span></div>
                             </td>
                         </tr>
         
@@ -96,35 +101,8 @@
                             <td><strong>Beta (external, friends & family)</strong></td>
                             <td>Account and pick-level functionality needed to put app in hands of real users for real testing</td>
                             <td style="text-align: right;">
-                                <div>Aug 12, 2026</div>
-                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 58d</span></div>
-                            </td>
-                        </tr>
-        
-                        <tr>
-                            <td><strong>Install-base activation</strong></td>
-                            <td>Customer-ready app, with focus on functionality needed to activate existing FBG users</td>
-                            <td style="text-align: right;">
-                                <div>Sep 9, 2026</div>
-                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 86d</span></div>
-                            </td>
-                        </tr>
-        
-                        <tr>
-                            <td><strong>Net-new customer acquisition</strong></td>
-                            <td>Additional functionality needed to start acquiring net new DFS-first users</td>
-                            <td style="text-align: right;">
-                                <div>~Q4 2026</div>
-                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 108d</span></div>
-                            </td>
-                        </tr>
-        
-                        <tr>
-                            <td><strong>Marketing push</strong></td>
-                            <td></td>
-                            <td style="text-align: right;">
-                                <div>~2027</div>
-                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 200d</span></div>
+                                <div>Aug 26, 2026</div>
+                                <div style="font-size: 11px; margin-top: 4px;"><span style="color: var(--text-muted);">in 5d</span></div>
                             </td>
                         </tr>
         
@@ -141,7 +119,7 @@
                         <span class="badge" style="background: var(--bg-hover); color: var(--text-secondary); margin-left: 8px;">In Progress</span>
                     </p>
                     <div class="vision-body"><p style="color: var(--text-secondary); margin-bottom: 10px;">DFS+ will be built as the most approachable, confidence-building, and fun entry point into the Fanatics ecosystem — a low-friction, games-first experience where casual fans learn, return, and gradually deepen their relationship with sports and Fanatics. Over the next 18–24 months, this initiative will:</p><p style="color: var(--text-secondary); margin-bottom: 10px;">• Make DFS+ the product fans “learn on,” with experiences that adapt as users gain confidence so repeat play feels easier, smarter, and more rewarding.<br>• Shift engagement from event-driven spikes to habitual, routine play (e.g., part of a weekly sports rhythm), with resilient cohorts that persist well beyond major events.<br>• Use generosity (promos, rewards, DI) in a disciplined, EV-modeled way: helping users overcome the learning curve and build habits early, then evolving into more targeted, loyalty-oriented rewards as the product itself drives stickiness.<br>• Position DFS+ as a durable, standalone product that serves as a trusted top-of-funnel on-ramp into Markets and Sportsbook, introducing those products in simple, highly engaging ways without overwhelming cross-sell or cannibalization.<br>• Compete primarily on product quality — clarity, feedback, progression, and social/fun —…</p></div>
-                    <p style="margin-top: 12px; font-size: 11px; color: var(--text-faint);">Snapshot generated June 15, 2026 at 09:57</p>
+                    <p style="margin-top: 12px; font-size: 11px; color: var(--text-faint);">Snapshot generated August 21, 2026 at 12:00</p>
                 </div>
             </div>
     
@@ -150,25 +128,25 @@
                 <div class="metrics-grid">
                     <div class="metric-card info">
                         <div class="metric-label">Features</div>
-                        <div class="metric-value">54</div>
-                        <div class="metric-subtext">2 done · 33 in flight · 12 discovery · 5 dropped</div>
-                        <div class="status-bar"><div class="status-bar-seg" style="width: 3.7%; background: var(--success);" title="Done: 2 (4%)"></div><div class="status-bar-seg" style="width: 61.1%; background: var(--info);" title="In Flight: 33 (61%)"></div><div class="status-bar-seg" style="width: 22.2%; background: var(--text-muted);" title="Discovery: 12 (22%)"></div><div class="status-bar-seg" style="width: 9.3%; background: var(--danger);" title="Dropped: 5 (9%)"></div><div class="status-bar-seg" style="width: 3.7%; background: var(--text-faint);" title="Other: 2 (4%)"></div></div>
+                        <div class="metric-value">63</div>
+                        <div class="metric-subtext">19 done · 18 in flight · 12 discovery · 7 dropped</div>
+                        <div class="status-bar"><div class="status-bar-seg" style="width: 30.2%; background: var(--success);" title="Done: 19 (30%)"></div><div class="status-bar-seg" style="width: 28.6%; background: var(--info);" title="In Flight: 18 (29%)"></div><div class="status-bar-seg" style="width: 19.0%; background: var(--text-muted);" title="Discovery: 12 (19%)"></div><div class="status-bar-seg" style="width: 11.1%; background: var(--danger);" title="Dropped: 7 (11%)"></div><div class="status-bar-seg" style="width: 11.1%; background: var(--text-faint);" title="Other: 7 (11%)"></div></div>
                     </div>
                     <div class="metric-card info">
                         <div class="metric-label">Epics</div>
-                        <div class="metric-value">156</div>
-                        <div class="metric-subtext">37 done · 46 in flight · 55 discovery · 16 dropped</div>
-                        <div class="status-bar"><div class="status-bar-seg" style="width: 23.7%; background: var(--success);" title="Done: 37 (24%)"></div><div class="status-bar-seg" style="width: 29.5%; background: var(--info);" title="In Flight: 46 (29%)"></div><div class="status-bar-seg" style="width: 35.3%; background: var(--text-muted);" title="Discovery: 55 (35%)"></div><div class="status-bar-seg" style="width: 10.3%; background: var(--danger);" title="Dropped: 16 (10%)"></div><div class="status-bar-seg" style="width: 1.3%; background: var(--text-faint);" title="Other: 2 (1%)"></div></div>
+                        <div class="metric-value">195</div>
+                        <div class="metric-subtext">105 done · 27 in flight · 38 discovery · 23 dropped</div>
+                        <div class="status-bar"><div class="status-bar-seg" style="width: 53.8%; background: var(--success);" title="Done: 105 (54%)"></div><div class="status-bar-seg" style="width: 13.8%; background: var(--info);" title="In Flight: 27 (14%)"></div><div class="status-bar-seg" style="width: 19.5%; background: var(--text-muted);" title="Discovery: 38 (19%)"></div><div class="status-bar-seg" style="width: 11.8%; background: var(--danger);" title="Dropped: 23 (12%)"></div><div class="status-bar-seg" style="width: 1.0%; background: var(--text-faint);" title="Other: 2 (1%)"></div></div>
                     </div>
                     <div class="metric-card info">
                         <div class="metric-label">Stories</div>
-                        <div class="metric-value">607</div>
-                        <div class="metric-subtext">319 done · 54 in flight · 194 discovery · 29 dropped</div>
-                        <div class="status-bar"><div class="status-bar-seg" style="width: 52.6%; background: var(--success);" title="Done: 319 (53%)"></div><div class="status-bar-seg" style="width: 8.9%; background: var(--info);" title="In Flight: 54 (9%)"></div><div class="status-bar-seg" style="width: 32.0%; background: var(--text-muted);" title="Discovery: 194 (32%)"></div><div class="status-bar-seg" style="width: 4.8%; background: var(--danger);" title="Dropped: 29 (5%)"></div><div class="status-bar-seg" style="width: 1.8%; background: var(--text-faint);" title="Other: 11 (2%)"></div></div>
+                        <div class="metric-value">1000</div>
+                        <div class="metric-subtext">741 done · 35 in flight · 128 discovery · 80 dropped</div>
+                        <div class="status-bar"><div class="status-bar-seg" style="width: 74.1%; background: var(--success);" title="Done: 741 (74%)"></div><div class="status-bar-seg" style="width: 3.5%; background: var(--info);" title="In Flight: 35 (4%)"></div><div class="status-bar-seg" style="width: 12.8%; background: var(--text-muted);" title="Discovery: 128 (13%)"></div><div class="status-bar-seg" style="width: 8.0%; background: var(--danger);" title="Dropped: 80 (8%)"></div><div class="status-bar-seg" style="width: 1.6%; background: var(--text-faint);" title="Other: 16 (2%)"></div></div>
                     </div>
                     <div class="metric-card danger">
                         <div class="metric-label">Features At Risk</div>
-                        <div class="metric-value">37</div>
+                        <div class="metric-value">43</div>
                         <div class="metric-subtext">flagged in snapshot</div>
                     </div>
                 </div>
@@ -177,7 +155,7 @@
             <div class="section">
                 <h2 class="section-title">🔗 Useful Links</h2>
                 <ul class="useful-links">
-    <li><a href="https://playmaker-internal.dev1.fanatics.bet/fantasy/contests" target="_blank">Playmaker</a> <span style="color: var(--text-muted); font-size: 12px;">— Internal contest admin (dev1)</span></li><li><a href="https://betfanatics.atlassian.net/jira/apps/94d5de1a-112d-4549-bd03-5f910d5fd27b/880424a7-af14-4c77-b446-5ef9feee797a/structure/board/6464" target="_blank">Fantasy Structure Board</a> <span style="color: var(--text-muted); font-size: 12px;">— Jira Structure board</span></li>
+    <li><a href="https://playmaker-internal.dev1.fanatics.bet/fantasy/contests" target="_blank">Playmaker</a> <span style="color: var(--text-muted); font-size: 12px;">— Internal contest admin (dev1)</span></li><li><a href="https://betfanatics.atlassian.net/jira/apps/94d5de1a-112d-4549-bd03-5f910d5fd27b/880424a7-af14-4c77-b446-5ef9feee797a/structure/board/6464" target="_blank">Structure Board</a> <span style="color: var(--text-muted); font-size: 12px;">— Jira Structure board</span></li>
                 </ul>
             </div>
     

@@ -12,7 +12,7 @@ There is no web framework and no build step — the "frontend" is generated HTML
 
 This project is deliberately separate from the sibling **em-dashboard** repo:
 they must share no data, cron jobs, or build processes. Project Fantasy serves
-on **:8080**, em-dashboard on **:8070**. (Note: `run_jira_collector_agent.sh`
+on **:8001**, em-dashboard on **:8002**. (Note: `run_jira_collector_agent.sh`
 intentionally chains a call into em-dashboard's regen script — that is the one
 sanctioned cross-repo touch, gated on `-x`, because both read the same DB and
 must agree on which collection pass they reflect.)
@@ -29,7 +29,7 @@ python3 scripts/generate_html_report.py   # regenerate every page under reports/
 ./scripts/run_jira_collector_agent.sh     # collector + report regen, with log rotation
 
 # Serve locally (single-user LAN server, no auth by design):
-python3 scripts/serve_dashboard.py --port 8080
+python3 scripts/serve_dashboard.py --port 8001   # note: the script's default is still 8080
 
 # Other collectors / generators:
 python3 scripts/jira_hygiene_agent.py         # hygiene violations

@@ -266,6 +266,7 @@
                 <li class="nav-item"><a href="delivery_excellence_dashboard.html">Delivery</a></li>
                 <li class="nav-item"><a href="pull_requests_dashboard.html">Repositories</a></li>
                 <li class="nav-item"><a href="hygiene_dashboard.html">Ticket Hygiene</a></li>
+                <li class="nav-item"><a href="team.html">Team</a></li>
                 <li class="nav-item"><a href="stakeholders.html">Stakeholders</a></li>
                 <li class="nav-item"><a href="dependencies.html">Dependencies</a></li>
                 <li class="nav-item"><a href="mbr.html">MBR</a></li>
@@ -377,7 +378,14 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'fantasy-dashboard.capacity-planner.v1';
+        const STORAGE_KEY = 'fantasy-dashboard.capacity-planner.v2';
+        const LEGACY_STORAGE_KEY = 'fantasy-dashboard.capacity-planner.v1';
+
+        // Names dropped from the roster. Only applied while migrating a v1
+        // payload forward, so a browser with saved edits stops showing someone
+        // who is no longer planned for — while re-adding the name by hand still
+        // sticks, because this never runs against a v2 payload.
+        const REMOVED_NAMES = new Set(['Michael Goodwin']);
 
         // Fantasy engineering roster, split by role from config/team_config.yaml.
         const DEFAULT_ROWS = [
@@ -385,7 +393,6 @@
             { name: 'Josh Schaefer',   team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
             { name: 'Kevin Paquette',  team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
             { name: 'Liam Butler',     team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
-            { name: 'Michael Goodwin', team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
             { name: 'Nigel Young',     team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
             { name: 'Patrick Kilburn', team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
             { name: 'Ryan Taylor',     team: 'backend',  capacity: 8, primary: false, secondary: false, holidays: 0, pto: 0, spill: 0, planned: 0 },
@@ -418,12 +425,32 @@
         function loadRows() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return migrateLegacyRows();
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed) || parsed.length === 0) {
+                    return migrateLegacyRows();
+                }
+                return parsed.map(normalizeRow);
+            } catch (e) {
+                return DEFAULT_ROWS.map(r => ({ ...r }));
+            }
+        }
+
+        // No v2 payload yet: carry v1's saved edits forward minus anyone since
+        // removed from the roster, so a planner full of hand-entered PTO and
+        // planned numbers survives the key bump.
+        function migrateLegacyRows() {
+            try {
+                const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
                 if (!raw) return DEFAULT_ROWS.map(r => ({ ...r }));
                 const parsed = JSON.parse(raw);
                 if (!Array.isArray(parsed) || parsed.length === 0) {
                     return DEFAULT_ROWS.map(r => ({ ...r }));
                 }
-                return parsed.map(normalizeRow);
+                const kept = parsed
+                    .map(normalizeRow)
+                    .filter(r => !REMOVED_NAMES.has(r.name));
+                return kept.length ? kept : DEFAULT_ROWS.map(r => ({ ...r }));
             } catch (e) {
                 return DEFAULT_ROWS.map(r => ({ ...r }));
             }
